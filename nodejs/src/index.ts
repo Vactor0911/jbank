@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import { errorHandler } from "./middlewares/errorHandler";
 
 // 환경변수 설정
 dotenv.config();
@@ -18,6 +19,9 @@ app.use(
 app.get("/", (_req: Request, res: Response) => {
   res.send("Jbank Express Server!");
 });
+
+// 전역 오류 처리 미들웨어 등록
+app.use(errorHandler);
 
 // 서버 시작
 const PORT = Number(process.env.PORT);
