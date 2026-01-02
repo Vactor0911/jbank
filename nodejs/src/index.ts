@@ -20,6 +20,14 @@ app.get("/", (_req: Request, res: Response) => {
   res.send("Jbank Express Server!");
 });
 
+// 헬스체크 라우트 설정
+app.get("/api/health", (_req: Request, res: Response) => {
+  res.status(200).json({
+    status: "OK",
+    message: "서버가 정상적으로 작동 중입니다.",
+  });
+});
+
 // 전역 오류 처리 미들웨어 등록
 app.use(errorHandler);
 
