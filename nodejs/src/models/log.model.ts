@@ -19,7 +19,7 @@ class LogModel {
   ) {
     const result = await connection.execute(
       `
-        INSERT INTO log (log_uuid, api_key, action, detail)
+        INSERT INTO log (log_uuid, apikey, action, detail)
         VALUES (?, ?, ?, ?)
       `,
       [logUuid, apiKey, action, detail]
