@@ -2,11 +2,15 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { errorHandler } from "./middlewares/errorHandler";
+import { userRouter } from "./routes";
+import bodyParser from "body-parser";
 
 // 환경변수 설정
 dotenv.config();
 
 const app = express();
+app.use(express.json());
+app.use(bodyParser.json());
 
 // CORS 설정
 app.use(
@@ -27,6 +31,9 @@ app.get("/api/health", (_req: Request, res: Response) => {
     message: "서버가 정상적으로 작동 중입니다.",
   });
 });
+
+// 라우트 정의
+app.use("/api/user", userRouter);
 
 // 전역 오류 처리 미들웨어 등록
 app.use(errorHandler);
