@@ -168,7 +168,7 @@ class UserService {
    * @param steamId 스팀 고유번호 (SteamID64)
    */
   static async refreshUserName(steamId: string) {
-    const result = await TransactionHandler.executeInTransaction(
+    const newUserName = await TransactionHandler.executeInTransaction(
       dbPool,
       async (connection) => {
         // 사용자 조회
@@ -178,27 +178,23 @@ class UserService {
         }
 
         // 스팀 고유번호로 사용자명 조회
-        let steamUserName = await this.fetchSteamUserName(steamId);
+        let newUserName = await this.fetchSteamUserName(steamId);
 
         // 사용자명 길이 제한 (최대 20자)
-        if (steamUserName.length > 20) {
-          steamUserName = steamUserName.slice(0, 20);
+        if (newUserName.length > 20) {
+          newUserName = newUserName.slice(0, 20);
         }
 
         // 사용자명 업데이트
-        const result = await UserModel.updateName(
-          user.user_id,
-          steamUserName,
-          connection
-        );
+        await UserModel.updateName(user.user_id, newUserName, connection);
 
-        // 업데이트 결과 반환
-        return result;
+        // 새 사용자 이름 반환
+        return newUserName;
       }
     );
 
     // 결과 반환
-    return result;
+    return newUserName;
   }
 
   /**

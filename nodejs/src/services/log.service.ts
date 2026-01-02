@@ -23,14 +23,19 @@ class LogService {
    * 사용자명 재설정 로그 기록
    * @param apiKey 사용된 API 키
    * @param steamId 스팀 고유번호 (SteamID64)
+   * @param newUserName 새 사용자명
    */
-  static async logUserNameRefresh(apiKey: string, steamId: string) {
+  static async logUserNameRefresh(
+    apiKey: string,
+    steamId: string,
+    newUserName: string
+  ) {
     const logUuid = uuidv4();
     await LogModel.create(
       logUuid,
       apiKey,
       "user",
-      `사용자명 재설정 : ${steamId}`,
+      `사용자명 재설정 : ${steamId} -> ${newUserName}`,
       dbPool
     );
   }

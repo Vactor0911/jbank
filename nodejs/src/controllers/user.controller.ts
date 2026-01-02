@@ -49,11 +49,11 @@ class UserController {
     const { steamId } = req.params;
 
     // 사용자 사용자명 재설정
-    await UserService.refreshUserName(steamId);
+    const newUserName = await UserService.refreshUserName(steamId);
 
     // 로그 기록
     const apiKey = req.headers["x-api-key"] as string;
-    await LogService.logUserNameRefresh(apiKey, steamId);
+    await LogService.logUserNameRefresh(apiKey, steamId, newUserName);
 
     // 응답 반환
     res.status(200).json({
