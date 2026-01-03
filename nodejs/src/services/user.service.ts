@@ -4,46 +4,10 @@ import { dbPool } from "../config/db";
 import UserModel from "../models/user.model";
 import { ConflictError, NotFoundError } from "../errors/CustomErrors";
 import AccountModel from "../models/account.model";
-import { generateAccountNumber } from "../utils/account";
+import { fetchSteamUserName, generateAccountNumber } from "../utils";
 import bcrypt from "bcrypt";
-import axios from "axios";
-import { XMLParser } from "fast-xml-parser";
 
 class UserService {
-  /**
-   * Steam 프로필에서 사용자 이름 추출
-   * @param steamId 스팀 고유번호 (SteamID64)
-   * @returns 스팀 사용자 이름
-   */
-  private static async fetchSteamUserName(steamId: string): Promise<string> {
-    try {
-      const url = `https://steamcommunity.com/profiles/${steamId}?xml=1`;
-      const response = await axios.get(url);
-
-      const xmlText = response.data;
-
-      // XMLParser를 사용하여 XML 파싱
-      const parser = new XMLParser({
-        ignoreAttributes: false,
-        trimValues: true,
-      });
-      const parsed = parser.parse(xmlText);
-
-      // 사용자 이름 추출
-      const steamUserName = parsed?.profile?.steamID;
-      if (!steamUserName) {
-        // 사용자 이름이 없으면 스팀 고유번호 그대로 반환
-        return steamId;
-      }
-
-      // 공백 제거 후 반환
-      return steamUserName.trim();
-    } catch (error) {
-      // 오류 발생 시 스팀 고유번호 그대로 반환
-      return steamId;
-    }
-  }
-
   /**
    * 사용자 생성
    * @param steamId 스팀 고유번호 (SteamID64)
@@ -61,7 +25,7 @@ class UserService {
         }
 
         // 스팀 고유번호로 사용자명 조회
-        let steamUserName = await this.fetchSteamUserName(steamId);
+        let steamUserName = await fetchSteamUserName(steamId);
 
         // 사용자명 길이 제한 (최대 20자)
         if (steamUserName.length > 20) {
@@ -178,7 +142,7 @@ class UserService {
         }
 
         // 스팀 고유번호로 사용자명 조회
-        let newUserName = await this.fetchSteamUserName(steamId);
+        let newUserName = await fetchSteamUserName(steamId);
 
         // 사용자명 길이 제한 (최대 20자)
         if (newUserName.length > 20) {
