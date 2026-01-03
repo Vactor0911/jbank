@@ -112,6 +112,29 @@ class AccountModel {
 
     return result;
   }
+
+  /**
+   * 계좌번호로 계좌 상세 정보 조회
+   * @param accountNumber 계좌번호
+   * @param connection 데이터베이스 연결 객체
+   * @returns 계좌 상세 정보
+   */
+  static async searchByAccountNumber(
+    accountNumber: string,
+    connection: PoolConnection | Pool
+  ) {
+    const [account] = await connection.execute(
+      `
+        SELECT a.*, u.name AS owner_name, u.steam_id AS owner_steam_id
+        FROM account a
+        JOIN user u ON a.user_id = u.user_id
+        WHERE a.account_number = ?
+      `,
+      [accountNumber]
+    );
+
+    return account;
+  }
 }
 
 export default AccountModel;
