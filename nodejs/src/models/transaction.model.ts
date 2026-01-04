@@ -110,7 +110,7 @@ class TransactionModel {
    * @param accountNumber 계좌번호
    * @param connection 데이터베이스 연결 객체
    */
-  static async getTransactionsByAccountNumber(
+  static async findTransactionsByAccountNumber(
     accountNumber: string,
     connection: PoolConnection | Pool
   ) {
@@ -121,7 +121,8 @@ class TransactionModel {
         JOIN account a ON t.sender_account_id = a.account_id OR t.receiver_account_id = a.account_id
         WHERE a.account_number = ?
         ORDER BY t.created_at DESC
-      `
+      `,
+      [accountNumber]
     );
 
     return transactions;

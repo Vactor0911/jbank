@@ -44,29 +44,6 @@ class AccountController {
       });
     }
   );
-
-  /**
-   * 거래 내역 조회
-   */
-  static getAccountTransactions = asyncHandler(
-    async (req: Request, res: Response) => {
-      const { accountNumber } = req.params;
-
-      // 거래 내역 조회
-      const transactions = await AccountService.getAccountTransactions(
-        accountNumber
-      );
-
-      // 응답 반환
-      res.status(200).json({
-        success: true,
-        message: "거래 내역 조회에 성공했습니다.",
-        data: {
-          transactions,
-        },
-      });
-    }
-  );
 }
 
 export default AccountController;
