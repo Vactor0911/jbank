@@ -8,7 +8,7 @@ const transactionRouter = Router();
 
 // 거래 내역 조회
 transactionRouter.get(
-  "/:accountNumber/transactions",
+  "/:accountNumber",
   validateApiKey,
   validateParams(getTransactionsSchema),
   TransactionController.getTransactions
