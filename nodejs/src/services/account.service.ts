@@ -58,7 +58,7 @@ class AccountService {
    */
   private static formatAccount(account: any) {
     return {
-      accountUuid: account.account_uuid,
+      uuid: account.account_uuid,
       ownerName: account.owner_name,
       ownerSteamId: account.owner_steam_id,
       accountNumber: account.account_number,

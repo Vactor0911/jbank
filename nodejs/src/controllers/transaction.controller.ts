@@ -6,12 +6,12 @@ class TransactionController {
   /**
    * 거래 내역 조회
    */
-  static getTransactions = asyncHandler(async (req: Request, res: Response) => {
-    const { accountNumber } = req.params;
+  static findTransaction = asyncHandler(async (req: Request, res: Response) => {
+    const { transactionUuid } = req.params;
 
     // 거래 내역 조회
-    const transactions = await TransactionService.getTransactions(
-      accountNumber
+    const transaction = await TransactionService.findTransaction(
+      transactionUuid
     );
 
     // 응답 반환
@@ -19,7 +19,7 @@ class TransactionController {
       success: true,
       message: "거래 내역 조회에 성공했습니다.",
       data: {
-        transactions,
+        transaction,
       },
     });
   });

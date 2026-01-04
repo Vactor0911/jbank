@@ -1,17 +1,17 @@
 import { Router } from "express";
 import { validateApiKey } from "../middlewares/authenticate";
 import { validateParams } from "../middlewares/validation";
-import { getTransactionsSchema } from "../schema/transaction.schema";
 import TransactionController from "../controllers/transaction.controller";
+import { findTransactionSchema } from "../schema/transaction.schema";
 
 const transactionRouter = Router();
 
 // 거래 내역 조회
 transactionRouter.get(
-  "/:accountNumber",
+  "/:transactionUuid",
   validateApiKey,
-  validateParams(getTransactionsSchema),
-  TransactionController.getTransactions
+  validateParams(findTransactionSchema),
+  TransactionController.findTransaction
 );
 
 export default transactionRouter;
