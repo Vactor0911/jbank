@@ -9,7 +9,7 @@ const App = () => {
     <ThemeProvider theme={theme}>
       <Stack
         width="100vw"
-        height="100vh"
+        height="100dvh"
         direction={{
           xs: "column",
           md: "row-reverse",
