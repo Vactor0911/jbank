@@ -36,7 +36,9 @@ class TransactionModel {
     const [transaction] = await connection.execute(
       `
         SELECT *
-        FROM transaction
+        FROM transaction t
+        JOIN account a ON t.sender_account_id = a.account_id OR t.receiver_account_id = a.account_id
+        JOIN currency c ON t.sender_currency_id = c.currency_id OR t.receiver_currency_id = c.currency_id
         WHERE transaction_uuid = ?
       `,
       [transactionUuid]
@@ -110,7 +112,7 @@ class TransactionModel {
    * @param accountNumber 계좌번호
    * @param connection 데이터베이스 연결 객체
    */
-  static async getTransactionsByAccountNumber(
+  static async findTransactionsByAccountNumber(
     accountNumber: string,
     connection: PoolConnection | Pool
   ) {
@@ -121,21 +123,11 @@ class TransactionModel {
         JOIN account a ON t.sender_account_id = a.account_id OR t.receiver_account_id = a.account_id
         WHERE a.account_number = ?
         ORDER BY t.created_at DESC
-      `
+      `,
+      [accountNumber]
     );
 
     return transactions;
-  }
-
-  /**
-   * 거래 내역 정보 포맷팅
-   * @param transaction 거래 내역 데이터
-   * @returns 포맷팅된 거래 내역 정보
-   */
-  private static formatTransaction(transaction: any) {
-    return {
-      transactionUuid: transaction.transaction_uuid,
-    };
   }
 }
 

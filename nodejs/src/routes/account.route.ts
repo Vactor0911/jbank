@@ -3,8 +3,8 @@ import { validateApiKey } from "../middlewares/authenticate";
 import { validateParams } from "../middlewares/validation";
 import {
   getAccountBalanceSchema,
+  getAccountTransactionsSchema,
   searchAccountSchema,
-  searchAccountTransactionsSchema,
 } from "../schema/account.schema";
 import AccountController from "../controllers/account.controller";
 
@@ -18,11 +18,11 @@ accountRouter.get(
   AccountController.getAccountBalance
 );
 
-// 거래 내역 조회
+// 계좌 거래 내역 조회
 accountRouter.get(
-  "/:accountNumber/transactions",
+  "/:accountNumber",
   validateApiKey,
-  validateParams(searchAccountTransactionsSchema),
+  validateParams(getAccountTransactionsSchema),
   AccountController.getAccountTransactions
 );
 

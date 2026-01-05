@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import AccountService from "../services/account.service";
 import { asyncHandler } from "../utils/asyncHandler";
+import TransactionService from "../services/transaction.service";
 
 class AccountController {
   /**
@@ -53,7 +54,7 @@ class AccountController {
       const { accountNumber } = req.params;
 
       // 거래 내역 조회
-      const transactions = await AccountService.getAccountTransactions(
+      const transactions = await TransactionService.getAccountTransactions(
         accountNumber
       );
 
