@@ -1,21 +1,33 @@
-import { CssBaseline, ThemeProvider } from "@mui/material";
+import { Box, CssBaseline, Stack, ThemeProvider } from "@mui/material";
 import { theme } from "./utils/theme";
 import { BrowserRouter, Route, Routes } from "react-router";
 import { Home } from "./pages";
-import Header from "./components/Header";
+import Navigation from "./components/Navigation";
 
 const App = () => {
   return (
     <ThemeProvider theme={theme}>
-      <CssBaseline />
+      <Stack
+        width="100vw"
+        height="100vh"
+        direction={{
+          xs: "column",
+          md: "row-reverse",
+        }}
+      >
+        <CssBaseline enableColorScheme />
 
-      <Header />
+        <BrowserRouter>
+          <Box flex={1}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+            </Routes>
+          </Box>
 
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />} />
-        </Routes>
-      </BrowserRouter>
+          {/* 네비게이션 바 */}
+          <Navigation />
+        </BrowserRouter>
+      </Stack>
     </ThemeProvider>
   );
 };
