@@ -31,10 +31,6 @@ const Navigation = () => {
             xs: 0,
             md: 2,
           },
-          mb: {
-            xs: 2,
-            md: 0,
-          },
           px: {
             xs: 0,
             md: 1.5,
@@ -57,8 +53,8 @@ const Navigation = () => {
             flex: 0,
             width: "auto",
             minWidth: {
-                xs: "auto",
-                md: "0",
+              xs: "auto",
+              md: "0",
             },
             padding: {
               xs: "0 8px",
