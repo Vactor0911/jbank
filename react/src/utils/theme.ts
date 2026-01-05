@@ -7,7 +7,11 @@ import {
 // 공통 팔레트 값
 const commonPalette = {
   primary: {
-    main: "#1976d2",
+    main: "#4880EE",
+  },
+  text: {
+    primary: "#313C4A",
+    secondary: "#B0B8C1",
   },
 };
 
@@ -27,7 +31,7 @@ const getComponents = (mode: PaletteMode) => ({
   MuiCssBaseline: {
     styleOverrides: {
       body: {
-        backgroundColor: mode === "dark" ? "#1f1f1f" : "#ffffff",
+        backgroundColor: mode === "dark" ? "#18181A" : "#FEFEFE",
         transition: "background-color 0.3s ease, color 0.3s ease",
       },
     },
