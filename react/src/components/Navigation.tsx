@@ -1,16 +1,18 @@
 import { BottomNavigation, BottomNavigationAction, Paper } from "@mui/material";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { useLocation, useNavigate } from "react-router";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import LocalAtmIcon from "@mui/icons-material/LocalAtm";
 import AdsClickRoundedIcon from "@mui/icons-material/AdsClickRounded";
 import DevicesRoundedIcon from "@mui/icons-material/DevicesRounded";
+import { useAtom } from "jotai";
+import { navigationValueAtom } from "../states";
 
 const Navigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [navigationValue, setNavigationValue] = useState(0);
+  const [navigationValue, setNavigationValue] = useAtom(navigationValueAtom);
 
   // 네비게이션 변경 핸들러
   const handleNavigationChange = useCallback(
@@ -22,7 +24,7 @@ const Navigation = () => {
         navigate("/");
       }
     },
-    [location.pathname, navigate]
+    [location.pathname, navigate, setNavigationValue]
   );
 
   return (
