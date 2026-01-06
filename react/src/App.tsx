@@ -17,17 +17,17 @@ const App = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Stack
-        width="100vw"
-        height="100dvh"
-        direction={{
-          xs: "column",
-          md: "row-reverse",
-        }}
-      >
-        <CssBaseline enableColorScheme />
+      <CssBaseline enableColorScheme />
 
-        <BrowserRouter>
+      <BrowserRouter>
+        <Stack
+          width="100vw"
+          height="100dvh"
+          direction={{
+            xs: "column",
+            md: "row-reverse",
+          }}
+        >
           {/* 모바일 헤더 */}
           {isMobile && <Header />}
 
@@ -43,8 +43,8 @@ const App = () => {
 
           {/* 네비게이션 바 */}
           <NavigationBar />
-        </BrowserRouter>
-      </Stack>
+        </Stack>
+      </BrowserRouter>
     </ThemeProvider>
   );
 };
