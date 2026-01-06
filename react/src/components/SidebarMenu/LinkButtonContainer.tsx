@@ -6,7 +6,7 @@ interface LinkButtonGroupProps {
   children?: ReactNode;
 }
 
-const LinkButtonGroup = (props: LinkButtonGroupProps) => {
+const LinkButtonContainer = (props: LinkButtonGroupProps) => {
   const { label, children } = props;
 
   return (
@@ -30,4 +30,4 @@ const LinkButtonGroup = (props: LinkButtonGroupProps) => {
   );
 };
 
-export default LinkButtonGroup;
+export default LinkButtonContainer;

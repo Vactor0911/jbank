@@ -1,39 +1,56 @@
 import { BottomNavigation, BottomNavigationAction, Paper } from "@mui/material";
-import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import { useCallback, useState } from "react";
+import { useLocation, useNavigate } from "react-router";
+import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
+import LocalAtmIcon from "@mui/icons-material/LocalAtm";
+import AdsClickRoundedIcon from "@mui/icons-material/AdsClickRounded";
+import DevicesRoundedIcon from "@mui/icons-material/DevicesRounded";
 
-const NavigationBar = () => {
+const Navigation = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [navigationValue, setNavigationValue] = useState(0);
 
+  // 네비게이션 변경 핸들러
   const handleNavigationChange = useCallback(
     (_event: React.SyntheticEvent, newValue: number) => {
       setNavigationValue(newValue);
+
+      // 홈 화면으로 이동
+      if (location.pathname !== "/") {
+        navigate("/");
+      }
     },
-    []
+    [location.pathname, navigate]
   );
 
   return (
-    <Paper elevation={2}>
+    <Paper
+      elevation={2}
+      sx={{
+        position: "sticky",
+        bottom: 0,
+        left: 0,
+        zIndex: 1000,
+      }}
+    >
       <BottomNavigation
         showLabels
         value={navigationValue}
         onChange={handleNavigationChange}
         sx={{
-          minWidth: {
+          width: {
             xs: "100vw",
-            md: "56px",
+            md: "64px",
           },
           height: {
             xs: "64px",
-            md: "100vh",
+            md: "100dvh",
           },
-          pt: {
+          p: {
             xs: 0,
-            md: 2,
-          },
-          px: {
-            xs: 0,
-            md: 1.5,
+            md: "16px 12px",
           },
           flexDirection: {
             xs: "row",
@@ -61,7 +78,10 @@ const NavigationBar = () => {
               md: "8px",
             },
             fontWeight: "bold",
-            borderRadius: 2,
+            borderRadius: {
+              xs: 2,
+              md: 3,
+            },
           },
           // 버튼 라벨
           "& .MuiBottomNavigationAction-label.Mui-selected": {
@@ -69,21 +89,32 @@ const NavigationBar = () => {
           },
         }}
       >
+        {/* 홈 */}
         <BottomNavigationAction
-          label="Home"
+          label="홈"
           icon={<HomeRoundedIcon fontSize="large" />}
         />
+
+        {/* ATM */}
         <BottomNavigationAction
-          label="Home"
-          icon={<HomeRoundedIcon fontSize="large" />}
+          label="ATM"
+          icon={<LocalAtmIcon fontSize="large" />}
         />
+
+        {/* 광고 */}
         <BottomNavigationAction
-          label="Home"
-          icon={<HomeRoundedIcon fontSize="large" />}
+          label="광고"
+          icon={<AdsClickRoundedIcon fontSize="large" />}
+        />
+
+        {/* 개발자 */}
+        <BottomNavigationAction
+          label="개발자"
+          icon={<DevicesRoundedIcon fontSize="large" />}
         />
       </BottomNavigation>
     </Paper>
   );
 };
 
-export default NavigationBar;
+export default Navigation;
