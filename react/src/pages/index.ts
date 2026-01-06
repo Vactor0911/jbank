@@ -1,3 +1,4 @@
-import Main from "./Main";
+import Home from "./Home";
+import NotFoundError from "./NotFoundError";
 
-export { Main };
+export { Home, NotFoundError };
