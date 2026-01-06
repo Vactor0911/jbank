@@ -1,28 +1,16 @@
 import { Paper, Stack } from "@mui/material";
 import Tasks from "./Tasks";
+import Ads from "./Ads";
 
 const Home = () => {
   return (
     <Stack height="100%" gap={5}>
-      {/* Jbank 소개 섹션 */}
-      <Paper
-        elevation={0}
-        sx={{
-          dispay: "flex",
-          flex: 1,
-          borderRadius: 5,
-          overflow: "hidden",
-        }}
-      >
-      </Paper>
-
-      {/* 2행 */}
-      <Stack direction="row" flex={1} gap={5}>
+      <Stack direction="row" gap={5} flexWrap="wrap">
         {/* 빠른 작업 섹션 */}
         <Paper
           elevation={0}
           sx={{
-            dispay: "flex",
+            minWidth: "400px",
             flex: 1,
             borderRadius: 5,
           }}
@@ -34,12 +22,12 @@ const Home = () => {
         <Paper
           elevation={0}
           sx={{
-            dispay: "flex",
+            minWidth: "400px",
             flex: 1,
             borderRadius: 5,
           }}
         >
-          <Stack width="100%" height="100%"></Stack>
+          <Ads />
         </Paper>
       </Stack>
     </Stack>

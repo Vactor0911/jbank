@@ -72,7 +72,7 @@ const Home = () => {
       {/* 계좌 */}
       <AccountSection />
 
-      {/* Ads (광고) */}
+      {/* 광고 */}
       <AdsSection />
     </>
   );
