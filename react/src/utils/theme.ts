@@ -77,6 +77,11 @@ const getComponents = (mode: PaletteMode) => ({
       },
     },
   },
+  MuiIconButton: {
+    defaultProps: {
+      size: "small" as const,
+    },
+  },
 });
 
 // 라이트 테마 생성
