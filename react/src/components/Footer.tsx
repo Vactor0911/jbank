@@ -31,7 +31,7 @@ const Footer = () => {
 
           {/* 텍스트 */}
           <Typography variant="body1" fontWeight="bold">
-            개발자 커피 사주기
+            개발자에게 커피 사주기
           </Typography>
         </Stack>
       </ButtonBase>
