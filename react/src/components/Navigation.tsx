@@ -2,8 +2,9 @@ import { BottomNavigation, BottomNavigationAction, Paper } from "@mui/material";
 import { useCallback, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
-import LocalAtmIcon from '@mui/icons-material/LocalAtm';
-import AdsClickRoundedIcon from '@mui/icons-material/AdsClickRounded';
+import LocalAtmIcon from "@mui/icons-material/LocalAtm";
+import AdsClickRoundedIcon from "@mui/icons-material/AdsClickRounded";
+import DevicesRoundedIcon from "@mui/icons-material/DevicesRounded";
 
 const Navigation = () => {
   const navigate = useNavigate();
@@ -88,17 +89,28 @@ const Navigation = () => {
           },
         }}
       >
+        {/* 홈 */}
         <BottomNavigationAction
           label="홈"
           icon={<HomeRoundedIcon fontSize="large" />}
         />
+
+        {/* ATM */}
         <BottomNavigationAction
           label="ATM"
           icon={<LocalAtmIcon fontSize="large" />}
         />
+
+        {/* 광고 */}
         <BottomNavigationAction
           label="광고"
           icon={<AdsClickRoundedIcon fontSize="large" />}
+        />
+
+        {/* 개발자 */}
+        <BottomNavigationAction
+          label="개발자"
+          icon={<DevicesRoundedIcon fontSize="large" />}
         />
       </BottomNavigation>
     </Paper>
