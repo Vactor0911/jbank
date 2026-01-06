@@ -8,11 +8,22 @@ import {
 } from "@mui/material";
 import NavigateNextOutlinedIcon from "@mui/icons-material/NavigateNextOutlined";
 import SampleProfileImage from "../../assets/sample-user-profile.png";
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
+import LinkButtonContainer from "./LinkButtonContainer";
+import AccountLinkButtonContainer from "./AccountLinkButtonContainer";
+import { useCallback } from "react";
+import AdsContainer from "./AdsContainer";
+import Footer from "../Footer";
 
 const MobileMenu = () => {
   const theme = useTheme();
+  const navigate = useNavigate();
   const location = useLocation();
+
+  // 프로필 정보 클릭 핸들러
+  const handleProfileClick = useCallback(() => {
+    navigate("/profile");
+  }, [navigate]);
 
   // 모바일 화면에서만 표시
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -22,7 +33,7 @@ const MobileMenu = () => {
 
   return (
     <Stack width="100%" flex={1} px={2} pb={3} gap={3}>
-      {/* 로그인 정보 */}
+      {/* 프로필 정보 */}
       <ButtonBase
         sx={{
           width: "100%",
@@ -30,6 +41,7 @@ const MobileMenu = () => {
           p: "2px 4px",
           borderRadius: 2,
         }}
+        onClick={handleProfileClick}
       >
         <Stack direction="row" width="100%" gap={2} alignItems="center">
           {/* 프로필 이미지 */}
@@ -37,8 +49,8 @@ const MobileMenu = () => {
             src={SampleProfileImage}
             variant="rounded"
             sx={{
-              width: "32px",
-              height: "32px",
+              width: "40px",
+              height: "40px",
             }}
           />
 
@@ -69,6 +81,19 @@ const MobileMenu = () => {
           <NavigateNextOutlinedIcon />
         </Stack>
       </ButtonBase>
+
+      {/* 링크 버튼 컨테이너 */}
+      {/* 송금하기 */}
+      <LinkButtonContainer label="송금하기" linkTo="/transfer" />
+
+      {/* 계좌 */}
+      <AccountLinkButtonContainer />
+
+      {/* Ads (광고) */}
+      <AdsContainer />
+
+      {/* 푸터 */}
+      <Footer />
     </Stack>
   );
 };

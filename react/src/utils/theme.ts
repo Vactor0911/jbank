@@ -14,7 +14,7 @@ const palette = {
   },
   text: {
     primary: "#424E5E",
-    secondary: "#B0B8C1",
+    secondary: "#677383",
   },
 };
 
@@ -74,12 +74,27 @@ const getComponents = (mode: PaletteMode) => ({
       root: {
         backgroundImage: "none",
         transition: "background-color 0.3s ease",
+        borderRadius: 2,
+      },
+    },
+    defaultProps: {
+      sx: {
+        borderRadius: 2,
       },
     },
   },
   MuiIconButton: {
     defaultProps: {
       size: "small" as const,
+    },
+  },
+  MuiAvatar: {
+    defaultProps: {
+      slotProps: {
+        img: {
+          draggable: false,
+        },
+      },
     },
   },
 });
