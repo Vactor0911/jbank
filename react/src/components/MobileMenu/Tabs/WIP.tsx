@@ -1,5 +1,4 @@
-import { Box, Typography, useTheme } from "@mui/material";
-import ConstructionRoundedIcon from "@mui/icons-material/ConstructionRounded";
+import { Avatar, Box, Typography, useTheme } from "@mui/material";
 import TrafficCone from "../../../assets/traffic-cone.svg";
 
 const WIP = () => {
@@ -9,33 +8,36 @@ const WIP = () => {
     <>
       {/* 로고 */}
       <Box width="160px" height="160px" position="relative" mx="auto" my={5}>
-        <Box
-          width="100%"
-          height="100%"
-          bgcolor={theme.palette.text.secondary}
-        />
+        <Avatar
+          variant="rounded"
+          sx={{
+            width: "100%",
+            height: "100%",
+            bgcolor: theme.palette.primary.main,
+            fontWeight: "bold",
+            fontSize: "6em",
+            borderRadius: 5,
+          }}
+        >
+          J
+        </Avatar>
 
         {/* 공사 아이콘 */}
-        <ConstructionRoundedIcon
-          sx={{
-            position: "absolute",
-            top: "0",
-            right: "0",
-            transform: "rotate(15deg)",
-            fontSize: "80px",
-            color: theme.palette.text.primary,
-          }}
+        <Box
+          component="img"
+          src={TrafficCone}
+          width="55%"
+          position="absolute"
+          bottom="-14%"
+          right="-10%"
         />
         <Box
           component="img"
           src={TrafficCone}
-          width="96px"
+          width="55%"
           position="absolute"
-          bottom={0}
-          left={0}
-          sx={{
-            transform: "translate(-40%, 25%)",
-          }}
+          bottom="-20%"
+          left="-20%"
         />
       </Box>
 
