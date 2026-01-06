@@ -30,7 +30,14 @@ const SidebarMenu = () => {
   }
 
   return (
-    <Stack width="250px" px={2} py={3} gap={3}>
+    <Stack
+      width="250px"
+      px={2}
+      py={3}
+      gap={3}
+      position="relative"
+      zIndex={1000}
+    >
       {/* 로고 */}
       <Box
         onClick={() => {

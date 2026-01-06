@@ -1,0 +1,76 @@
+import {
+  Avatar,
+  ButtonBase,
+  Stack,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
+import NavigateNextOutlinedIcon from "@mui/icons-material/NavigateNextOutlined";
+import SampleProfileImage from "../../assets/sample-user-profile.png";
+import { useLocation } from "react-router";
+
+const MobileMenu = () => {
+  const theme = useTheme();
+  const location = useLocation();
+
+  // 모바일 화면에서만 표시
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  if (!isMobile || location.pathname !== "/") {
+    return null;
+  }
+
+  return (
+    <Stack width="100%" flex={1} px={2} pb={3} gap={3}>
+      {/* 로그인 정보 */}
+      <ButtonBase
+        sx={{
+          width: "100%",
+          textAlign: "left",
+          p: "2px 4px",
+          borderRadius: 2,
+        }}
+      >
+        <Stack direction="row" width="100%" gap={2} alignItems="center">
+          {/* 프로필 이미지 */}
+          <Avatar
+            src={SampleProfileImage}
+            variant="rounded"
+            sx={{
+              width: "32px",
+              height: "32px",
+            }}
+          />
+
+          {/* 사용자 정보 */}
+          <Stack flex={1} overflow="hidden">
+            {/* Jbank 사용자 닉네임 */}
+            <Typography
+              variant="body1"
+              fontWeight={500}
+              noWrap
+              textOverflow="ellipsis"
+            >
+              백터
+            </Typography>
+
+            {/* Steam 닉네임 */}
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              noWrap
+              textOverflow="ellipsis"
+            >
+              백터 (Vactor0911)
+            </Typography>
+          </Stack>
+
+          {/* 아이콘 */}
+          <NavigateNextOutlinedIcon />
+        </Stack>
+      </ButtonBase>
+    </Stack>
+  );
+};
+
+export default MobileMenu;

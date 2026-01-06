@@ -21,7 +21,7 @@ const PageWrapper = (props: PageWrapperProps) => {
   }
 
   return (
-    <Box flex={1}>
+    <Box flex={1} height="100dvh" overflow="auto">
       {/* PC 헤더 */}
       {!isMobile && <Header />}
 

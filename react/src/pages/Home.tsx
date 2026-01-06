@@ -1,10 +1,14 @@
-import { Typography } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import PageWrapper from "../components/PageWrapper";
 
 const Home = () => {
   return (
     <PageWrapper>
-      <Typography variant="h4">Welcome to JBank</Typography>
+      <Stack>
+        <Typography variant="h4">Welcome to JBank</Typography>
+
+        <Box height="2000px" />
+      </Stack>
     </PageWrapper>
   );
 };
