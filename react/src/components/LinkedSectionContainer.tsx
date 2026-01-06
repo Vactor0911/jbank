@@ -4,13 +4,13 @@ import NavigateNextOutlinedIcon from "@mui/icons-material/NavigateNextOutlined";
 import { useNavigate } from "react-router";
 import SectionContainer from "./SectionContainer";
 
-interface LinkButtonContainerProps {
+interface LinkedSectionContainerProps {
   label: ReactNode;
   children?: ReactNode;
   linkTo?: string;
 }
 
-const LinkButtonContainer = (props: LinkButtonContainerProps) => {
+const LinkedSectionContainer = (props: LinkedSectionContainerProps) => {
   const { label, children, linkTo } = props;
 
   const navigate = useNavigate();
@@ -53,4 +53,4 @@ const LinkButtonContainer = (props: LinkButtonContainerProps) => {
   );
 };
 
-export default LinkButtonContainer;
+export default LinkedSectionContainer;

@@ -6,11 +6,11 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import SectionContainer from "./SectionContainer";
+import SectionContainer from "../SectionContainer";
 import HelpOutlineRoundedIcon from "@mui/icons-material/HelpOutlineRounded";
 import { useState } from "react";
 
-const AdsContainer = () => {
+const AdsSection = () => {
   const theme = useTheme();
 
   const [tooltipOpen, setTooltipOpen] = useState(false);
@@ -61,4 +61,4 @@ const AdsContainer = () => {
   );
 };
 
-export default AdsContainer;
+export default AdsSection;

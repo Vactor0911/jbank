@@ -1,9 +1,9 @@
 import { Avatar, ButtonBase, Stack, Typography } from "@mui/material";
 import NavigateNextOutlinedIcon from "@mui/icons-material/NavigateNextOutlined";
 import SampleProfileImage from "../../../assets/sample-user-profile.png";
-import LinkButtonContainer from "../LinkButtonContainer";
-import AccountLinkButtonContainer from "../AccountLinkButtonContainer";
-import AdsContainer from "../AdsContainer";
+import LinkedSectionContainer from "../../LinkedSectionContainer";
+import AccountSection from "../../sections/AccountSection";
+import AdsSection from "../../sections/AdsSection";
 import { useNavigate } from "react-router";
 import { useCallback } from "react";
 
@@ -67,13 +67,13 @@ const Home = () => {
       </ButtonBase>
 
       {/* 송금하기 */}
-      <LinkButtonContainer label="송금하기" linkTo="/transfer" />
+      <LinkedSectionContainer label="송금하기" linkTo="/transfer" />
 
       {/* 계좌 */}
-      <AccountLinkButtonContainer />
+      <AccountSection />
 
       {/* Ads (광고) */}
-      <AdsContainer />
+      <AdsSection />
     </>
   );
 };

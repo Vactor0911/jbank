@@ -7,16 +7,16 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import LinkButtonContainer from "./LinkButtonContainer";
+import LinkedSectionContainer from "../LinkedSectionContainer";
 import { useState } from "react";
 
-const AccountLinkButtonContainer = () => {
+const AccountSection = () => {
   const theme = useTheme();
 
   const [credits] = useState("1,234,567,123,123,132");
 
   return (
-    <LinkButtonContainer
+    <LinkedSectionContainer
       label={
         <Stack
           direction="row"
@@ -29,7 +29,7 @@ const AccountLinkButtonContainer = () => {
           <Typography variant="h6">계좌</Typography>
 
           {/* 계좌 수 */}
-          <Chip variant="filled" label={2} size="small" />
+          <Chip variant="filled" label={1} size="small" />
 
           {/* 크레딧 정보 */}
           <Stack
@@ -144,8 +144,8 @@ const AccountLinkButtonContainer = () => {
           </Button>
         </Stack>
       </ButtonBase>
-    </LinkButtonContainer>
+    </LinkedSectionContainer>
   );
 };
 
-export default AccountLinkButtonContainer;
+export default AccountSection;

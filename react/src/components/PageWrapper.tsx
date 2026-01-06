@@ -1,4 +1,4 @@
-import { Box, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Container, useMediaQuery, useTheme } from "@mui/material";
 import { useCallback, useRef, type ReactNode } from "react";
 import { useLocation } from "react-router";
 import Header from "./Header";
@@ -43,7 +43,15 @@ const PageWrapper = (props: PageWrapperProps) => {
       {!isMobile && <Header />}
 
       {/* 페이지 내용 */}
-      {children}
+      <Container
+        maxWidth="xl"
+        sx={{
+          height: "calc(100% - 64px)",
+          pb: "64px",
+        }}
+      >
+        {children}
+      </Container>
     </Box>
   );
 };
