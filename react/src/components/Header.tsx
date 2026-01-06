@@ -26,6 +26,7 @@ const Header = () => {
         top={0}
         right={0}
         bgcolor="#F6F7F9"
+        zIndex={1000}
       >
         {/* 언어 변경 버튼 */}
         <IconButton>
