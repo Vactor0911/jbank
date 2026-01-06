@@ -1,16 +1,25 @@
 import { BottomNavigation, BottomNavigationAction, Paper } from "@mui/material";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import { useCallback, useState } from "react";
+import { useLocation, useNavigate } from "react-router";
 
 const Navigation = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [navigationValue, setNavigationValue] = useState(0);
 
   // 네비게이션 변경 핸들러
   const handleNavigationChange = useCallback(
     (_event: React.SyntheticEvent, newValue: number) => {
       setNavigationValue(newValue);
+
+      // 홈 화면으로 이동
+      if (location.pathname !== "/") {
+        navigate("/");
+      }
     },
-    []
+    [location.pathname, navigate]
   );
 
   return (
