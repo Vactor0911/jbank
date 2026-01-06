@@ -6,7 +6,7 @@ import {
 } from "@mui/material";
 import { theme } from "./utils/theme";
 import { BrowserRouter, Route, Routes } from "react-router";
-import { Home } from "./pages";
+import { Main } from "./pages";
 import NavigationBar from "./components/Navigation";
 import SidebarMenu from "./components/SidebarMenu";
 import MobileMenu from "./components/MobileMenu";
@@ -17,22 +17,22 @@ const App = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Stack
-        width="100vw"
-        height="100dvh"
-        direction={{
-          xs: "column",
-          md: "row-reverse",
-        }}
-      >
-        <CssBaseline enableColorScheme />
+      <CssBaseline enableColorScheme />
 
-        <BrowserRouter>
+      <BrowserRouter>
+        <Stack
+          width="100vw"
+          height="100dvh"
+          direction={{
+            xs: "column",
+            md: "row-reverse",
+          }}
+        >
           {/* 모바일 헤더 */}
           {isMobile && <Header />}
 
           <Routes>
-            <Route path="*" element={<Home />} />
+            <Route path="*" element={<Main />} />
           </Routes>
 
           {/* 모바일용 메뉴 */}
@@ -43,8 +43,8 @@ const App = () => {
 
           {/* 네비게이션 바 */}
           <NavigationBar />
-        </BrowserRouter>
-      </Stack>
+        </Stack>
+      </BrowserRouter>
     </ThemeProvider>
   );
 };

@@ -10,19 +10,18 @@ import {
 } from "@mui/material";
 import NavigateNextOutlinedIcon from "@mui/icons-material/NavigateNextOutlined";
 import SampleProfileImage from "../../assets/sample-user-profile.png";
-import LinkButtonContainer from "./LinkButtonContainer";
-import LinkButton from "./LinkButton";
-import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
-import BuildRoundedIcon from "@mui/icons-material/BuildRounded";
-import NotificationsRoundedIcon from "@mui/icons-material/NotificationsRounded";
-import { green, orange } from "@mui/material/colors";
 import { useNavigate } from "react-router";
 import Footer from "../Footer";
 import { useCallback } from "react";
+import { Home } from "./Tabs";
+import { useAtomValue } from "jotai";
+import { navigationValueAtom } from "../../states";
 
 const SidebarMenu = () => {
   const theme = useTheme();
   const navigate = useNavigate();
+
+  const navigationValue = useAtomValue(navigationValueAtom);
 
   // 프로필 정보 클릭 핸들러
   const handleProfileClick = useCallback(() => {
@@ -144,38 +143,8 @@ const SidebarMenu = () => {
         </ButtonBase>
       </Stack>
 
-      {/* 링크 버튼 */}
-      <LinkButtonContainer label="개발">
-        <LinkButton
-          title="홈"
-          icon={<HomeRoundedIcon color="primary" />}
-          linkTo="/home"
-        />
-        <LinkButton
-          title="도움말"
-          icon={
-            <BuildRoundedIcon fontSize="small" sx={{ color: orange[500] }} />
-          }
-          linkTo="/help"
-        />
-        <LinkButton
-          title="공지사항"
-          icon={
-            <NotificationsRoundedIcon
-              sx={{
-                color: green[400],
-              }}
-            />
-          }
-          linkTo="/notice"
-        />
-      </LinkButtonContainer>
-
-      <LinkButtonContainer label="개발">
-        <LinkButton title="홈" />
-        <LinkButton title="도움말" />
-        <LinkButton title="공지사항" />
-      </LinkButtonContainer>
+      {/* 링크 버튼 탭 */}
+      {navigationValue === 0 && <Home />}
 
       {/* 푸터 */}
       <Footer />
