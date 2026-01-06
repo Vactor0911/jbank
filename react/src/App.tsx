@@ -6,7 +6,7 @@ import {
 } from "@mui/material";
 import { theme } from "./utils/theme";
 import { BrowserRouter, Route, Routes } from "react-router";
-import { Home } from "./pages";
+import { Main } from "./pages";
 import NavigationBar from "./components/Navigation";
 import SidebarMenu from "./components/SidebarMenu";
 import MobileMenu from "./components/MobileMenu";
@@ -32,7 +32,7 @@ const App = () => {
           {isMobile && <Header />}
 
           <Routes>
-            <Route path="*" element={<Home />} />
+            <Route path="*" element={<Main />} />
           </Routes>
 
           {/* 모바일용 메뉴 */}
