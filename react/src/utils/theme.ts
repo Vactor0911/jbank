@@ -13,7 +13,7 @@ const palette = {
     main: "#F1F2F5",
   },
   text: {
-    primary: "#313C4A",
+    primary: "#424E5E",
     secondary: "#B0B8C1",
   },
 };
