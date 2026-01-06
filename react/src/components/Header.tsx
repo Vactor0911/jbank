@@ -3,10 +3,15 @@ import NotificationsNoneRoundedIcon from "@mui/icons-material/NotificationsNoneR
 import LightModeRoundedIcon from "@mui/icons-material/LightModeRounded";
 import DarkModeRoundedIcon from "@mui/icons-material/DarkModeRounded";
 import LanguageRoundedIcon from "@mui/icons-material/LanguageRounded";
+import { useAtomValue } from "jotai";
+import { isScrollOnTopAtom } from "../states";
 
 const Header = () => {
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === "dark";
+
+  // 스크롤이 최상단에 있는지 여부
+  const isScrollOnTop = useAtomValue(isScrollOnTopAtom);
 
   return (
     <Stack
@@ -22,6 +27,11 @@ const Header = () => {
       right={0}
       bgcolor="#F6F7F9"
       zIndex={1000}
+      borderBottom={`1px solid ${theme.palette.divider}`}
+      borderColor={isScrollOnTop ? "transparent" : theme.palette.divider}
+      sx={{
+        transition: "border-color 0.15s ease",
+      }}
     >
       {/* 언어 변경 버튼 */}
       <IconButton>

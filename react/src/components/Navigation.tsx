@@ -31,9 +31,7 @@ const Navigation = () => {
     <Paper
       elevation={2}
       sx={{
-        position: "sticky",
-        bottom: 0,
-        left: 0,
+        position: "relative",
         zIndex: 1000,
       }}
     >

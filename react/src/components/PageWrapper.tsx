@@ -1,7 +1,9 @@
 import { Box, useMediaQuery, useTheme } from "@mui/material";
-import type { ReactNode } from "react";
+import { useCallback, useRef, type ReactNode } from "react";
 import { useLocation } from "react-router";
 import Header from "./Header";
+import { useSetAtom } from "jotai";
+import { isScrollOnTopAtom } from "../states";
 
 interface PageWrapperProps {
   children: ReactNode;
@@ -13,6 +15,15 @@ const PageWrapper = (props: PageWrapperProps) => {
   const theme = useTheme();
   const location = useLocation();
 
+  const rootRef = useRef<HTMLDivElement>(null);
+  const setIsScrollOnTop = useSetAtom(isScrollOnTopAtom);
+
+  // 스크롤 이벤트 핸들러
+  const handleScroll = useCallback(() => {
+    const isScrollOnTop = rootRef.current?.scrollTop === 0;
+    setIsScrollOnTop(isScrollOnTop);
+  }, [setIsScrollOnTop]);
+
   // 모바일 환경의 홈 화면에서는 표시하지 않음
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const pathName = location.pathname;
@@ -21,7 +32,13 @@ const PageWrapper = (props: PageWrapperProps) => {
   }
 
   return (
-    <Box flex={1} height="100dvh" overflow="auto">
+    <Box
+      ref={rootRef}
+      flex={1}
+      height="100dvh"
+      overflow="auto"
+      onScroll={handleScroll}
+    >
       {/* PC 헤더 */}
       {!isMobile && <Header />}
 
