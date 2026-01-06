@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import NavigateNextOutlinedIcon from "@mui/icons-material/NavigateNextOutlined";
 import SampleProfileImage from "../../assets/sample-user-profile.png";
-import LinkButtonGroup from "./LinkButtonGroup";
+import LinkButtonContainer from "./LinkButtonContainer";
 import LinkButton from "./LinkButton";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import BuildRoundedIcon from "@mui/icons-material/BuildRounded";
@@ -18,10 +18,16 @@ import NotificationsRoundedIcon from "@mui/icons-material/NotificationsRounded";
 import { green, orange } from "@mui/material/colors";
 import { useNavigate } from "react-router";
 import Footer from "../Footer";
+import { useCallback } from "react";
 
 const SidebarMenu = () => {
   const theme = useTheme();
   const navigate = useNavigate();
+
+  // 프로필 정보 클릭 핸들러
+  const handleProfileClick = useCallback(() => {
+    navigate("/profile");
+  }, [navigate]);
 
   // 모바일 화면에서는 사이드바 메뉴를 표시하지 않음
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -52,7 +58,7 @@ const SidebarMenu = () => {
         </Typography>
       </Box>
 
-      {/* 로그인 정보 */}
+      {/* 프로필 정보 */}
       <ButtonBase
         sx={{
           width: "100%",
@@ -60,6 +66,7 @@ const SidebarMenu = () => {
           p: "2px 4px",
           borderRadius: 2,
         }}
+        onClick={handleProfileClick}
       >
         <Stack direction="row" width="100%" gap={2} alignItems="center">
           {/* 프로필 이미지 */}
@@ -67,8 +74,8 @@ const SidebarMenu = () => {
             src={SampleProfileImage}
             variant="rounded"
             sx={{
-              width: "32px",
-              height: "32px",
+              width: "40px",
+              height: "40px",
             }}
           />
 
@@ -100,7 +107,7 @@ const SidebarMenu = () => {
         </Stack>
       </ButtonBase>
 
-      {/* 버튼 컨테이너 */}
+      {/* 링크 버튼 컨테이너 */}
       <Stack
         direction="row"
         divider={<Divider flexItem />}
@@ -138,7 +145,7 @@ const SidebarMenu = () => {
       </Stack>
 
       {/* 링크 버튼 */}
-      <LinkButtonGroup label="개발">
+      <LinkButtonContainer label="개발">
         <LinkButton
           title="홈"
           icon={<HomeRoundedIcon color="primary" />}
@@ -162,13 +169,13 @@ const SidebarMenu = () => {
           }
           linkTo="/notice"
         />
-      </LinkButtonGroup>
+      </LinkButtonContainer>
 
-      <LinkButtonGroup label="개발">
+      <LinkButtonContainer label="개발">
         <LinkButton title="홈" />
         <LinkButton title="도움말" />
         <LinkButton title="공지사항" />
-      </LinkButtonGroup>
+      </LinkButtonContainer>
 
       {/* 푸터 */}
       <Footer />
