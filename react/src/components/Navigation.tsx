@@ -61,10 +61,7 @@ const NavigationBar = () => {
               md: "8px",
             },
             fontWeight: "bold",
-            borderRadius: {
-              xs: 2,
-              md: 3,
-            },
+            borderRadius: 2,
           },
           // 버튼 라벨
           "& .MuiBottomNavigationAction-label.Mui-selected": {
