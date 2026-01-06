@@ -5,6 +5,7 @@ import {
   Divider,
   Stack,
   Typography,
+  useMediaQuery,
   useTheme,
 } from "@mui/material";
 import NavigateNextOutlinedIcon from "@mui/icons-material/NavigateNextOutlined";
@@ -21,6 +22,12 @@ import Footer from "../Footer";
 const SidebarMenu = () => {
   const theme = useTheme();
   const navigate = useNavigate();
+
+  // 모바일 화면에서는 사이드바 메뉴를 표시하지 않음
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  if (isMobile) {
+    return null;
+  }
 
   return (
     <Stack width="250px" px={2} py={3} gap={3}>
