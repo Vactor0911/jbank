@@ -2,7 +2,7 @@ import { BottomNavigation, BottomNavigationAction, Paper } from "@mui/material";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import { useCallback, useState } from "react";
 
-const Navigation = () => {
+const NavigationBar = () => {
   const [navigationValue, setNavigationValue] = useState(0);
 
   const handleNavigationChange = useCallback(
@@ -89,4 +89,4 @@ const Navigation = () => {
   );
 };
 
-export default Navigation;
+export default NavigationBar;
