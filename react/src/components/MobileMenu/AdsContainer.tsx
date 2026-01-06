@@ -29,10 +29,17 @@ const AdsContainer = () => {
               open={tooltipOpen}
               onClose={() => setTooltipOpen(false)}
               onClick={() => setTooltipOpen(true)}
-              placement="right"
-              leaveDelay={3000}
-              title="광고 관련 정보입니다."
+              title="사용자가 직접 등록한 광고가 표시되는 배너입니다."
+              leaveTouchDelay={3000}
+              placement="right-start"
               disableFocusListener
+              slotProps={{
+                tooltip: {
+                  sx: {
+                    maxWidth: "200px",
+                  }
+                }
+              }}
             >
               <HelpOutlineRoundedIcon
                 sx={{
