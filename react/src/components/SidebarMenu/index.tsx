@@ -16,6 +16,7 @@ import BuildRoundedIcon from "@mui/icons-material/BuildRounded";
 import NotificationsRoundedIcon from "@mui/icons-material/NotificationsRounded";
 import { green, orange } from "@mui/material/colors";
 import { useNavigate } from "react-router";
+import Footer from "../Footer";
 
 const SidebarMenu = () => {
   const theme = useTheme();
@@ -36,7 +37,6 @@ const SidebarMenu = () => {
           Jbank
         </Typography>
       </Box>
-
       {/* 로그인 정보 */}
       <ButtonBase
         sx={{
@@ -84,7 +84,6 @@ const SidebarMenu = () => {
           <NavigateNextOutlinedIcon />
         </Stack>
       </ButtonBase>
-
       {/* 버튼 컨테이너 */}
       <Stack
         direction="row"
@@ -121,7 +120,6 @@ const SidebarMenu = () => {
           </Typography>
         </ButtonBase>
       </Stack>
-
       {/* 링크 버튼 */}
       <LinkButtonGroup label="개발">
         <LinkButton
@@ -148,12 +146,14 @@ const SidebarMenu = () => {
           linkTo="/notice"
         />
       </LinkButtonGroup>
-
       <LinkButtonGroup label="개발">
         <LinkButton title="홈" />
         <LinkButton title="도움말" />
         <LinkButton title="공지사항" />
       </LinkButtonGroup>
+
+      {/* 푸터 */}
+      <Footer />
     </Stack>
   );
 };
