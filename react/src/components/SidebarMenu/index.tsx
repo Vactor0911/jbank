@@ -15,23 +15,24 @@ import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import BuildRoundedIcon from "@mui/icons-material/BuildRounded";
 import NotificationsRoundedIcon from "@mui/icons-material/NotificationsRounded";
 import { green, orange } from "@mui/material/colors";
+import { useNavigate } from "react-router";
 
 const SidebarMenu = () => {
   const theme = useTheme();
+  const navigate = useNavigate();
 
   return (
     <Stack width="250px" px={2} py={3} gap={3}>
       {/* 로고 */}
-      <Box>
-        <Typography
-          variant="h5"
-          component="a"
-          href="/"
-          color="primary"
-          sx={{
-            textDecoration: "none",
-          }}
-        >
+      <Box
+        onClick={() => {
+          navigate("/");
+        }}
+        sx={{
+          cursor: "pointer",
+        }}
+      >
+        <Typography variant="h5" color="primary">
           Jbank
         </Typography>
       </Box>
@@ -123,12 +124,17 @@ const SidebarMenu = () => {
 
       {/* 링크 버튼 */}
       <LinkButtonGroup label="개발">
-        <LinkButton title="홈" icon={<HomeRoundedIcon color="primary" />} />
+        <LinkButton
+          title="홈"
+          icon={<HomeRoundedIcon color="primary" />}
+          linkTo="/home"
+        />
         <LinkButton
           title="도움말"
           icon={
             <BuildRoundedIcon fontSize="small" sx={{ color: orange[500] }} />
           }
+          linkTo="/help"
         />
         <LinkButton
           title="공지사항"
@@ -139,6 +145,7 @@ const SidebarMenu = () => {
               }}
             />
           }
+          linkTo="/notice"
         />
       </LinkButtonGroup>
 
