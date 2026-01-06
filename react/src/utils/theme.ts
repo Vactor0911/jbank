@@ -5,12 +5,15 @@ import {
 } from "@mui/material";
 
 // 공통 팔레트 값
-const commonPalette = {
+const palette = {
   primary: {
     main: "#4880EE",
   },
+  secondary: {
+    main: "#F1F2F5",
+  },
   text: {
-    primary: "#313C4A",
+    primary: "#424E5E",
     secondary: "#B0B8C1",
   },
 };
@@ -26,12 +29,17 @@ const typography = {
   h6: { fontWeight: 700 },
 };
 
+// 공통 모양
+const shape = {
+  borderRadius: 4,
+};
+
 // 공통 컴포넌트 스타일
 const getComponents = (mode: PaletteMode) => ({
   MuiCssBaseline: {
     styleOverrides: {
       body: {
-        backgroundColor: mode === "dark" ? "#18181A" : "#FEFEFE",
+        backgroundColor: mode === "dark" ? "#18181A" : "#F6F7F9",
         transition: "background-color 0.3s ease, color 0.3s ease",
       },
     },
@@ -77,9 +85,10 @@ export const createLightTheme = () =>
     createTheme({
       palette: {
         mode: "light",
-        ...commonPalette,
+        ...palette,
       },
       typography,
+      shape,
       components: getComponents("light"),
     })
   );
@@ -90,9 +99,10 @@ export const createDarkTheme = () =>
     createTheme({
       palette: {
         mode: "dark",
-        ...commonPalette,
+        ...palette,
       },
       typography,
+      shape,
       components: getComponents("dark"),
     })
   );

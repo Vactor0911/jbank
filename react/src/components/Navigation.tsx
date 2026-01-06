@@ -2,7 +2,7 @@ import { BottomNavigation, BottomNavigationAction, Paper } from "@mui/material";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import { useCallback, useState } from "react";
 
-const Navigation = () => {
+const NavigationBar = () => {
   const [navigationValue, setNavigationValue] = useState(0);
 
   const handleNavigationChange = useCallback(
@@ -61,10 +61,7 @@ const Navigation = () => {
               md: "8px",
             },
             fontWeight: "bold",
-            borderRadius: {
-              xs: 2,
-              md: 3,
-            },
+            borderRadius: 2,
           },
           // 버튼 라벨
           "& .MuiBottomNavigationAction-label.Mui-selected": {
@@ -89,4 +86,4 @@ const Navigation = () => {
   );
 };
 
-export default Navigation;
+export default NavigationBar;
