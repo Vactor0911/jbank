@@ -5,12 +5,7 @@ const WIP = () => {
   const theme = useTheme();
 
   return (
-    <Stack
-      height="calc(100% - 64px)"
-      justifyContent="center"
-      alignItems="center"
-      gap={4}
-    >
+    <Stack height="100%" justifyContent="center" alignItems="center" gap={4}>
       {/* 로고 */}
       <Box width="250px" height="250px" position="relative" mx="auto" my={5}>
         <Avatar
