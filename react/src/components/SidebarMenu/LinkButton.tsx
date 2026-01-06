@@ -1,13 +1,23 @@
 import { ButtonBase, Stack, Typography } from "@mui/material";
-import type { ReactNode } from "react";
+import { useCallback, type ReactNode } from "react";
+import { useLocation, useNavigate } from "react-router";
 
 interface LinkButtonProps {
   icon?: ReactNode;
   title: string;
+  linkTo?: string;
 }
 
 const LinkButton = (props: LinkButtonProps) => {
-  const { icon, title } = props;
+  const { icon, title, linkTo } = props;
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // 클릭 핸들러
+  const handleClick = useCallback(() => {
+    navigate(linkTo || "#");
+  }, [linkTo, navigate]);
 
   return (
     <ButtonBase
@@ -15,14 +25,23 @@ const LinkButton = (props: LinkButtonProps) => {
         p: "8px 12px",
         textAlign: "left",
         borderRadius: 2,
+        bgcolor: location.pathname === linkTo ? "action.selected" : "inherit",
+        transition: "background-color 0.3s",
       }}
+      onClick={handleClick}
     >
       <Stack width="100%" direction="row" alignItems="center" gap={1}>
         {/* 아이콘 */}
         {icon}
 
         {/* 제목 */}
-        <Typography flex={1} fontWeight={500}>
+        <Typography
+          flex={1}
+          fontWeight={location.pathname === linkTo ? "bold" : 500}
+          sx={{
+            transition: "font-weight 0.3s",
+          }}
+        >
           {title}
         </Typography>
       </Stack>
