@@ -1,0 +1,198 @@
+import {
+  Box,
+  Button,
+  ButtonBase,
+  IconButton,
+  InputAdornment,
+  Slide,
+  Stack,
+  Typography,
+} from "@mui/material";
+import JbankIcon from "../../assets/sample-user-profile.png";
+import { useCallback, useState } from "react";
+import ResponsiveTextField from "../../components/ResponsiveTextField";
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
+import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
+import { useNavigate } from "react-router";
+import { useSetAtom } from "jotai";
+import { transferDataAtom } from "../../states/transfer";
+
+const AccountNumberForm = () => {
+  const navigate = useNavigate();
+
+  const [accountNumber, setAccountNumber] = useState("");
+  const setTransferData = useSetAtom(transferDataAtom);
+
+  // 계좌번호 입력 핸들러
+  const handleAccountNumberChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      // 9자리 제한
+      if (event.target.value.length > 9) {
+        // 포커스 해제
+        event.target.blur();
+        return;
+      }
+
+      // 숫자만 허용
+      const rawValue = event.target.value.replace(/-/g, "");
+      if (!/^\d*$/.test(rawValue)) {
+        return;
+      }
+
+      // 4번째 자리마다 하이픈 추가
+      let formattedValue = event.target.value.replace(/-/g, "");
+      if (formattedValue.length > 4) {
+        formattedValue =
+          formattedValue.slice(0, 4) + "-" + formattedValue.slice(4, 9);
+      }
+
+      setAccountNumber(formattedValue);
+
+      // 9자리 입력 시 포커스 해제
+      if (formattedValue.length >= 9) {
+        event.target.blur();
+      }
+    },
+    []
+  );
+
+  // 다음 버튼 클릭 핸들러
+  const handleNextClick = useCallback(() => {
+    const newTransferData = {
+      accountNumber: accountNumber,
+    };
+    setTransferData(newTransferData);
+  }, [accountNumber, setTransferData]);
+
+  return (
+    <Stack gap={5} flex={1}>
+      {/* 헤더 */}
+      <Stack direction="row" alignItems="center">
+        {/* 뒤로가기 버튼 */}
+        <IconButton
+          sx={{
+            display: {
+              xs: "inline-flex",
+              md: "none",
+            },
+            p: 0,
+
+            transform: "translateX(-10px)",
+          }}
+          onClick={() => navigate("/")}
+        >
+          <ArrowBackRoundedIcon fontSize="large" />
+        </IconButton>
+
+        {/* 라벨 */}
+        <Typography variant="h6">어디로 크레딧을 보낼까요?</Typography>
+      </Stack>
+
+      {/* 계좌번호 입력란 */}
+      <ResponsiveTextField
+        label="계좌번호 입력"
+        value={accountNumber}
+        onChange={handleAccountNumberChange}
+        endAdornment={
+          accountNumber && (
+            <InputAdornment position="end">
+              <IconButton onClick={() => setAccountNumber("")}>
+                <CloseRoundedIcon />
+              </IconButton>
+            </InputAdornment>
+          )
+        }
+        slotProps={{
+          input: {
+            type: "text",
+            inputMode: "numeric",
+            pattern: "[0-9-]*",
+            sx: {
+              fontSize: "2em",
+            },
+          },
+        }}
+      />
+
+      {/* 내 계좌 */}
+      <Stack gap={1}>
+        {/* 헤더 */}
+        <Typography variant="body1" fontWeight={500}>
+          내 계좌
+        </Typography>
+
+        {/* 계좌 목록 */}
+        <ButtonBase
+          sx={{
+            textAlign: "left",
+            borderRadius: 2,
+            overflow: "hidden",
+            p: 1,
+          }}
+        >
+          <Stack width="100%" direction="row" alignItems="center" gap={2}>
+            {/* 은행 아이콘 */}
+            <Box
+              component="img"
+              src={JbankIcon}
+              width="40px"
+              borderRadius="50%"
+              sx={{
+                aspectRatio: "1 / 1",
+              }}
+            />
+
+            {/* 계좌 정보 */}
+            <Stack flex={1}>
+              {/* 계좌명 */}
+              <Typography variant="body1" fontWeight="bold">
+                Jbank 계좌
+              </Typography>
+
+              {/* 계좌번호 */}
+              <Typography
+                variant="body2"
+                fontWeight={500}
+                color="text.secondary"
+              >
+                Jbank 1234-5678
+              </Typography>
+            </Stack>
+          </Stack>
+        </ButtonBase>
+      </Stack>
+
+      {/* 다음 버튼 */}
+      <Box
+        overflow="hidden"
+        width="100%"
+        position={{
+          xs: "fixed",
+          md: "static",
+        }}
+        bottom="64px"
+        left={0}
+      >
+        <Slide in={accountNumber.length === 9} direction="up">
+          <Button
+            variant="contained"
+            disableElevation
+            fullWidth
+            sx={{
+              p: 1.5,
+              borderRadius: {
+                xs: 0,
+                md: 2,
+              },
+            }}
+            onClick={handleNextClick}
+          >
+            <Typography variant="h5">다음</Typography>
+          </Button>
+        </Slide>
+      </Box>
+    </Stack>
+  );
+};
+
+export default AccountNumberForm;
