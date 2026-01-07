@@ -12,7 +12,7 @@ const Footer = () => {
   const theme = useTheme();
 
   return (
-    <Stack mt="auto" gap={3}>
+    <Stack gap={3} mt={3}>
       {/* Buy me a coffee 버튼 */}
       <ButtonBase
         sx={{

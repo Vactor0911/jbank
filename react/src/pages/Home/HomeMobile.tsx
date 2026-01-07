@@ -1,13 +1,13 @@
 import { Avatar, ButtonBase, Stack, Typography } from "@mui/material";
 import NavigateNextOutlinedIcon from "@mui/icons-material/NavigateNextOutlined";
-import SampleProfileImage from "../../../assets/sample-user-profile.png";
-import LinkedSectionContainer from "../../LinkedSectionContainer";
-import AccountSection from "../../sections/AccountSection";
-import AdsSection from "../../sections/AdsSection";
+import SampleProfileImage from "../../assets/sample-user-profile.png";
 import { useNavigate } from "react-router";
 import { useCallback } from "react";
+import AdsSection from "../../components/sections/AdsSection";
+import AccountSection from "../../components/sections/AccountSection";
+import LinkedSectionContainer from "../../components/LinkedSectionContainer";
 
-const Home = () => {
+const HomeMobile = () => {
   const navigate = useNavigate();
 
   // 프로필 정보 클릭 핸들러
@@ -16,7 +16,7 @@ const Home = () => {
   }, [navigate]);
 
   return (
-    <>
+    <Stack width="100%" gap={3}>
       {/* 프로필 정보 */}
       <ButtonBase
         sx={{
@@ -74,8 +74,8 @@ const Home = () => {
 
       {/* 광고 */}
       <AdsSection />
-    </>
+    </Stack>
   );
 };
 
-export default Home;
+export default HomeMobile;

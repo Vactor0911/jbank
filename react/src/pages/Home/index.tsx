@@ -1,18 +1,21 @@
-import PageWrapper from "../../components/PageWrapper";
 import { useAtomValue } from "jotai";
 import { navigationValueAtom } from "../../states";
-import Home from "./Home";
-import WIP from "./WIP";
+import HomePc from "./HomePc";
+import WIP from "../WIP";
+import { useIsMobile } from "../../hooks";
+import HomeMobile from "./HomeMobile";
 
 const Main = () => {
   const navigationValue = useAtomValue(navigationValueAtom);
+  const isMobile = useIsMobile();
 
-  return (
-    <PageWrapper>
-      {navigationValue === 0 && <Home />}
-      {navigationValue !== 0 && <WIP />}
-    </PageWrapper>
-  );
+  if (navigationValue === 0) {
+    if (isMobile) {
+      return <HomeMobile />;
+    }
+    return <HomePc />;
+  }
+  return <WIP />;
 };
 
 export default Main;

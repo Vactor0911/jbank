@@ -1,13 +1,24 @@
-import { Avatar, Box, Typography, useTheme } from "@mui/material";
-import TrafficCone from "../../../assets/traffic-cone.svg";
+import { Avatar, Box, Stack, Typography, useTheme } from "@mui/material";
+import TrafficCone from "../assets/traffic-cone.svg";
 
 const WIP = () => {
   const theme = useTheme();
 
   return (
-    <>
+    <Stack justifyContent="center" alignItems="center" flex={1} gap={4}>
       {/* 로고 */}
-      <Box width="160px" height="160px" position="relative" mx="auto" my={5}>
+      <Box
+        width={{
+          xs: "150px",
+          md: "250px",
+        }}
+        position="relative"
+        mx="auto"
+        my={5}
+        sx={{
+          aspectRatio: "1 / 1",
+        }}
+      >
         <Avatar
           variant="rounded"
           sx={{
@@ -15,7 +26,10 @@ const WIP = () => {
             height: "100%",
             bgcolor: theme.palette.primary.main,
             fontWeight: "bold",
-            fontSize: "6em",
+            fontSize: {
+              xs: "7em",
+              md: "10em",
+            },
             borderRadius: 5,
           }}
         >
@@ -41,15 +55,21 @@ const WIP = () => {
         />
       </Box>
 
-      <Typography variant="h4" textAlign="center">
+      <Typography variant="h3" textAlign="center">
         열심히 개발하는중!
       </Typography>
-      <Typography variant="body1" color="text.secondary" textAlign="center">
+
+      <Typography
+        variant="h6"
+        color="text.secondary"
+        textAlign="center"
+        fontWeight={500}
+      >
         곧 멋진 기능으로 찾아올게요.
         <br />
         조금만 기다려주세요!
       </Typography>
-    </>
+    </Stack>
   );
 };
 
