@@ -147,7 +147,9 @@ const SidebarMenu = () => {
       {navigationValue === 0 && <Home />}
 
       {/* 푸터 */}
-      <Footer />
+      <Box mt="auto">
+        <Footer />
+      </Box>
     </Stack>
   );
 };
