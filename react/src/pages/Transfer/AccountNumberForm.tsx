@@ -56,12 +56,11 @@ const AccountNumberForm = () => {
     []
   );
 
-  // 다음 버튼 클릭 핸들러
-  const handleNextClick = useCallback(() => {
-    const newTransferData = {
+  // 다음 단계로 이동 핸들러
+  const handleNext = useCallback(() => {
+    setTransferData({
       accountNumber: accountNumber,
-    };
-    setTransferData(newTransferData);
+    });
   }, [accountNumber, setTransferData]);
 
   return (
@@ -184,7 +183,7 @@ const AccountNumberForm = () => {
                 md: 2,
               },
             }}
-            onClick={handleNextClick}
+            onClick={handleNext}
           >
             <Typography variant="h5">다음</Typography>
           </Button>
