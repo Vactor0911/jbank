@@ -5,6 +5,8 @@ import AmountForm from "./AmountForm";
 import { useEffect } from "react";
 import { scrollContainerRefAtom } from "../../states";
 import VerifyInputForm from "./VerifyInputForm";
+import PasswordForm from "./PasswordForm";
+import Loading from "./Loading";
 
 const TransferSteps = () => {
   const transferData = useAtomValue(transferDataAtom);
@@ -28,6 +30,10 @@ const TransferSteps = () => {
   if (!transferData.inputVerified) {
     return <VerifyInputForm />;
   }
+  if (!transferData.password) {
+    return <PasswordForm />;
+  }
+  return <Loading />;
 };
 
 export default TransferSteps;
