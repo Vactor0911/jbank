@@ -35,7 +35,7 @@ const Notice = () => {
           />
         }
       >
-        {Array.from({ length: 30 }).map((_, index) => (
+        {Array.from({ length: 10 }).map((_, index) => (
           <ButtonBase
             key={`notice=-${index}`}
             sx={{
