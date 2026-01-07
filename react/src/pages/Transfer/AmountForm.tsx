@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  Collapse,
   IconButton,
   Slide,
   Stack,
@@ -12,7 +11,7 @@ import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import { useAtom } from "jotai";
 import { transferDataAtom } from "../../states/transfer";
 import ResponsiveTextField from "../../components/ResponsiveTextField";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { formatNumberKor } from "../../utils";
 
 const AmountForm = () => {
@@ -20,6 +19,7 @@ const AmountForm = () => {
 
   const [transferData, setTransferData] = useAtom(transferDataAtom);
   const [amount, setAmount] = useState("");
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   // 송금액 추출
   const getRawAmount = useCallback((amountStr: string) => {
@@ -73,6 +73,16 @@ const AmountForm = () => {
       amount: Number(getRawAmount(amount)),
     }));
   }, [setTransferData, getRawAmount, amount]);
+
+  // Slide가 나타날 때 스크롤
+  useEffect(() => {
+    if (isAmountValid() && buttonRef.current) {
+      buttonRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+      });
+    }
+  }, [isAmountValid]);
 
   return (
     <Stack gap={3} flex={1}>
@@ -210,6 +220,7 @@ const AmountForm = () => {
       >
         <Slide in={isAmountValid()} direction="up">
           <Button
+            ref={buttonRef}
             variant="contained"
             disableElevation
             fullWidth

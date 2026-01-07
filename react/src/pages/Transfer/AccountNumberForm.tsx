@@ -9,7 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 import JbankIcon from "../../assets/sample-user-profile.png";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import ResponsiveTextField from "../../components/ResponsiveTextField";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
@@ -22,6 +22,7 @@ const AccountNumberForm = () => {
 
   const [accountNumber, setAccountNumber] = useState("");
   const setTransferData = useSetAtom(transferDataAtom);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   // 계좌번호 입력 핸들러
   const handleAccountNumberChange = useCallback(
@@ -62,6 +63,18 @@ const AccountNumberForm = () => {
       accountNumber: accountNumber,
     });
   }, [accountNumber, setTransferData]);
+
+  // Slide가 나타날 때 스크롤
+  useEffect(() => {
+    if (accountNumber.length === 9 && buttonRef.current) {
+      setTimeout(() => {
+        buttonRef.current?.parentElement?.scrollIntoView({
+          behavior: "smooth",
+          block: "end",
+        });
+      }, 0);
+    }
+  }, [accountNumber]);
 
   return (
     <Stack gap={5} flex={1}>
@@ -116,48 +129,61 @@ const AccountNumberForm = () => {
       <Stack gap={1}>
         {/* 헤더 */}
         <Typography variant="body1" fontWeight={500}>
-          내 계좌
+          최근 보낸 계좌
         </Typography>
 
         {/* 계좌 목록 */}
-        <ButtonBase
-          sx={{
-            textAlign: "left",
-            borderRadius: 2,
-            overflow: "hidden",
-            p: 1,
+        <Box
+          maxHeight={{
+            xs: "auto",
+            md: "240px",
           }}
+          overflow="auto"
         >
-          <Stack width="100%" direction="row" alignItems="center" gap={2}>
-            {/* 은행 아이콘 */}
-            <Box
-              component="img"
-              src={JbankIcon}
-              width="40px"
-              borderRadius="50%"
-              sx={{
-                aspectRatio: "1 / 1",
-              }}
-            />
-
-            {/* 계좌 정보 */}
-            <Stack flex={1}>
-              {/* 계좌명 */}
-              <Typography variant="body1" fontWeight="bold">
-                Jbank 계좌
-              </Typography>
-
-              {/* 계좌번호 */}
-              <Typography
-                variant="body2"
-                fontWeight={500}
-                color="text.secondary"
+          <Stack>
+            {Array.from({ length: 10 }).map((_, index) => (
+              <ButtonBase
+                key={`recent-send-account-${index}`}
+                sx={{
+                  textAlign: "left",
+                  borderRadius: 2,
+                  overflow: "hidden",
+                  p: 1,
+                }}
               >
-                Jbank 1234-5678
-              </Typography>
-            </Stack>
+                <Stack width="100%" direction="row" alignItems="center" gap={2}>
+                  {/* 은행 아이콘 */}
+                  <Box
+                    component="img"
+                    src={JbankIcon}
+                    width="40px"
+                    borderRadius="50%"
+                    sx={{
+                      aspectRatio: "1 / 1",
+                    }}
+                  />
+
+                  {/* 계좌 정보 */}
+                  <Stack flex={1}>
+                    {/* 계좌명 */}
+                    <Typography variant="body1" fontWeight="bold">
+                      Jbank 계좌
+                    </Typography>
+
+                    {/* 계좌번호 */}
+                    <Typography
+                      variant="body2"
+                      fontWeight={500}
+                      color="text.secondary"
+                    >
+                      Jbank 1234-5678
+                    </Typography>
+                  </Stack>
+                </Stack>
+              </ButtonBase>
+            ))}
           </Stack>
-        </ButtonBase>
+        </Box>
       </Stack>
 
       {/* 다음 버튼 */}
@@ -173,6 +199,7 @@ const AccountNumberForm = () => {
       >
         <Slide in={accountNumber.length === 9} direction="up">
           <Button
+            ref={buttonRef}
             variant="contained"
             disableElevation
             fullWidth
