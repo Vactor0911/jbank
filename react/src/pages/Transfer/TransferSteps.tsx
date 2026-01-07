@@ -4,6 +4,7 @@ import { transferDataAtom } from "../../states/transfer";
 import AmountForm from "./AmountForm";
 import { useEffect } from "react";
 import { scrollContainerRefAtom } from "../../states";
+import VerifyInputForm from "./VerifyInputForm";
 
 const TransferSteps = () => {
   const transferData = useAtomValue(transferDataAtom);
@@ -30,7 +31,7 @@ const TransferSteps = () => {
     return <AmountForm />;
   }
   if (!transferData.password) {
-    return <div>송금 확인</div>;
+    return <VerifyInputForm />;
   }
 };
 

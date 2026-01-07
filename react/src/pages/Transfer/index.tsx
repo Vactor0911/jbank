@@ -39,14 +39,17 @@ const Transfer = () => {
       return 1;
     }
 
-    // 거래 비밀번호 미입력
-    if (!transferData.password) {
+    // 입력 정보 미확인
+    if (!transferData.inputVerified) {
       return 2;
     }
 
-    // 모든 입력 완료
     return 3;
-  }, [transferData.accountNumber, transferData.amount, transferData.password]);
+  }, [
+    transferData.accountNumber,
+    transferData.amount,
+    transferData.inputVerified,
+  ]);
 
   // 모바일인 경우 전체 화면으로 표시
   if (isMobile) {
@@ -66,13 +69,15 @@ const Transfer = () => {
           xs: 0,
           md: "450px",
         },
+        display: "flex",
+        flex: 1,
         mt: {
           xs: 2,
           md: 0,
         },
       }}
     >
-      <Stack gap={3}>
+      <Stack gap={3} flex={1}>
         {/* PC용 단계 표시 */}
         <Stepper
           activeStep={getCurrentStep()}
@@ -95,6 +100,8 @@ const Transfer = () => {
         <Paper
           variant="outlined"
           sx={{
+            display: "flex",
+            flex: 1,
             p: 2,
             borderRadius: 2,
             bgcolor: theme.palette.secondary.main,

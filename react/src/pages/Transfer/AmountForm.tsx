@@ -85,7 +85,7 @@ const AmountForm = () => {
   }, [isAmountValid]);
 
   return (
-    <Stack gap={3} flex={1}>
+    <Stack gap={3} flex={1} position="relative">
       {/* 뒤로가기 버튼 */}
       <IconButton
         sx={{
@@ -215,8 +215,9 @@ const AmountForm = () => {
           xs: "fixed",
           md: "static",
         }}
-        bottom="64px"
+        bottom={0}
         left={0}
+        mt="auto"
       >
         <Slide in={isAmountValid()} direction="up">
           <Button

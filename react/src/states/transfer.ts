@@ -4,6 +4,7 @@ import { atom } from "jotai";
 export type TransferData = {
   accountNumber?: string;
   amount?: number;
+  inputVerified?: boolean;
   password?: string;
 };
 

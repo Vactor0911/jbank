@@ -194,8 +194,9 @@ const AccountNumberForm = () => {
           xs: "fixed",
           md: "static",
         }}
-        bottom="64px"
+        bottom={0}
         left={0}
+        mt="auto"
       >
         <Slide in={accountNumber.length === 9} direction="up">
           <Button
