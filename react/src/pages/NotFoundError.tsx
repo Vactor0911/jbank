@@ -16,9 +16,25 @@ const NotFoundError = () => {
 
   return (
     <PageWrapper>
-      <Stack height="100%" justifyContent="center" alignItems="center" gap={4}>
+      <Stack
+        minHeight="100%"
+        justifyContent="center"
+        alignItems="center"
+        gap={4}
+      >
         {/* 로고 */}
-        <Box width="200px" height="200px" position="relative" mx="auto" my={5}>
+        <Box
+          width={{
+            xs: "150px",
+            md: "200px",
+          }}
+          position="relative"
+          mx="auto"
+          my={5}
+          sx={{
+            aspectRatio: "1 / 1",
+          }}
+        >
           <Avatar
             variant="rounded"
             sx={{
@@ -66,7 +82,17 @@ const NotFoundError = () => {
         </Typography>
 
         {/*버튼 컨테이너 */}
-        <Stack direction="row" alignItems="center" gap={5}>
+        <Stack
+          direction={{
+            xs: "column",
+            md: "row",
+          }}
+          alignItems="center"
+          gap={{
+            xs: 3,
+            md: 5,
+          }}
+        >
           {/* 오류 신고 버튼 */}
           <Button
             variant="contained"
