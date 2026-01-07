@@ -76,7 +76,6 @@ const AccountNumberForm = () => {
               md: "none",
             },
             p: 0,
-
             transform: "translateX(-10px)",
           }}
           onClick={() => navigate("/")}
