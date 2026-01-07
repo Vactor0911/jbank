@@ -1,4 +1,4 @@
-import { Box, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Container, useMediaQuery, useTheme } from "@mui/material";
 import { useCallback, useRef, type ReactNode } from "react";
 import { useLocation } from "react-router";
 import Header from "./Header";
@@ -35,15 +35,24 @@ const PageWrapper = (props: PageWrapperProps) => {
     <Box
       ref={rootRef}
       flex={1}
-      height="100dvh"
-      overflow="auto"
+      width="100%"
+      height="calc(100dvh)"
       onScroll={handleScroll}
     >
       {/* PC 헤더 */}
       {!isMobile && <Header />}
 
       {/* 페이지 내용 */}
-      {children}
+      <Container
+        maxWidth="xl"
+        sx={{
+          height: "calc(100% - 64px)",
+          overflow: "auto",
+          pb: "64px",
+        }}
+      >
+        {children}
+      </Container>
     </Box>
   );
 };
