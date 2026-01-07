@@ -3,9 +3,9 @@ import NavigateNextOutlinedIcon from "@mui/icons-material/NavigateNextOutlined";
 import SampleProfileImage from "../../assets/sample-user-profile.png";
 import { useNavigate } from "react-router";
 import { useCallback } from "react";
-import AdsSection from "../../components/sections/AdsSection";
-import AccountSection from "../../components/sections/AccountSection";
 import LinkedSectionContainer from "../../components/LinkedSectionContainer";
+import AccountSection from "./AccountSection";
+import AdsSection from "./AdsSection";
 
 const HomeMobile = () => {
   const navigate = useNavigate();
