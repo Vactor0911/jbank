@@ -38,9 +38,12 @@ const AdsSection = () => {
 
         {/* 광고 콘텐츠 */}
         <Box
-          height={"250px"}
+          width="100%"
           bgcolor={theme.palette.secondary.main}
           borderRadius={2}
+          sx={{
+            aspectRatio: "16 / 9",
+          }}
         />
       </Stack>
     </SectionContainer>

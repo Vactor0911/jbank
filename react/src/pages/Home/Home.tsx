@@ -4,7 +4,7 @@ import Ads from "./Ads";
 
 const Home = () => {
   return (
-    <Stack height="100%" gap={5}>
+    <Stack gap={5}>
       <Stack direction="row" gap={5} flexWrap="wrap">
         {/* 빠른 작업 섹션 */}
         <Paper

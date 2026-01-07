@@ -35,8 +35,8 @@ const PageWrapper = (props: PageWrapperProps) => {
     <Box
       ref={rootRef}
       flex={1}
-      height="100dvh"
-      overflow="auto"
+      width="100%"
+      height="calc(100dvh)"
       onScroll={handleScroll}
     >
       {/* PC 헤더 */}
@@ -47,6 +47,7 @@ const PageWrapper = (props: PageWrapperProps) => {
         maxWidth="xl"
         sx={{
           height: "calc(100% - 64px)",
+          overflow: "auto",
           pb: "64px",
         }}
       >
