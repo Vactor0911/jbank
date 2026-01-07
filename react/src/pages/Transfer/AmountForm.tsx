@@ -78,13 +78,13 @@ const AmountForm = () => {
 
   // Slide가 나타날 때 스크롤
   useEffect(() => {
-    if (isAmountValid() && buttonRef.current) {
+    if (amount.length === 1 && buttonRef.current) {
       buttonRef.current.scrollIntoView({
         behavior: "smooth",
         block: "end",
       });
     }
-  }, [isAmountValid]);
+  }, [amount.length, isAmountValid]);
 
   return (
     <Stack gap={3} flex={1} position="relative">
