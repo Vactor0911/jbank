@@ -143,7 +143,7 @@ const PasswordForm = () => {
             {Array.from({ length: 4 }).map((_, index) => (
               <Box
                 key={`password-indicator-${index}`}
-                width={password.length > index ? "1.5em" : "1.25em"}
+                width="1.25em"
                 borderRadius="50%"
                 bgcolor={
                   password.length > index
@@ -152,6 +152,8 @@ const PasswordForm = () => {
                 }
                 sx={{
                   aspectRatio: "1 / 1",
+                  transform:
+                    password.length > index ? "scale(1.2)" : "scale(1)",
                   transition: "all 0.2s ease",
                 }}
               />
