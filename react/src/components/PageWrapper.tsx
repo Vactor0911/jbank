@@ -1,9 +1,10 @@
 import { Box, Container } from "@mui/material";
-import { useCallback, useRef, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, type ReactNode } from "react";
 import { useSetAtom } from "jotai";
 import { isScrollOnTopAtom } from "../states";
 import { useIsMobile } from "../hooks";
 import Footer from "./Footer";
+import { useLocation } from "react-router";
 
 interface PageWrapperProps {
   children: ReactNode;
@@ -12,9 +13,19 @@ interface PageWrapperProps {
 const PageWrapper = (props: PageWrapperProps) => {
   const { children } = props;
 
+  const location = useLocation();
+
   const rootRef = useRef<HTMLDivElement>(null);
   const setIsScrollOnTop = useSetAtom(isScrollOnTopAtom);
   const isMobile = useIsMobile();
+
+  // 페이지 전환 시 스크롤 위치 초기화
+  useEffect(() => {
+    if (rootRef.current) {
+      rootRef.current.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+      setIsScrollOnTop(true);
+    }
+  }, [location.pathname, setIsScrollOnTop]);
 
   // 스크롤 이벤트 핸들러
   const handleScroll = useCallback(() => {
