@@ -160,6 +160,11 @@ const AmountForm = () => {
         <ResponsiveTextField
           value={amount}
           onChange={handleAmountChange}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && isAmountValid()) {
+              handleNext();
+            }
+          }}
           slotProps={{
             input: {
               type: "text",

@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   ButtonBase,
+  Collapse,
   IconButton,
   InputAdornment,
   Slide,
@@ -16,6 +17,7 @@ import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import { useNavigate } from "react-router";
 import { useSetAtom } from "jotai";
 import { transferDataAtom } from "../../states/transfer";
+import { isAccountNumberValid } from "../../utils";
 
 const AccountNumberForm = () => {
   const navigate = useNavigate();
@@ -59,6 +61,11 @@ const AccountNumberForm = () => {
 
   // 다음 단계로 이동 핸들러
   const handleNext = useCallback(() => {
+    // 계좌번호 유효성 검증
+    if (!isAccountNumberValid(accountNumber)) {
+      return;
+    }
+
     setTransferData((prev) => ({
       ...prev,
       toAccountNumber: accountNumber,
@@ -105,6 +112,11 @@ const AccountNumberForm = () => {
         label="계좌번호 입력"
         value={accountNumber}
         onChange={handleAccountNumberChange}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && accountNumber.length === 9) {
+            handleNext();
+          }
+        }}
         endAdornment={
           accountNumber && (
             <InputAdornment position="end">
@@ -125,66 +137,74 @@ const AccountNumberForm = () => {
         }}
       />
 
-      {/* 내 계좌 */}
-      <Stack gap={1}>
-        {/* 헤더 */}
-        <Typography variant="body1" fontWeight={500}>
-          최근 보낸 계좌
-        </Typography>
+      {/* 최근 보낸 계좌 */}
+      <Collapse in={accountNumber.length === 0}>
+        <Stack gap={1}>
+          {/* 헤더 */}
+          <Typography variant="body1" fontWeight={500}>
+            최근 보낸 계좌
+          </Typography>
 
-        {/* 계좌 목록 */}
-        <Box
-          maxHeight={{
-            xs: "auto",
-            md: "240px",
-          }}
-          overflow="auto"
-        >
-          <Stack>
-            {Array.from({ length: 10 }).map((_, index) => (
-              <ButtonBase
-                key={`recent-send-account-${index}`}
-                sx={{
-                  textAlign: "left",
-                  borderRadius: 2,
-                  overflow: "hidden",
-                  p: 1,
-                }}
-              >
-                <Stack width="100%" direction="row" alignItems="center" gap={2}>
-                  {/* 은행 아이콘 */}
-                  <Box
-                    component="img"
-                    src={JbankIcon}
-                    width="40px"
-                    borderRadius="50%"
-                    sx={{
-                      aspectRatio: "1 / 1",
-                    }}
-                  />
+          {/* 계좌 목록 */}
+          <Box
+            maxHeight={{
+              xs: "auto",
+              md: "240px",
+            }}
+            overflow="auto"
+          >
+            <Stack>
+              {Array.from({ length: 10 }).map((_, index) => (
+                <ButtonBase
+                  key={`recent-send-account-${index}`}
+                  disabled={accountNumber.length > 0}
+                  sx={{
+                    textAlign: "left",
+                    borderRadius: 2,
+                    overflow: "hidden",
+                    p: 1,
+                  }}
+                >
+                  <Stack
+                    width="100%"
+                    direction="row"
+                    alignItems="center"
+                    gap={2}
+                  >
+                    {/* 은행 아이콘 */}
+                    <Box
+                      component="img"
+                      src={JbankIcon}
+                      width="40px"
+                      borderRadius="50%"
+                      sx={{
+                        aspectRatio: "1 / 1",
+                      }}
+                    />
 
-                  {/* 계좌 정보 */}
-                  <Stack flex={1}>
-                    {/* 계좌명 */}
-                    <Typography variant="body1" fontWeight="bold">
-                      Jbank 계좌
-                    </Typography>
+                    {/* 계좌 정보 */}
+                    <Stack flex={1}>
+                      {/* 계좌명 */}
+                      <Typography variant="body1" fontWeight="bold">
+                        Jbank 계좌
+                      </Typography>
 
-                    {/* 계좌번호 */}
-                    <Typography
-                      variant="body2"
-                      fontWeight={500}
-                      color="text.secondary"
-                    >
-                      Jbank 1234-5678
-                    </Typography>
+                      {/* 계좌번호 */}
+                      <Typography
+                        variant="body2"
+                        fontWeight={500}
+                        color="text.secondary"
+                      >
+                        Jbank 1234-5678
+                      </Typography>
+                    </Stack>
                   </Stack>
-                </Stack>
-              </ButtonBase>
-            ))}
-          </Stack>
-        </Box>
-      </Stack>
+                </ButtonBase>
+              ))}
+            </Stack>
+          </Box>
+        </Stack>
+      </Collapse>
 
       {/* 다음 버튼 */}
       <Box
