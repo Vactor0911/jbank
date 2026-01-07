@@ -7,7 +7,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import LinkedSectionContainer from "../LinkedSectionContainer";
+import LinkedSectionContainer from "../../components/LinkedSectionContainer";
 import { useState } from "react";
 
 const AccountSection = () => {

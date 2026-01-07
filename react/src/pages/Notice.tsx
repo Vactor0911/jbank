@@ -1,7 +1,9 @@
+import { Stack } from "@mui/material";
+
 const Notice = () => {
-  return (
-    <></>
-  );
+  return <Stack>
+    
+  </Stack>;
 };
 
 export default Notice;
