@@ -14,7 +14,7 @@ import { transferDataAtom } from "../../states/transfer";
 import { useCallback, useEffect } from "react";
 
 // 단계 이름
-const STEPS = ["계좌번호 입력", "송금 금액 입력", "거래 비밀번호 입력"];
+const STEPS = ["계좌번호 입력", "송금 금액 입력", "입력 정보 확인"];
 
 const Transfer = () => {
   const theme = useTheme();
@@ -64,7 +64,7 @@ const Transfer = () => {
         },
         minWidth: {
           xs: 0,
-          md: "400px",
+          md: "450px",
         },
         mt: {
           xs: 2,

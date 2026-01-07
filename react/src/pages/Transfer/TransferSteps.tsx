@@ -13,7 +13,7 @@ const TransferSteps = () => {
     return <AmountForm />;
   }
   if (!transferData.password) {
-    return <div>거래 비밀번호 입력 폼</div>;
+    return <div>송금 확인</div>;
   }
 };
 
