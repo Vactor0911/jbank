@@ -1,10 +1,13 @@
 import { Box, Container } from "@mui/material";
 import { useCallback, useEffect, useRef, type ReactNode } from "react";
 import { useSetAtom } from "jotai";
-import { isScrollOnTopAtom } from "../states";
+import { isScrollOnTopAtom, scrollContainerRefAtom } from "../states";
 import { useIsMobile } from "../hooks";
 import Footer from "./Footer";
 import { useLocation } from "react-router";
+
+// 푸터를 숨길 경로 목록
+const HIDE_FOOTER_PATHS = ["/transfer"];
 
 interface PageWrapperProps {
   children: ReactNode;
@@ -18,6 +21,12 @@ const PageWrapper = (props: PageWrapperProps) => {
   const rootRef = useRef<HTMLDivElement>(null);
   const setIsScrollOnTop = useSetAtom(isScrollOnTopAtom);
   const isMobile = useIsMobile();
+  const setScrollContainerRef = useSetAtom(scrollContainerRefAtom);
+
+  // 스크롤 컨테이너 참조 설정
+  useEffect(() => {
+    setScrollContainerRef(rootRef.current);
+  }, [setScrollContainerRef]);
 
   // 페이지 전환 시 스크롤 위치 초기화
   useEffect(() => {
@@ -67,7 +76,12 @@ const PageWrapper = (props: PageWrapperProps) => {
 
         {/* 모바일용 푸터 */}
         {isMobile && (
-          <Box mt={5}>
+          <Box
+            display={
+              HIDE_FOOTER_PATHS.includes(location.pathname) ? "none" : "block"
+            }
+            mt={5}
+          >
             <Footer />
           </Box>
         )}
