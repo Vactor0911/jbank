@@ -40,8 +40,8 @@ const ResponsiveTextField = (props: ResponsiveTextFieldProps) => {
   if (isMobile) {
     return (
       <FormControl variant="standard">
-        <InputLabel>{label}</InputLabel>
-        <Input {...others} onFocus={handleFocus} />
+        {label && <InputLabel>{label}</InputLabel>}
+        <Input onFocus={handleFocus} spellCheck={false} {...others} />
       </FormControl>
     );
   }
@@ -49,8 +49,13 @@ const ResponsiveTextField = (props: ResponsiveTextFieldProps) => {
   // PC용 스타일
   return (
     <FormControl variant="outlined">
-      <InputLabel>{label}</InputLabel>
-      <OutlinedInput label={label} onFocus={handleFocus} {...others} />
+      {label && <InputLabel>{label}</InputLabel>}
+      <OutlinedInput
+        label={label}
+        onFocus={handleFocus}
+        spellCheck={false}
+        {...others}
+      />
     </FormControl>
   );
 };
