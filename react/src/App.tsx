@@ -2,19 +2,17 @@ import {
   CssBaseline,
   Stack,
   ThemeProvider,
-  useMediaQuery,
 } from "@mui/material";
 import { theme } from "./utils/theme";
 import { BrowserRouter, Route, Routes } from "react-router";
 import { Home, NotFoundError } from "./pages";
 import NavigationBar from "./components/Navigation";
 import SidebarMenu from "./components/SidebarMenu";
-import MobileMenu from "./components/MobileMenu";
 import Header from "./components/Header";
+import Notice from "./pages/Notice";
+import PageWrapper from "./components/PageWrapper";
 
 const App = () => {
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline enableColorScheme />
@@ -28,16 +26,16 @@ const App = () => {
             md: "row-reverse",
           }}
         >
-          {/* 모바일 헤더 */}
-          {isMobile && <Header />}
+          {/* 헤더 */}
+          <Header />
 
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="*" element={<NotFoundError />} />
-          </Routes>
-
-          {/* 모바일용 메뉴 */}
-          <MobileMenu />
+          <PageWrapper>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/notice" element={<Notice />} />
+              <Route path="*" element={<NotFoundError />} />
+            </Routes>
+          </PageWrapper>
 
           {/* PC용 사이드 바 메뉴 */}
           <SidebarMenu />

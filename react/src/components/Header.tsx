@@ -16,13 +16,16 @@ const Header = () => {
   return (
     <Stack
       direction="row"
-      width="100%"
+      width={{
+        xs: "100vw",
+        md: "calc(100vw - 314px)",
+      }}
       height="64px"
       justifyContent="flex-end"
       alignItems="center"
       p={1}
       gap={0.5}
-      position="sticky"
+      position="fixed"
       top={0}
       right={0}
       bgcolor="#F6F7F9"
