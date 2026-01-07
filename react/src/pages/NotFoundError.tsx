@@ -88,7 +88,7 @@ const NotFoundError = () => {
             }}
             onClick={() => navigate("/", { replace: true })}
           >
-            <Typography variant="h6">메인으로 돌아가기</Typography>
+            <Typography variant="h6">처음으로 돌아가기</Typography>
           </Button>
         </Stack>
       </Stack>
