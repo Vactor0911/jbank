@@ -12,7 +12,15 @@ const Notice = () => {
   const theme = useTheme();
 
   return (
-    <Section label="공지사항">
+    <Section
+      label="공지사항"
+      sx={{
+        mt: {
+          xs: 2,
+          md: 0,
+        },
+      }}
+    >
       <Stack
         borderRadius={5}
         overflow="hidden"
