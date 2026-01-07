@@ -164,7 +164,6 @@ const AmountForm = () => {
             input: {
               type: "text",
               inputMode: "numeric",
-              pattern: "[0-9-]*",
               placeholder: "얼마나 보낼까요?",
               sx: {
                 fontSize: "2em",
