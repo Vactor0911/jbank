@@ -68,11 +68,13 @@ const AmountForm = () => {
 
   // 다음 단계로 이동 핸들러
   const handleNext = useCallback(() => {
+    console.log(transferData);
+
     setTransferData((prev) => ({
-      accountNumber: prev.accountNumber,
+      ...prev,
       amount: Number(getRawAmount(amount)),
     }));
-  }, [setTransferData, getRawAmount, amount]);
+  }, [transferData, setTransferData, getRawAmount, amount]);
 
   // Slide가 나타날 때 스크롤
   useEffect(() => {
@@ -93,7 +95,11 @@ const AmountForm = () => {
           alignSelf: "flex-start",
           transform: "translateX(-10px)",
         }}
-        onClick={() => setTransferData({})}
+        onClick={() =>
+          setTransferData((prev) => ({
+            fromAccountNumber: prev.fromAccountNumber,
+          }))
+        }
       >
         <ArrowBackRoundedIcon fontSize="large" />
       </IconButton>
@@ -145,7 +151,7 @@ const AmountForm = () => {
 
         {/* 계좌 번호 */}
         <Typography variant="body1">
-          Jbank {transferData.accountNumber}
+          Jbank {transferData.toAccountNumber}
         </Typography>
       </Stack>
 
@@ -215,7 +221,7 @@ const AmountForm = () => {
           xs: "fixed",
           md: "static",
         }}
-        bottom={0}
+        bottom="64px"
         left={0}
         mt="auto"
       >

@@ -17,20 +17,15 @@ const TransferSteps = () => {
     }
 
     scrollContainerRef.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-  }, [
-    scrollContainerRef,
-    transferData.accountNumber,
-    transferData.amount,
-    transferData.password,
-  ]);
+  }, [scrollContainerRef, transferData]);
 
-  if (!transferData.accountNumber) {
+  if (!transferData.toAccountNumber) {
     return <AccountNumberForm />;
   }
   if (!transferData.amount) {
     return <AmountForm />;
   }
-  if (!transferData.password) {
+  if (!transferData.inputVerified) {
     return <VerifyInputForm />;
   }
 };

@@ -24,13 +24,13 @@ const Transfer = () => {
 
   // 송금하기 페이지 접속 시 기존 데이터 초기화
   useEffect(() => {
-    setTransferData({});
+    setTransferData({ fromAccountNumber: "1234-5678" });
   }, [setTransferData]);
 
   // 현재 단계 계산
   const getCurrentStep = useCallback(() => {
     // 계좌번호 미입력
-    if (!transferData.accountNumber) {
+    if (!transferData.toAccountNumber) {
       return 0;
     }
 
@@ -46,7 +46,7 @@ const Transfer = () => {
 
     return 3;
   }, [
-    transferData.accountNumber,
+    transferData.toAccountNumber,
     transferData.amount,
     transferData.inputVerified,
   ]);

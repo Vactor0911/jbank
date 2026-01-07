@@ -59,9 +59,10 @@ const AccountNumberForm = () => {
 
   // 다음 단계로 이동 핸들러
   const handleNext = useCallback(() => {
-    setTransferData({
-      accountNumber: accountNumber,
-    });
+    setTransferData((prev) => ({
+      ...prev,
+      toAccountNumber: accountNumber,
+    }));
   }, [accountNumber, setTransferData]);
 
   // Slide가 나타날 때 스크롤
@@ -194,7 +195,7 @@ const AccountNumberForm = () => {
           xs: "fixed",
           md: "static",
         }}
-        bottom={0}
+        bottom="64px"
         left={0}
         mt="auto"
       >
