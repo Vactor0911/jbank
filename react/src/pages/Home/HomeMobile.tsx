@@ -74,6 +74,9 @@ const HomeMobile = () => {
 
       {/* 광고 */}
       <AdsSection />
+
+      {/* 공지사항 */}
+      <LinkedSectionContainer label="공지사항" linkTo="/notice" />
     </Stack>
   );
 };
