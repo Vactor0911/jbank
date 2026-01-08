@@ -116,7 +116,7 @@ const Transfer = () => {
               flex: 1,
               p: 2,
               borderRadius: 2,
-              bgcolor: theme.palette.secondary.main,
+              bgcolor: theme.palette.background.default,
             }}
           >
             {/* 단계별 화면 */}
