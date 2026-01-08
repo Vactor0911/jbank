@@ -1,9 +1,8 @@
-import { Avatar, Box, Stack, Typography, useTheme } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import TrafficCone from "../assets/traffic-cone.svg";
+import JbankIcon from "../assets/logo/icon.svg?react";
 
 const WIP = () => {
-  const theme = useTheme();
-
   return (
     <Stack justifyContent="center" alignItems="center" flex={1} gap={4}>
       {/* 로고 */}
@@ -12,29 +11,21 @@ const WIP = () => {
           xs: "150px",
           md: "250px",
         }}
+        height={{
+          xs: "150px",
+          md: "250px",
+        }}
         position="relative"
         mx="auto"
         my={5}
-        sx={{
-          aspectRatio: "1 / 1",
-        }}
       >
-        <Avatar
-          variant="rounded"
-          sx={{
+        <JbankIcon
+          css={{
             width: "100%",
             height: "100%",
-            bgcolor: theme.palette.primary.main,
-            fontWeight: "bold",
-            fontSize: {
-              xs: "7em",
-              md: "10em",
-            },
-            borderRadius: 5,
+            borderRadius: "20px",
           }}
-        >
-          J
-        </Avatar>
+        />
 
         {/* 공사 아이콘 */}
         <Box
@@ -44,6 +35,7 @@ const WIP = () => {
           position="absolute"
           bottom="-14%"
           right="-10%"
+          draggable={false}
         />
         <Box
           component="img"
@@ -52,6 +44,7 @@ const WIP = () => {
           position="absolute"
           bottom="-20%"
           left="-20%"
+          draggable={false}
         />
       </Box>
 

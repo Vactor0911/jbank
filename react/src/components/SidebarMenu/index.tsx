@@ -16,6 +16,7 @@ import { useCallback } from "react";
 import { Home } from "./Tabs";
 import { useAtomValue } from "jotai";
 import { navigationValueAtom } from "../../states";
+import JbankLogo from "../../assets/logo/jbank.svg?react";
 
 const SidebarMenu = () => {
   const theme = useTheme();
@@ -48,13 +49,17 @@ const SidebarMenu = () => {
         onClick={() => {
           navigate("/");
         }}
+        py={1}
+        alignSelf="flex-start"
         sx={{
           cursor: "pointer",
         }}
       >
-        <Typography variant="h5" color="primary">
-          Jbank
-        </Typography>
+        <JbankLogo
+          css={{
+            height: "24px",
+          }}
+        />
       </Box>
 
       {/* 프로필 정보 */}

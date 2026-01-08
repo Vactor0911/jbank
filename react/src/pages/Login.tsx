@@ -1,5 +1,4 @@
 import {
-  Avatar,
   Button,
   Container,
   Divider,
@@ -9,6 +8,7 @@ import {
 } from "@mui/material";
 import { useIsMobile } from "../hooks";
 import SteamLogo from "../assets/steam.svg?react";
+import JbankIcon from "../assets/logo/icon.svg?react";
 
 const Login = () => {
   const isMobile = useIsMobile();
@@ -40,18 +40,13 @@ const Login = () => {
 
           <Stack gap={5} justifyContent="center" alignItems="center">
             {/* Jbank 로고 */}
-            <Avatar
-              variant="rounded"
-              sx={{
+            <JbankIcon
+              css={{
                 width: "128px",
                 height: "128px",
-                fontSize: "600%",
-                bgcolor: "primary.main",
-                borderRadius: 2,
+                borderRadius: "10px",
               }}
-            >
-              J
-            </Avatar>
+            />
 
             {/* 슬로건 */}
             <Stack alignItems="center" gap={1.5}>

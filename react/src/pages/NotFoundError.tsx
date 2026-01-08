@@ -1,16 +1,9 @@
-import {
-  Avatar,
-  Box,
-  Button,
-  Stack,
-  Typography,
-  useTheme,
-} from "@mui/material";
+import { Box, Button, Stack, Typography } from "@mui/material";
 import TrafficCone from "../assets/traffic-cone.svg";
 import { useNavigate } from "react-router";
+import JbankIcon from "../assets/logo/icon.svg?react";
 
 const NotFoundError = () => {
-  const theme = useTheme();
   const navigate = useNavigate();
 
   return (
@@ -27,29 +20,21 @@ const NotFoundError = () => {
           xs: "150px",
           md: "250px",
         }}
+        height={{
+          xs: "150px",
+          md: "250px",
+        }}
         position="relative"
         mx="auto"
         my={5}
-        sx={{
-          aspectRatio: "1 / 1",
-        }}
       >
-        <Avatar
-          variant="rounded"
-          sx={{
+        <JbankIcon
+          css={{
             width: "100%",
             height: "100%",
-            bgcolor: theme.palette.primary.main,
-            fontWeight: "bold",
-            fontSize: {
-              xs: "7em",
-              md: "10em",
-            },
-            borderRadius: 5,
+            borderRadius: "20px",
           }}
-        >
-          J
-        </Avatar>
+        />
 
         {/* 공사 아이콘 */}
         <Box
@@ -59,6 +44,7 @@ const NotFoundError = () => {
           position="absolute"
           bottom="-14%"
           right="-10%"
+          draggable={false}
         />
         <Box
           component="img"
@@ -67,6 +53,7 @@ const NotFoundError = () => {
           position="absolute"
           bottom="-20%"
           left="-20%"
+          draggable={false}
         />
       </Box>
 
