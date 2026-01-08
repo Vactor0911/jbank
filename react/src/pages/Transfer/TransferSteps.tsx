@@ -5,7 +5,6 @@ import { scrollContainerRefAtom } from "../../states";
 import {
   AccountNumberForm,
   AmountForm,
-  Loading,
   PasswordForm,
   VerifyInputForm,
 } from "./steps";
@@ -35,7 +34,6 @@ const TransferSteps = () => {
   if (!transferData.password) {
     return <PasswordForm />;
   }
-  return <Loading />;
 };
 
 export default TransferSteps;

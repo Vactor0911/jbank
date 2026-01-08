@@ -6,7 +6,10 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { transferDataAtom } from "../../../states/transfer";
+import {
+  isTransferLoadingAtom,
+  transferDataAtom,
+} from "../../../states/transfer";
 import { useSetAtom } from "jotai";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import { useCallback, useRef, useState } from "react";
@@ -18,6 +21,7 @@ const PasswordForm = () => {
   const passwordInputRef = useRef<HTMLInputElement>(null);
   const [password, setPassword] = useState("");
   const [isPasswordInputFocused, setIsPasswordInputFocused] = useState(false);
+  const setIsTransferLoading = useSetAtom(isTransferLoadingAtom);
 
   // 뒤로가기 핸들러
   const handleBackClick = useCallback(() => {
@@ -64,9 +68,10 @@ const PasswordForm = () => {
           ...prev,
           password: rawValue,
         }));
+        setIsTransferLoading(true);
       }
     },
-    [password.length, setTransferData]
+    [password.length, setIsTransferLoading, setTransferData]
   );
 
   return (
