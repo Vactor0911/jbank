@@ -6,7 +6,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { transferDataAtom } from "../../states/transfer";
+import { transferDataAtom } from "../../../states/transfer";
 import { useSetAtom } from "jotai";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import { useCallback, useRef, useState } from "react";

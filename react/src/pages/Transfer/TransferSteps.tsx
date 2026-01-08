@@ -1,12 +1,14 @@
 import { useAtomValue } from "jotai";
-import AccountNumberForm from "./AccountNumberForm";
 import { transferDataAtom } from "../../states/transfer";
-import AmountForm from "./AmountForm";
 import { useEffect } from "react";
 import { scrollContainerRefAtom } from "../../states";
-import VerifyInputForm from "./VerifyInputForm";
-import PasswordForm from "./PasswordForm";
-import Loading from "./Loading";
+import {
+  AccountNumberForm,
+  AmountForm,
+  Loading,
+  PasswordForm,
+  VerifyInputForm,
+} from "./steps";
 
 const TransferSteps = () => {
   const transferData = useAtomValue(transferDataAtom);

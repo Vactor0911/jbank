@@ -1,7 +1,7 @@
 import { Button, IconButton, Stack, Typography, useTheme } from "@mui/material";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import { useAtom } from "jotai";
-import { transferDataAtom } from "../../states/transfer";
+import { transferDataAtom } from "../../../states/transfer";
 
 const VerifyInputForm = () => {
   const theme = useTheme();

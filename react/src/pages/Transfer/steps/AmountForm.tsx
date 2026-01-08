@@ -9,10 +9,10 @@ import {
 } from "@mui/material";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import { useAtom } from "jotai";
-import { transferDataAtom } from "../../states/transfer";
-import ResponsiveTextField from "../../components/ResponsiveTextField";
+import { transferDataAtom } from "../../../states/transfer";
+import ResponsiveTextField from "../../../components/ResponsiveTextField";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { formatNumberKor } from "../../utils";
+import { formatNumberKor } from "../../../utils";
 
 const AmountForm = () => {
   const theme = useTheme();

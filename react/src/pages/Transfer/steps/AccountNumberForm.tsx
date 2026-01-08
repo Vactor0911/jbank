@@ -9,15 +9,15 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import JbankIcon from "../../assets/sample-user-profile.png";
+import JbankIcon from "../../../assets/sample-user-profile.png";
 import { useCallback, useEffect, useRef, useState } from "react";
-import ResponsiveTextField from "../../components/ResponsiveTextField";
+import ResponsiveTextField from "../../../components/ResponsiveTextField";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import { useNavigate } from "react-router";
 import { useSetAtom } from "jotai";
-import { transferDataAtom } from "../../states/transfer";
-import { isAccountNumberValid } from "../../utils";
+import { transferDataAtom } from "../../../states/transfer";
+import { isAccountNumberValid } from "../../../utils";
 
 const AccountNumberForm = () => {
   const navigate = useNavigate();
