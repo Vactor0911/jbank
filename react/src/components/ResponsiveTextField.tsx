@@ -14,7 +14,7 @@ interface ResponsiveTextFieldProps extends InputProps {
 }
 
 const ResponsiveTextField = (props: ResponsiveTextFieldProps) => {
-  const { label, ...others } = props;
+  const { label, sx, ...others } = props;
 
   const isMobile = useIsMobile();
 
@@ -41,7 +41,15 @@ const ResponsiveTextField = (props: ResponsiveTextFieldProps) => {
     return (
       <FormControl variant="standard">
         {label && <InputLabel>{label}</InputLabel>}
-        <Input onFocus={handleFocus} spellCheck={false} {...others} />
+        <Input
+          onFocus={handleFocus}
+          spellCheck={false}
+          sx={{
+            borderRadius: 2,
+            ...sx,
+          }}
+          {...others}
+        />
       </FormControl>
     );
   }
@@ -54,6 +62,10 @@ const ResponsiveTextField = (props: ResponsiveTextFieldProps) => {
         label={label}
         onFocus={handleFocus}
         spellCheck={false}
+        sx={{
+          borderRadius: 2,
+          ...sx,
+        }}
         {...others}
       />
     </FormControl>
