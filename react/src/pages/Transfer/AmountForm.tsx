@@ -68,13 +68,11 @@ const AmountForm = () => {
 
   // 다음 단계로 이동 핸들러
   const handleNext = useCallback(() => {
-    console.log(transferData);
-
     setTransferData((prev) => ({
       ...prev,
       amount: Number(getRawAmount(amount)),
     }));
-  }, [transferData, setTransferData, getRawAmount, amount]);
+  }, [setTransferData, getRawAmount, amount]);
 
   // Slide가 나타날 때 스크롤
   useEffect(() => {

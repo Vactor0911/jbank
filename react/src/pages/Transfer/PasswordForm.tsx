@@ -74,7 +74,6 @@ const PasswordForm = () => {
       gap={5}
       flex={1}
       onClick={() => {
-        console.log("click", passwordInputRef.current);
         passwordInputRef.current?.focus();
       }}
     >

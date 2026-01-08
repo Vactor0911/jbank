@@ -72,7 +72,6 @@ const AccountSection = () => {
           px: 1,
           borderRadius: 2,
         }}
-        onClick={() => console.log("계좌 버튼 클릭")}
       >
         <Stack direction="row" width="100%" alignItems="center" gap={2}>
           {/* Jbank 아이콘 */}
