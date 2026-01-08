@@ -10,14 +10,12 @@ import {
 } from "@mui/material";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import { useNavigate } from "react-router";
-import { useIsMobile } from "../../hooks";
 import SectionContainer from "./SectionContainer";
 import SampleProfileImage from "../../assets/sample-user-profile.png";
 import HelpOutlineRoundedIcon from "@mui/icons-material/HelpOutlineRounded";
 
 const Profile = () => {
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
 
   return (
     <Paper
@@ -27,7 +25,10 @@ const Profile = () => {
           xs: "100%",
           md: "600px",
         },
-        bgcolor: isMobile ? "transparent" : "background.paper",
+        bgcolor: {
+          xs: "transparent",
+          md: "background.paper",
+        },
         borderRadius: 5,
       }}
     >
