@@ -9,6 +9,7 @@ import {
   VerifyInputForm,
 } from "./steps";
 import TransferSuccess from "./steps/TransferSuccess";
+import TransferFailed from "./steps/TransferFailed";
 
 const TransferSteps = () => {
   const transferData = useAtomValue(transferDataAtom);
@@ -30,6 +31,7 @@ const TransferSteps = () => {
     return <TransferSuccess />;
   } else if (isTransferSuccess === false) {
     // 송금 실패
+    return <TransferFailed />;
   }
 
   // 단계별 폼 렌더

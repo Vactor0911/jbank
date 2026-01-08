@@ -16,6 +16,9 @@ const palette = {
     primary: "#424E5E",
     secondary: "#677383",
   },
+  warning: {
+    main: "#F7D16C",
+  },
 };
 
 // 공통 타이포그래피

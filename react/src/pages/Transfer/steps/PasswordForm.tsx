@@ -75,7 +75,7 @@ const PasswordForm = () => {
         setIsTransferLoading(true);
         setTimeout(() => {
           setIsTransferLoading(false);
-          setIsTransferSuccess(true);
+          setIsTransferSuccess(false);
         }, 2000);
       }
     },

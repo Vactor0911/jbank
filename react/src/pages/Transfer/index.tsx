@@ -9,14 +9,11 @@ import {
 import Section from "../../components/Section";
 import { useIsMobile } from "../../hooks";
 import TransferSteps from "./TransferSteps";
-import { useAtom, useSetAtom } from "jotai";
-import {
-  isTransferLoadingAtom,
-  isTransferSuccessAtom,
-  transferDataAtom,
-} from "../../states/transfer";
+import { useAtomValue } from "jotai";
+import { isTransferLoadingAtom, transferDataAtom } from "../../states/transfer";
 import { useCallback, useEffect } from "react";
 import LoadingDialog from "./LoadingDialog";
+import { useTransfer } from "../../hooks/transfer";
 
 // 단계 이름
 const STEPS = ["계좌번호 입력", "송금 금액 입력", "입력 정보 확인"];
@@ -24,19 +21,15 @@ const STEPS = ["계좌번호 입력", "송금 금액 입력", "입력 정보 확
 const Transfer = () => {
   const theme = useTheme();
   const isMobile = useIsMobile();
+  const { resetTransferData } = useTransfer();
 
-  const [transferData, setTransferData] = useAtom(transferDataAtom);
-  const [isTransferLoading, setIsTransferLoading] = useAtom(
-    isTransferLoadingAtom
-  );
-  const setIsTransferSuccess = useSetAtom(isTransferSuccessAtom);
+  const transferData = useAtomValue(transferDataAtom);
+  const isTransferLoading = useAtomValue(isTransferLoadingAtom);
 
   // 송금하기 페이지 접속 시 기존 데이터 초기화
   useEffect(() => {
-    setTransferData({ fromAccountNumber: "1234-5678" });
-    setIsTransferLoading(false);
-    setIsTransferSuccess(null);
-  }, [setTransferData, setIsTransferLoading, setIsTransferSuccess]);
+    resetTransferData();
+  }, [resetTransferData]);
 
   // 현재 단계 계산
   const getCurrentStep = useCallback(() => {
