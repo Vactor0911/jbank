@@ -9,9 +9,11 @@ import {
 } from "@mui/material";
 import LinkedSectionContainer from "../../components/LinkedSectionContainer";
 import { useState } from "react";
+import { useNavigate } from "react-router";
 
 const AccountSection = () => {
   const theme = useTheme();
+  const navigate = useNavigate();
 
   const [credits] = useState("1,234,567,123,123,132");
 
@@ -136,7 +138,7 @@ const AccountSection = () => {
             }}
             onClick={(e) => {
               e.stopPropagation();
-              console.log("송금 버튼 클릭");
+              navigate("/transfer");
             }}
             onMouseDown={(e) => e.stopPropagation()}
             onTouchStart={(e) => e.stopPropagation()}
