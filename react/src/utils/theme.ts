@@ -10,11 +10,14 @@ const palette = {
     main: "#4880EE",
   },
   secondary: {
-    main: "#F1F2F5",
+    main: "#F2F4F6",
   },
   text: {
     primary: "#424E5E",
     secondary: "#677383",
+  },
+  warning: {
+    main: "#F7D16C",
   },
 };
 

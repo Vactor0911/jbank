@@ -27,7 +27,7 @@ const Section = (props: SectionProps) => {
       }}
       {...others}
     >
-      <Stack height="100%" gap={dense ? 2 : 3} p={dense ? 2 : 3}>
+      <Stack gap={dense ? 2 : 3} p={dense ? 2 : 3} flex={1}>
         {/* 헤더 */}
         {typeof label === "string" ? (
           <Typography variant="h6">{label}</Typography>

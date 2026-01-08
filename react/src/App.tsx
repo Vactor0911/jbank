@@ -1,16 +1,12 @@
-import {
-  CssBaseline,
-  Stack,
-  ThemeProvider,
-} from "@mui/material";
+import { CssBaseline, Stack, ThemeProvider } from "@mui/material";
 import { theme } from "./utils/theme";
 import { BrowserRouter, Route, Routes } from "react-router";
-import { Home, NotFoundError } from "./pages";
+import { Home, NotFoundError, Notice, Transfer } from "./pages";
 import NavigationBar from "./components/Navigation";
 import SidebarMenu from "./components/SidebarMenu";
 import Header from "./components/Header";
-import Notice from "./pages/Notice";
 import PageWrapper from "./components/PageWrapper";
+import WIP from "./pages/WIP";
 
 const App = () => {
   return (
@@ -33,6 +29,8 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/notice" element={<Notice />} />
+              <Route path="/transfer" element={<Transfer />} />
+              <Route path="/accounts" element={<WIP />} />
               <Route path="*" element={<NotFoundError />} />
             </Routes>
           </PageWrapper>

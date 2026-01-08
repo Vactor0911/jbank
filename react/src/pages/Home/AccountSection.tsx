@@ -9,9 +9,11 @@ import {
 } from "@mui/material";
 import LinkedSectionContainer from "../../components/LinkedSectionContainer";
 import { useState } from "react";
+import { useNavigate } from "react-router";
 
 const AccountSection = () => {
   const theme = useTheme();
+  const navigate = useNavigate();
 
   const [credits] = useState("1,234,567,123,123,132");
 
@@ -59,7 +61,8 @@ const AccountSection = () => {
           </Stack>
         </Stack>
       }
-      linkTo="/accounts"
+      // TODO: 계좌 페이지로 링크 연결
+      linkTo="#"
     >
       {/* Jbank 계좌 */}
       <ButtonBase
@@ -69,7 +72,6 @@ const AccountSection = () => {
           px: 1,
           borderRadius: 2,
         }}
-        onClick={() => console.log("계좌 버튼 클릭")}
       >
         <Stack direction="row" width="100%" alignItems="center" gap={2}>
           {/* Jbank 아이콘 */}
@@ -135,7 +137,7 @@ const AccountSection = () => {
             }}
             onClick={(e) => {
               e.stopPropagation();
-              console.log("송금 버튼 클릭");
+              navigate("/transfer");
             }}
             onMouseDown={(e) => e.stopPropagation()}
             onTouchStart={(e) => e.stopPropagation()}
