@@ -90,19 +90,17 @@ const SidebarMenu = () => {
               variant="body1"
               fontWeight={500}
               noWrap
-              textOverflow="ellipsis"
             >
               백터
             </Typography>
 
             {/* Steam 닉네임 */}
             <Typography
-              variant="body2"
+              variant="caption"
               color="text.secondary"
               noWrap
-              textOverflow="ellipsis"
             >
-              백터 (Vactor0911)
+              76561198012345678
             </Typography>
           </Stack>
 

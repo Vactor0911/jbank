@@ -1,7 +1,7 @@
 import { CssBaseline, Stack, ThemeProvider } from "@mui/material";
 import { theme } from "./utils/theme";
 import { BrowserRouter, Route, Routes } from "react-router";
-import { Home, Login, NotFoundError, Notice, Transfer } from "./pages";
+import { Home, Login, NotFoundError, Notice, Profile, Transfer } from "./pages";
 import NavigationBar from "./components/Navigation";
 import SidebarMenu from "./components/SidebarMenu";
 import Header from "./components/Header";
@@ -32,6 +32,8 @@ const App = () => {
               <Route path="/transfer" element={<Transfer />} />
               <Route path="/accounts" element={<WIP />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/profile" element={<Profile />} />
+
               <Route path="*" element={<NotFoundError />} />
             </Routes>
           </PageWrapper>

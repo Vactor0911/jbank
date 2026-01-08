@@ -54,7 +54,7 @@ const Notice = () => {
               {/* 공지사항 정보 */}
               <Stack flex={1}>
                 {/* 제목 */}
-                <Typography variant="h6" noWrap textOverflow="ellipsis">
+                <Typography variant="h6" noWrap>
                   공지사항 제목 어쩌구 저쩌구
                 </Typography>
 

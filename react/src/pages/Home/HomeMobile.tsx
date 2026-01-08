@@ -45,7 +45,6 @@ const HomeMobile = () => {
               variant="body1"
               fontWeight={500}
               noWrap
-              textOverflow="ellipsis"
             >
               백터
             </Typography>
@@ -55,7 +54,6 @@ const HomeMobile = () => {
               variant="body2"
               color="text.secondary"
               noWrap
-              textOverflow="ellipsis"
             >
               백터 (Vactor0911)
             </Typography>

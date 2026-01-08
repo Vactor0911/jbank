@@ -10,7 +10,7 @@ const palette = {
     main: "#4880EE",
   },
   secondary: {
-    main: "#F2F4F6",
+    main: "#ECEEF1",
   },
   text: {
     primary: "#424E5E",
@@ -108,6 +108,9 @@ export const createLightTheme = () =>
     createTheme({
       palette: {
         mode: "light",
+        background: {
+          default: "#F6F7F9",
+        },
         ...palette,
       },
       typography,
@@ -122,6 +125,9 @@ export const createDarkTheme = () =>
     createTheme({
       palette: {
         mode: "dark",
+        background: {
+          default: "#18181A",
+        },
         ...palette,
       },
       typography,
