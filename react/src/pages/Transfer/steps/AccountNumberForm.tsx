@@ -9,7 +9,6 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import JbankIcon from "../../../assets/sample-user-profile.png";
 import { useCallback, useEffect, useRef, useState } from "react";
 import ResponsiveTextField from "../../../components/ResponsiveTextField";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
@@ -18,6 +17,7 @@ import { useNavigate } from "react-router";
 import { useSetAtom } from "jotai";
 import { transferDataAtom } from "../../../states/transfer";
 import { isAccountNumberValid } from "../../../utils";
+import JbankIcon from "../../../assets/logo/icon.svg?react";
 
 const AccountNumberForm = () => {
   const navigate = useNavigate();
@@ -172,13 +172,11 @@ const AccountNumberForm = () => {
                     gap={2}
                   >
                     {/* 은행 아이콘 */}
-                    <Box
-                      component="img"
-                      src={JbankIcon}
-                      width="40px"
-                      borderRadius="50%"
-                      sx={{
-                        aspectRatio: "1 / 1",
+                    <JbankIcon
+                      css={{
+                        width: "40px",
+                        height: "40px",
+                        borderRadius: "4px",
                       }}
                     />
 
