@@ -1,23 +1,18 @@
 import { Button, Stack, Typography, useTheme } from "@mui/material";
 import PriorityHighRoundedIcon from "@mui/icons-material/PriorityHighRounded";
-import { useNavigate } from "react-router";
 import { useTransfer } from "../../../hooks/transfer";
 import { useCallback } from "react";
 import Zoom from "../../../components/transitions/Zoom";
 
 const TransferFailed = () => {
   const theme = useTheme();
-  const navigate = useNavigate();
   const { resetTransferData } = useTransfer();
 
   // 확인 버튼 클릭
   const handleConfirmClick = useCallback(() => {
     // 송금하기 페이지 접속 시 기존 데이터 초기화
     resetTransferData();
-
-    // 메인 페이지로 이동
-    navigate("/");
-  }, [navigate, resetTransferData]);
+  }, [resetTransferData]);
 
   return (
     <Stack gap={5} flex={1} justifyContent="space-between">
