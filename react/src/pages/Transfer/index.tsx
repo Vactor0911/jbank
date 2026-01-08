@@ -9,8 +9,12 @@ import {
 import Section from "../../components/Section";
 import { useIsMobile } from "../../hooks";
 import TransferSteps from "./TransferSteps";
-import { useAtom } from "jotai";
-import { isTransferLoadingAtom, transferDataAtom } from "../../states/transfer";
+import { useAtom, useSetAtom } from "jotai";
+import {
+  isTransferLoadingAtom,
+  isTransferSuccessAtom,
+  transferDataAtom,
+} from "../../states/transfer";
 import { useCallback, useEffect } from "react";
 import LoadingDialog from "./LoadingDialog";
 
@@ -25,12 +29,14 @@ const Transfer = () => {
   const [isTransferLoading, setIsTransferLoading] = useAtom(
     isTransferLoadingAtom
   );
+  const setIsTransferSuccess = useSetAtom(isTransferSuccessAtom);
 
   // 송금하기 페이지 접속 시 기존 데이터 초기화
   useEffect(() => {
     setTransferData({ fromAccountNumber: "1234-5678" });
     setIsTransferLoading(false);
-  }, [setTransferData, setIsTransferLoading]);
+    setIsTransferSuccess(null);
+  }, [setTransferData, setIsTransferLoading, setIsTransferSuccess]);
 
   // 현재 단계 계산
   const getCurrentStep = useCallback(() => {

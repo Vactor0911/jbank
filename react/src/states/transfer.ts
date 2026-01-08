@@ -14,3 +14,6 @@ export const transferDataAtom = atom<TransferData>({});
 
 // 송금중 상태
 export const isTransferLoadingAtom = atom<boolean>(false);
+
+// 송금 결과 상태
+export const isTransferSuccessAtom = atom<boolean | null>(null);

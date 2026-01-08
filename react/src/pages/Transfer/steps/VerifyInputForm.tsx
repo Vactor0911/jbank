@@ -86,6 +86,7 @@ const VerifyInputForm = () => {
       {/* 보내기 버튼 */}
       <Button
         variant="contained"
+        fullWidth
         disableElevation
         sx={{
           p: 1.5,

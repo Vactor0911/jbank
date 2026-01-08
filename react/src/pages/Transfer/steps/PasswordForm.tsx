@@ -8,6 +8,7 @@ import {
 } from "@mui/material";
 import {
   isTransferLoadingAtom,
+  isTransferSuccessAtom,
   transferDataAtom,
 } from "../../../states/transfer";
 import { useSetAtom } from "jotai";
@@ -22,6 +23,9 @@ const PasswordForm = () => {
   const [password, setPassword] = useState("");
   const [isPasswordInputFocused, setIsPasswordInputFocused] = useState(false);
   const setIsTransferLoading = useSetAtom(isTransferLoadingAtom);
+
+  // TODO: 테스트용
+  const setIsTransferSuccess = useSetAtom(isTransferSuccessAtom);
 
   // 뒤로가기 핸들러
   const handleBackClick = useCallback(() => {
@@ -69,9 +73,18 @@ const PasswordForm = () => {
           password: rawValue,
         }));
         setIsTransferLoading(true);
+        setTimeout(() => {
+          setIsTransferLoading(false);
+          setIsTransferSuccess(true);
+        }, 2000);
       }
     },
-    [password.length, setIsTransferLoading, setTransferData]
+    [
+      password.length,
+      setIsTransferLoading,
+      setIsTransferSuccess,
+      setTransferData,
+    ]
   );
 
   return (
