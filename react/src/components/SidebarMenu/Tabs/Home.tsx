@@ -45,6 +45,7 @@ const Home = () => {
           title="계좌"
           icon={<AccountBalanceRoundedIcon sx={{ color: orange[500] }} />}
           linkTo="/accounts"
+          disabled
         />
       </LinkButtonContainer>
     </>

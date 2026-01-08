@@ -6,6 +6,7 @@ import NavigationBar from "./components/Navigation";
 import SidebarMenu from "./components/SidebarMenu";
 import Header from "./components/Header";
 import PageWrapper from "./components/PageWrapper";
+import WIP from "./pages/WIP";
 
 const App = () => {
   return (
@@ -29,6 +30,7 @@ const App = () => {
               <Route path="/" element={<Home />} />
               <Route path="/notice" element={<Notice />} />
               <Route path="/transfer" element={<Transfer />} />
+              <Route path="/accounts" element={<WIP />} />
               <Route path="*" element={<NotFoundError />} />
             </Routes>
           </PageWrapper>

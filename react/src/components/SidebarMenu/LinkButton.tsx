@@ -1,15 +1,20 @@
-import { ButtonBase, Stack, Typography } from "@mui/material";
+import {
+  ButtonBase,
+  Stack,
+  Typography,
+  type ButtonBaseProps,
+} from "@mui/material";
 import { useCallback, type ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router";
 
-interface LinkButtonProps {
+interface LinkButtonProps extends ButtonBaseProps {
   icon?: ReactNode;
   title: string;
   linkTo?: string;
 }
 
 const LinkButton = (props: LinkButtonProps) => {
-  const { icon, title, linkTo } = props;
+  const { icon, title, linkTo, disabled, ...others } = props;
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -29,8 +34,14 @@ const LinkButton = (props: LinkButtonProps) => {
         transition: "background-color 0.3s",
       }}
       onClick={handleClick}
+      disabled={disabled}
+      {...others}
     >
-      <Stack width="100%" direction="row" alignItems="center" gap={1}>
+      <Stack width="100%" direction="row" alignItems="center" gap={1} sx={{
+        "& .MuiSvgIcon-root": {
+          opacity: disabled ? 0.25 : 1,
+        }
+      }}>
         {/* 아이콘 */}
         {icon}
 
@@ -38,6 +49,7 @@ const LinkButton = (props: LinkButtonProps) => {
         <Typography
           flex={1}
           fontWeight={location.pathname === linkTo ? "bold" : 500}
+          color={disabled ? "text.disabled" : "inherit"}
           sx={{
             transition: "font-weight 0.3s",
           }}

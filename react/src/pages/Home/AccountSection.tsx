@@ -59,7 +59,8 @@ const AccountSection = () => {
           </Stack>
         </Stack>
       }
-      linkTo="/accounts"
+      // TODO: 계좌 페이지로 링크 연결
+      linkTo="#"
     >
       {/* Jbank 계좌 */}
       <ButtonBase
