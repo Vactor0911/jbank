@@ -1,18 +1,10 @@
-import {
-  Avatar,
-  Button,
-  ButtonBase,
-  Chip,
-  Stack,
-  Typography,
-  useTheme,
-} from "@mui/material";
+import { Button, ButtonBase, Chip, Stack, Typography } from "@mui/material";
 import LinkedSectionContainer from "../../components/LinkedSectionContainer";
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import JbankIcon from "../../assets/logo/icon.svg?react";
 
 const AccountSection = () => {
-  const theme = useTheme();
   const navigate = useNavigate();
 
   const [credits] = useState("1,234,567,123,123,132");
@@ -75,17 +67,13 @@ const AccountSection = () => {
       >
         <Stack direction="row" width="100%" alignItems="center" gap={2}>
           {/* Jbank 아이콘 */}
-          <Avatar
-            sx={{
+          <JbankIcon
+            css={{
               width: "32px",
               height: "32px",
-              bgcolor: theme.palette.primary.main,
-              fontWeight: "bold",
+              borderRadius: "4px",
             }}
-            variant="rounded"
-          >
-            J
-          </Avatar>
+          />
 
           {/* 계좌 정보 */}
           <Stack alignItems="flex-start" flex={1} overflow="hidden">
