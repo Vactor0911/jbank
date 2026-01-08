@@ -5,8 +5,11 @@ import FeedRoundedIcon from "@mui/icons-material/FeedRounded";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import AccountBalanceRoundedIcon from "@mui/icons-material/AccountBalanceRounded";
 import { grey, orange } from "@mui/material/colors";
+import { useAccount } from "../../../hooks/account";
 
 const Home = () => {
+  const { accountData } = useAccount();
+
   return (
     <>
       {/* Jbank 홈 */}
@@ -44,8 +47,7 @@ const Home = () => {
         <LinkButton
           title="계좌"
           icon={<AccountBalanceRoundedIcon sx={{ color: orange[500] }} />}
-          linkTo="/accounts"
-          disabled
+          linkTo={`/account/${accountData?.uuid}`}
         />
       </LinkButtonContainer>
     </>
