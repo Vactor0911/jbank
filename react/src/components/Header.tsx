@@ -37,7 +37,7 @@ const Header = () => {
       }}
     >
       {/* 언어 변경 버튼 */}
-      <IconButton>
+      <IconButton disabled>
         <LanguageRoundedIcon
           sx={{
             fontSize: 32,
@@ -63,7 +63,7 @@ const Header = () => {
       </IconButton>
 
       {/* 알림 버튼 */}
-      <IconButton>
+      <IconButton disabled>
         <NotificationsNoneRoundedIcon
           sx={{
             fontSize: 32,
