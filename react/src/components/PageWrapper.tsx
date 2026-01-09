@@ -7,7 +7,7 @@ import Footer from "./Footer";
 import { useLocation } from "react-router";
 
 // 푸터를 숨길 경로 목록
-const HIDE_FOOTER_PATHS = ["/transfer", "/login"];
+const HIDE_FOOTER_PATHS = ["/transfer", "/login", "/account"];
 
 interface PageWrapperProps {
   children: ReactNode;
@@ -78,7 +78,11 @@ const PageWrapper = (props: PageWrapperProps) => {
         {isMobile && (
           <Box
             display={
-              HIDE_FOOTER_PATHS.includes(location.pathname) ? "none" : "block"
+              HIDE_FOOTER_PATHS.some((path) =>
+                location.pathname.startsWith(path)
+              )
+                ? "none"
+                : "block"
             }
             mt={5}
           >

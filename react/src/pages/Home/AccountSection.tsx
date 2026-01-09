@@ -3,11 +3,14 @@ import LinkedSectionContainer from "../../components/LinkedSectionContainer";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import JbankIcon from "../../assets/logo/icon.svg?react";
+import { useAtomValue } from "jotai";
+import { accountDataAtom } from "../../states/account";
 
 const AccountSection = () => {
   const navigate = useNavigate();
 
   const [credits] = useState("1,234,567,123,123,132");
+  const accountData = useAtomValue(accountDataAtom);
 
   return (
     <LinkedSectionContainer
@@ -53,8 +56,7 @@ const AccountSection = () => {
           </Stack>
         </Stack>
       }
-      // TODO: 계좌 페이지로 링크 연결
-      linkTo="#"
+      linkTo={`/account/${accountData?.uuid}`}
     >
       {/* Jbank 계좌 */}
       <ButtonBase
@@ -64,24 +66,20 @@ const AccountSection = () => {
           px: 1,
           borderRadius: 2,
         }}
+        onClick={() => navigate(`/account/${accountData?.uuid}`)}
       >
         <Stack direction="row" width="100%" alignItems="center" gap={2}>
           {/* Jbank 아이콘 */}
           <JbankIcon
             css={{
-              width: "32px",
-              height: "32px",
+              width: "36px",
+              height: "36px",
               borderRadius: "4px",
             }}
           />
 
           {/* 계좌 정보 */}
           <Stack alignItems="flex-start" flex={1} overflow="hidden">
-            {/* 은행명 */}
-            <Typography variant="body1" color="text.secondary">
-              Jbank
-            </Typography>
-
             {/* 계좌 잔액 */}
             <Stack
               width="100%"
@@ -112,6 +110,11 @@ const AccountSection = () => {
                 크레딧
               </Typography>
             </Stack>
+
+            {/* 은행명 */}
+            <Typography variant="body1" color="text.secondary">
+              Jbank {accountData?.accountNumber}
+            </Typography>
           </Stack>
 
           {/* 송금 버튼 */}
