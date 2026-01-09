@@ -38,7 +38,7 @@ passport.use(
         // Steam ID 추출
         const steamId = identifier.split("/").pop();
         if (!steamId) {
-          return done(new Error("Invalid Steam ID"), undefined);
+          return done(new Error("Steam ID가 올바르지 않습니다."), undefined);
         }
 
         // 기존 사용자 데이터 조회
