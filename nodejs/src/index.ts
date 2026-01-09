@@ -2,9 +2,7 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { errorHandler } from "./middlewares/errorHandler";
-import { accountRouter, userRouter } from "./routes";
 import bodyParser from "body-parser";
-import transactionRouter from "./routes/transaction.route";
 
 // 환경변수 설정
 dotenv.config();
@@ -34,9 +32,7 @@ app.get("/api/health", (_req: Request, res: Response) => {
 });
 
 // 라우트 정의
-app.use("/api/user", userRouter);
-app.use("/api/account", accountRouter);
-app.use("/api/transaction", transactionRouter);
+
 
 // 전역 오류 처리 미들웨어 등록
 app.use(errorHandler);
