@@ -77,7 +77,7 @@ const Profile = () => {
                   fontWeight={500}
                   noWrap
                 >
-                  스팀 닉네임
+                  Steam 닉네임
                 </Typography>
                 <Typography variant="h5" noWrap>
                   백터 (Vactor0911)
@@ -91,7 +91,7 @@ const Profile = () => {
                   mt={2}
                   noWrap
                 >
-                  스팀 고유번호
+                  Steam 고유번호
                 </Typography>
                 <Typography variant="h5" noWrap>
                   123456789
