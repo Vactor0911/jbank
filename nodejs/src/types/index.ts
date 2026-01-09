@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { JwtPayload } from "jsonwebtoken";
 
 /**
  * 사용자 데이터 인터페이스
@@ -51,7 +52,7 @@ export interface SteamProfile {
  * API 인증 요청 인터페이스
  */
 export interface AuthRequest extends Request {
-  user?: AccessTokenPayload;
+  user?: JwtPayload;
 }
 
 /**

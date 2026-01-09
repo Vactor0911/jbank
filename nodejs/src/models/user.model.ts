@@ -44,4 +44,12 @@ export class UserModel {
     console.log("Creating user with data:", userData);
     return new UserModel(userData);
   }
+
+  static async deleteRefreshTokenByUuid(userUuid: string): Promise<void> {
+    // TODO: 삭제 로직 구현
+
+    // 임시 반환
+    console.log("Deleting refresh token for user UUID:", userUuid);
+    return;
+  }
 }

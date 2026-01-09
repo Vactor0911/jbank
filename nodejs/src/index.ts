@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { errorHandler } from "./middlewares/errorHandler";
 import bodyParser from "body-parser";
+import { authRouter } from "./routes";
 
 // 환경변수 설정
 dotenv.config();
@@ -32,7 +33,7 @@ app.get("/api/health", (_req: Request, res: Response) => {
 });
 
 // 라우트 정의
-
+app.use("/api/auth", authRouter);
 
 // 전역 오류 처리 미들웨어 등록
 app.use(errorHandler);
