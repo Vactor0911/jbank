@@ -83,7 +83,7 @@ const Profile = () => {
                   백터 (Vactor0911)
                 </Typography>
 
-                {/* 스팀 닉네임 */}
+                {/* 스팀 고유번호 */}
                 <Typography
                   variant="body2"
                   color="text.secondary"
