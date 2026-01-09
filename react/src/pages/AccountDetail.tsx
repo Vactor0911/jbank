@@ -225,6 +225,7 @@ const AccountDetail = () => {
                     borderRadius: 2,
                     overflow: "hidden",
                   }}
+                  onClick={() => navigate("/transaction/transaction-uuid")}
                 >
                   <Stack direction="row" width="100%" gap={3}>
                     {/* 날짜 */}

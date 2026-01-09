@@ -73,6 +73,7 @@ const TransactionDetail = () => {
             direction="row"
             justifyContent="space-between"
             alignContent="center"
+            flexWrap="wrap"
           >
             {/* 라벨 */}
             <Typography variant="h6" color="text.secondary" fontWeight={500}>
@@ -90,6 +91,7 @@ const TransactionDetail = () => {
             direction="row"
             justifyContent="space-between"
             alignContent="center"
+            flexWrap="wrap"
           >
             {/* 라벨 */}
             <Typography variant="h6" color="text.secondary" fontWeight={500}>
@@ -107,6 +109,7 @@ const TransactionDetail = () => {
             direction="row"
             justifyContent="space-between"
             alignContent="center"
+            flexWrap="wrap"
           >
             {/* 라벨 */}
             <Typography variant="h6" color="text.secondary" fontWeight={500}>
