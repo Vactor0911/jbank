@@ -95,7 +95,7 @@ const TransactionDetail = () => {
           >
             {/* 라벨 */}
             <Typography variant="h6" color="text.secondary" fontWeight={500}>
-              입금처
+              출금처
             </Typography>
 
             {/* 계좌번호 */}
