@@ -1,65 +1,51 @@
 import { Response } from "express";
 import { APIResponse, AuthRequest } from "../types";
+import { UserModel } from "../models/user.model";
+import { asyncHandler } from "../utils/asyncHandler";
+import { AuthService } from "../services/auth.service";
 import {
   generateAccessToken,
   generateRefreshToken,
   verifyAccessToken,
   verifyRefreshToken,
 } from "../utils/jwt";
-import { UserModel } from "../models/user.model";
+import { dbPool } from "../config/db";
 
 export class AuthController {
   /**
    * Steam 로그인
-   * @param req API 요청 객체
-   * @param res API 응답 객체
    */
-  static login = async (req: AuthRequest, res: Response) => {
-    try {
-      // 요청 헤더에서 사용자 정보 추출
-      const user = req.user as any;
-      if (!user) {
-        return res.redirect(`${process.env.FRONTEND_URL}/login?error=no_user`);
-      }
-
-      // Access Token 및 Refresh Token 생성
-      const accessToken = generateAccessToken(user);
-      const refreshToken = generateRefreshToken(user);
-
-      // Refresh Token을 HttpOnly 쿠키로 설정
-      res.cookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
-      });
-
-      // 마지막 로그인 시간 업데이트
-      await UserModel.createOrUpdate({
-        ...user,
-        lastLogin: new Date(),
-      });
-
-      // 클라이언트로 리다이렉트
-      res.redirect(
-        `${process.env.FRONTEND_URL}/auth/callback?token=${accessToken}`
-      );
-    } catch (error) {
-      console.error("Steam authentication error:", error);
-      res.redirect(`${process.env.FRONTEND_URL}/login?error=server_error`);
+  static login = asyncHandler(async (req: AuthRequest, res: Response) => {
+    // 요청 헤더에서 사용자 정보 추출
+    const user = req.user as any;
+    if (!user) {
+      return res.redirect(`${process.env.FRONTEND_URL}/login?error=no_user`);
     }
-  };
+
+    // 로그인 처리
+    const tokens = await AuthService.login(user);
+
+    // Refresh Token을 HttpOnly 쿠키로 설정
+    res.cookie("refreshToken", tokens.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
+    });
+
+    // 응답 반환
+    res.json({
+      success: true,
+      message: "로그인 성공",
+      accessToken: tokens.accessToken,
+    });
+  });
 
   /**
    * Refresh Token으로 Access Token 재발급
-   * @param req API 요청 객체
-   * @param res API 응답 객체
    */
-  static refreshToken = async (
-    req: AuthRequest,
-    res: Response<APIResponse>
-  ) => {
-    try {
+  static refreshToken = asyncHandler(
+    async (req: AuthRequest, res: Response<APIResponse>) => {
       // 쿠키에서 Refresh Token 추출
       const refreshToken = req.cookies.refreshToken;
       if (!refreshToken) {
@@ -79,7 +65,7 @@ export class AuthController {
       }
 
       // 사용자 정보 조회
-      const user = await UserModel.findBySteamId(decoded.userUuid);
+      const user = await UserModel.findBySteamId(decoded.userUuid, dbPool);
       if (!user) {
         return res.status(404).json({
           success: false,
@@ -105,22 +91,14 @@ export class AuthController {
         message: "토큰이 재발급되었습니다.",
         accessToken: newAccessToken,
       });
-    } catch (error) {
-      console.error("Token refresh error:", error);
-      res.status(500).json({
-        success: false,
-        message: "토큰 갱신 중 오류가 발생했습니다.",
-      });
     }
-  };
+  );
 
   /**
    * 로그아웃
-   * @param req API 요청 객체
-   * @param res API 응답 객체
    */
-  static logout = async (req: AuthRequest, res: Response<APIResponse>) => {
-    try {
+  static logout = asyncHandler(
+    async (req: AuthRequest, res: Response<APIResponse>) => {
       // 쿠키에서 Refresh Token 추출
       const refreshToken = req.cookies.refreshToken;
       if (!refreshToken) {
@@ -130,7 +108,7 @@ export class AuthController {
       // DB에서 Refresh Token 삭제
       const decoded = verifyRefreshToken(refreshToken);
       if (decoded) {
-        await UserModel.deleteRefreshTokenByUuid(decoded.userUuid);
+        await UserModel.deleteRefreshTokenByUuid(decoded.userUuid, dbPool);
       }
 
       // 쿠키 삭제
@@ -141,17 +119,14 @@ export class AuthController {
         success: true,
         message: "로그아웃되었습니다.",
       });
-    } catch (error) {
-      console.error("Logout error:", error);
-      res.status(500).json({
-        success: false,
-        message: "로그아웃 중 오류가 발생했습니다.",
-      });
     }
-  };
+  );
 
-  static me = async (req: AuthRequest, res: Response<APIResponse>) => {
-    try {
+  /**
+   * 내 정보 조회
+   */
+  static me = asyncHandler(
+    async (req: AuthRequest, res: Response<APIResponse>) => {
       // 요청 헤더에서 토큰 추출
       const authHeader = req.headers["authorization"];
       const token = authHeader && authHeader.split(" ")[1];
@@ -172,7 +147,7 @@ export class AuthController {
       }
 
       // 사용자 정보 조회
-      const user = await UserModel.findBySteamId(decoded.userUuid);
+      const user = await UserModel.findBySteamId(decoded.userUuid, dbPool);
       if (!user) {
         return res.status(404).json({
           success: false,
@@ -190,16 +165,9 @@ export class AuthController {
             steamId: user.steamId,
             steamName: user.steamName,
             avatar: user.avatar,
-            profileUrl: user.profileUrl,
           },
         },
       });
-    } catch (error) {
-      console.error("Fetch user info error:", error);
-      res.status(500).json({
-        success: false,
-        message: "사용자 정보 조회 중 오류가 발생했습니다.",
-      });
     }
-  };
+  );
 }

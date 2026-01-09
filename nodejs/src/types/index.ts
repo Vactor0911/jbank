@@ -9,7 +9,6 @@ export interface UserData {
   steamId: string;
   steamName: string;
   avatar: string;
-  profileUrl: string;
   createdAt?: Date;
   lastLogin?: Date;
 }
@@ -40,7 +39,6 @@ export interface SteamProfile {
   photos: Array<{ value: string }>;
   _json: {
     steamid: string;
-    profileurl: string;
     personaname: string;
     avatar: string;
     avatarmedium: string;
