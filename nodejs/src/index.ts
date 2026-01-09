@@ -1,23 +1,29 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
-import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 import { errorHandler } from "./middlewares/errorHandler";
 import bodyParser from "body-parser";
 import { authRouter } from "./routes";
-
-// 환경변수 설정
-dotenv.config();
+import passport from "passport";
+import "dotenv/config";
 
 const app = express();
+
 app.use(express.json());
 app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser(process.env.COOKIE_SECRET));
 
 // CORS 설정
 app.use(
   cors({
+    origin: process.env.CLIENT_URL,
     credentials: true,
   })
 );
+
+// Passport 초기화
+app.use(passport.initialize());
 
 // 기본 라우트 설정
 app.get("/", (_req: Request, res: Response) => {
