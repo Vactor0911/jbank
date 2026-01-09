@@ -7,7 +7,7 @@ import Footer from "./Footer";
 import { useLocation } from "react-router";
 
 // 푸터를 숨길 경로 목록
-const HIDE_FOOTER_PATHS = ["/transfer", "/login", "/account"];
+const HIDE_FOOTER_PATHS = ["/transfer", "/login", "/account", "/transaction"];
 
 interface PageWrapperProps {
   children: ReactNode;
