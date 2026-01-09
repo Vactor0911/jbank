@@ -11,12 +11,12 @@ const Main = () => {
   const navigationValue = useAtomValue(navigationValueAtom);
   const isMobile = useIsMobile();
 
-  const { fetchAccountDetails } = useAccount();
+  const { fetchAccountData: fetchAccountData } = useAccount();
 
   // 계좌 정보 불러오기
   useEffect(() => {
-    fetchAccountDetails();
-  }, [fetchAccountDetails]);
+    fetchAccountData();
+  }, [fetchAccountData]);
 
   if (navigationValue === 0) {
     if (isMobile) {
