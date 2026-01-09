@@ -33,10 +33,7 @@ const Home = () => {
             {/* 도움말 */}
             <Tooltip
               title="사용자가 직접 등록한 광고가 표시되는 배너입니다."
-              enterTouchDelay={0}
-              leaveTouchDelay={3000}
               placement="right-start"
-              disableFocusListener
               slotProps={{
                 tooltip: {
                   sx: {

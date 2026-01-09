@@ -121,10 +121,13 @@ const Profile = () => {
                 {/* 도움말 */}
                 <Tooltip
                   title="스팀 계정 정보는 스팀 서버에서 주기적으로 동기화됩니다. 즉시 반영을 원하시면 새로고침 버튼을 눌러주세요."
-                  enterTouchDelay={0}
-                  leaveTouchDelay={3000}
-                  placement="right-start"
-                  disableFocusListener
+                  slotProps={{
+                    tooltip: {
+                      sx: {
+                        mx: 2,
+                      },
+                    },
+                  }}
                 >
                   <HelpOutlineRoundedIcon
                     sx={{

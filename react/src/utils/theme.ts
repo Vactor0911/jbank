@@ -58,10 +58,15 @@ const getComponents = (mode: PaletteMode) => ({
   MuiTooltip: {
     defaultProps: {
       arrow: true,
+      enterTouchDelay: 0,
+      leaveTouchDelay: 3000,
+      disableFocusListener: true,
     },
     styleOverrides: {
       tooltip: {
         fontSize: "0.9rem",
+        wordBreak: "keep-all" as const,
+        textWrap: "pretty",
       },
     },
   },
