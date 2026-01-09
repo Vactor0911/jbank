@@ -37,7 +37,7 @@ const Notice = () => {
       >
         {Array.from({ length: 10 }).map((_, index) => (
           <ButtonBase
-            key={`notice=-${index}`}
+            key={`notice-${index}`}
             sx={{
               textAlign: "left",
             }}
