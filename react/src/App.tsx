@@ -8,6 +8,7 @@ import {
   NotFoundError,
   Notice,
   Profile,
+  TransactionDetail,
   Transfer,
 } from "./pages";
 import NavigationBar from "./components/Navigation";
@@ -35,10 +36,14 @@ const App = () => {
           <PageWrapper>
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/account/:accountUuid" element={<AccountDetail />} />
+              <Route
+                path="/transaction/:transactionUuid"
+                element={<TransactionDetail />}
+              />
+              <Route path="/account" element={<NotFoundError />} />
               <Route path="/notice" element={<Notice />} />
               <Route path="/transfer" element={<Transfer />} />
-              <Route path="/account/:accountUuid" element={<AccountDetail />} />
-              <Route path="/account" element={<NotFoundError />} />
               <Route path="/login" element={<Login />} />
               <Route path="/profile" element={<Profile />} />
 
