@@ -1,7 +1,7 @@
 import { Router } from "express";
 import passport from "passport";
 import { AuthController } from "../controllers/auth.controller";
-import { authenticateToken } from "../middlewares/auth";
+import { authenticateJWT } from "../middlewares/auth";
 
 const authRouter = Router();
 
@@ -19,9 +19,9 @@ authRouter.get(
 );
 
 // Refresh Token으로 Access Token 재발급
-authRouter.post("/refresh", authenticateToken, AuthController.refreshToken);
+authRouter.post("/refresh", authenticateJWT, AuthController.refreshToken);
 
 // 로그아웃
-authRouter.post("/logout", authenticateToken, AuthController.logout);
+authRouter.post("/logout", authenticateJWT, AuthController.logout);
 
 export default authRouter;

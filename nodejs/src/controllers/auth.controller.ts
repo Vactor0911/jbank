@@ -6,6 +6,9 @@ import { AuthService } from "../services/auth.service";
 import { verifyRefreshToken } from "../utils/jwt";
 import { mariaDB } from "../config/mariadb";
 import { NotFoundError } from "../errors/CustomErrors";
+import { AuthModel } from "../models/auth.model";
+import { redis } from "../config/redis";
+import { deleteCsrfToken } from "../middlewares/csrf";
 
 export class AuthController {
   /**
@@ -74,10 +77,14 @@ export class AuthController {
         return;
       }
 
-      // DB에서 Refresh Token 삭제
+      // 토큰 삭제
       const decoded = verifyRefreshToken(refreshToken);
       if (decoded) {
-        await UserModel.deleteRefreshTokenByUuid(decoded.userUuid, mariaDB);
+        // Refresh Token 삭제
+        await AuthModel.deleteRefreshTokenByUserId(decoded.userUuid, redis);
+
+        // CSRF 토큰 삭제
+        await deleteCsrfToken(decoded.userUuid);
       }
 
       // 쿠키 삭제
