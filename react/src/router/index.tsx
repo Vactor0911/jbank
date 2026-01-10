@@ -1,6 +1,6 @@
 import { createBrowserRouter, redirect } from "react-router-dom";
 
-import apiClient from "../api/axios";
+import apiClient from "../services/axios";
 import {
   AccountDetail,
   Home,
