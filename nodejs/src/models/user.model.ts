@@ -28,7 +28,7 @@ export class UserModel {
     steamId: string,
     connection: PoolConnection | Pool
   ): Promise<UserModel | null> {
-    const user = await connection.execute(
+    const [result] = await connection.execute(
       `
         SELECT *
         FROM user
@@ -36,7 +36,17 @@ export class UserModel {
       `,
       [steamId]
     );
-    return user;
+
+    // 사용자 객체 생성
+    const user = {
+      uuid: result.user_uuid,
+      steamId: result.steam_id,
+      steamName: result.steam_name,
+      avatar: result.avatar,
+      createdAt: result.created_at,
+      lastLogin: result.last_login_at,
+    } as UserData;
+    return new UserModel(user);
   }
 
   /**

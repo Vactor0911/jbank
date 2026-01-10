@@ -3,13 +3,9 @@ import { APIResponse, AuthRequest } from "../types";
 import { UserModel } from "../models/user.model";
 import { asyncHandler } from "../utils/asyncHandler";
 import { AuthService } from "../services/auth.service";
-import {
-  generateAccessToken,
-  generateRefreshToken,
-  verifyAccessToken,
-  verifyRefreshToken,
-} from "../utils/jwt";
+import { verifyAccessToken, verifyRefreshToken } from "../utils/jwt";
 import { dbPool } from "../config/db";
+import { NotFoundError } from "../errors/CustomErrors";
 
 export class AuthController {
   /**
@@ -46,39 +42,12 @@ export class AuthController {
    */
   static refreshToken = asyncHandler(
     async (req: AuthRequest, res: Response<APIResponse>) => {
-      // 쿠키에서 Refresh Token 추출
-      const refreshToken = req.cookies.refreshToken;
-      if (!refreshToken) {
-        return res.status(401).json({
-          success: false,
-          message: "토큰이 없습니다.",
-        });
-      }
+      const { refreshToken } = req.cookies;
 
-      // Refresh Token 검증
-      const decoded = verifyRefreshToken(refreshToken);
-      if (!decoded) {
-        return res.status(403).json({
-          success: false,
-          message: "유효하지 않거나 만료된 토큰입니다.",
-        });
-      }
+      // 새로운 토큰 발급
+      const tokens = await AuthService.rotateTokens(refreshToken);
 
-      // 사용자 정보 조회
-      const user = await UserModel.findBySteamId(decoded.userUuid, dbPool);
-      if (!user) {
-        return res.status(404).json({
-          success: false,
-          message: "사용자를 찾을 수 없습니다.",
-        });
-      }
-
-      // 새로운 Access Token 발급
-      const newAccessToken = generateAccessToken(user);
-
-      // Refresh Token 로테이션
-      const newRefreshToken = generateRefreshToken(user);
-      res.cookie("refreshToken", newRefreshToken, {
+      res.cookie("refreshToken", tokens.refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
@@ -89,7 +58,7 @@ export class AuthController {
       res.json({
         success: true,
         message: "토큰이 재발급되었습니다.",
-        accessToken: newAccessToken,
+        accessToken: tokens.accessToken,
       });
     }
   );
@@ -100,7 +69,7 @@ export class AuthController {
   static logout = asyncHandler(
     async (req: AuthRequest, res: Response<APIResponse>) => {
       // 쿠키에서 Refresh Token 추출
-      const refreshToken = req.cookies.refreshToken;
+      const { refreshToken } = req.cookies;
       if (!refreshToken) {
         return;
       }
@@ -127,32 +96,12 @@ export class AuthController {
    */
   static me = asyncHandler(
     async (req: AuthRequest, res: Response<APIResponse>) => {
-      // 요청 헤더에서 토큰 추출
-      const authHeader = req.headers["authorization"];
-      const token = authHeader && authHeader.split(" ")[1];
-      if (!token) {
-        return res.status(401).json({
-          success: false,
-          message: "인증이 필요합니다.",
-        });
-      }
-
-      // Access Token 검증
-      const decoded = verifyAccessToken(token);
-      if (!decoded) {
-        return res.status(403).json({
-          success: false,
-          message: "유효하지 않거나 만료된 토큰입니다.",
-        });
-      }
+      const { userUuid } = req.user as { userUuid: string };
 
       // 사용자 정보 조회
-      const user = await UserModel.findBySteamId(decoded.userUuid, dbPool);
+      const user = await UserModel.findBySteamId(userUuid, dbPool);
       if (!user) {
-        return res.status(404).json({
-          success: false,
-          message: "사용자를 찾을 수 없습니다.",
-        });
+        throw new NotFoundError("사용자를 찾을 수 없습니다.");
       }
 
       // 응답 전송
