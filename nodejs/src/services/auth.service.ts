@@ -7,6 +7,8 @@ import {
 import TransactionHandler from "../utils/transactionHandler";
 import { mariaDB } from "../config/mariadb";
 import { ForbiddenError, NotFoundError } from "../errors/CustomErrors";
+import { redis } from "../config/redis";
+import { AuthModel } from "../models/auth.model";
 
 export class AuthService {
   /**
@@ -29,7 +31,7 @@ export class AuthService {
         const refreshToken = generateRefreshToken(user);
 
         // Refresh Token 저장
-        await UserModel.storeRefreshToken(user.id, refreshToken, connection);
+        await AuthModel.storeRefreshToken(user.id, refreshToken, redis);
 
         // 마지막 로그인 시간 업데이트
         await UserModel.stampLastLogin(user.id, connection);
@@ -71,6 +73,9 @@ export class AuthService {
 
     // Refresh Token 로테이션
     const newRefreshToken = generateRefreshToken(user);
+
+    // 새로운 Refresh Token 저장
+    await AuthModel.storeRefreshToken(user.id, newRefreshToken, redis);
 
     // 새로운 토큰 반환
     const tokens = {

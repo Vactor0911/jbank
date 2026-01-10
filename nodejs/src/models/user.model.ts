@@ -23,7 +23,7 @@ export class UserModel {
   /**
    * Steam ID로 사용자 조회
    * @param steamId 사용자 Steam ID
-   * @param connection 데이터베이스 연결 객체
+   * @param connection MariaDB 연결 객체
    * @returns 사용자 데이터 또는 null
    */
   static async findBySteamId(
@@ -60,7 +60,7 @@ export class UserModel {
   /**
    * 사용자 생성
    * @param userData 사용자 데이터
-   * @param connection 데이터베이스 연결 객체
+   * @param connection MariaDB 연결 객체
    * @returns 사용자 모델 객체
    */
   static async create(
@@ -87,7 +87,7 @@ export class UserModel {
   /**
    * 마지막 로그인 시간 업데이트
    * @param userId 사용자 id
-   * @param connection 데이터베이스 연결 객체
+   * @param connection MariaDB 연결 객체
    * @return 업데이트 결과
    */
   static async stampLastLogin(
@@ -98,50 +98,6 @@ export class UserModel {
       `
         UPDATE user
         SET last_login_at = NOW()
-        WHERE user_id = ?
-      `,
-      [userId]
-    );
-    return result;
-  }
-
-  /**
-   * 리프레시 토큰 저장
-   * @param userId 사용자 id
-   * @param refreshToken 리프레시 토큰
-   * @param connection 데이터베이스 연결 객체
-   * @return 저장 결과
-   */
-  static async storeRefreshToken(
-    userId: string,
-    refreshToken: string,
-    connection: PoolConnection | Pool
-  ): Promise<void> {
-    const result = await connection.execute(
-      `
-        UPDATE user
-        SET refresh_token = ?
-        WHERE user_id = ?
-      `,
-      [refreshToken, userId]
-    );
-    return result;
-  }
-
-  /**
-   * 사용자 id로 리프레시 토큰 삭제
-   * @param userId 사용자 id
-   * @param connection 데이터베이스 연결 객체
-   * @return 삭제 결과
-   */
-  static async deleteRefreshTokenByUuid(
-    userId: string,
-    connection: PoolConnection | Pool
-  ): Promise<void> {
-    const result = await connection.execute(
-      `
-        UPDATE user
-        SET refresh_token = NULL
         WHERE user_id = ?
       `,
       [userId]
