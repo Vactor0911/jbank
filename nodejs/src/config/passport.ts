@@ -65,13 +65,21 @@ passport.use(
 
             // 사용자가 없다면 생성
             const userUuid = uuidv4();
-            const newUser = await UserModel.create(
+            const result = await UserModel.create(
               {
                 ...userData,
                 uuid: userUuid,
               },
               connection
             );
+
+            // 사용자 id 삽입
+            const newUser = {
+              ...result,
+              id: result.id,
+            };
+
+            // 생성된 사용자 반환
             return newUser;
           }
         );
@@ -83,3 +91,5 @@ passport.use(
     }
   )
 );
+
+export default passport;

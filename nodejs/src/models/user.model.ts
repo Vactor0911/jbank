@@ -2,6 +2,7 @@ import { Pool, PoolConnection } from "mariadb/*";
 import { UserData } from "../types";
 
 export class UserModel {
+  id: string;
   uuid: string;
   steamId: string;
   steamName: string;
@@ -9,7 +10,8 @@ export class UserModel {
   createdAt: Date;
   lastLogin: Date;
 
-  constructor(data: UserData) {
+  constructor(data: any) {
+    this.id = data.id || "";
     this.uuid = data.uuid;
     this.steamId = data.steamId;
     this.steamName = data.steamName;
@@ -37,16 +39,22 @@ export class UserModel {
       [steamId]
     );
 
+    // 사용자가 없으면 null 반환
+    if (!result) {
+      return null;
+    }
+
     // 사용자 객체 생성
-    const user = {
+    const user = new UserModel({
+      id: result.user_id,
       uuid: result.user_uuid,
       steamId: result.steam_id,
       steamName: result.steam_name,
       avatar: result.avatar,
       createdAt: result.created_at,
       lastLogin: result.last_login_at,
-    } as UserData;
-    return new UserModel(user);
+    });
+    return user;
   }
 
   /**
@@ -61,7 +69,7 @@ export class UserModel {
   ): Promise<UserModel> {
     await connection.execute(
       `
-        INSERT INTO user (user_uuid, steam_id, steam_name, avatar, created_at, last_login) 
+        INSERT INTO user (user_uuid, steam_id, steam_name, avatar, created_at, last_login_at) 
         VALUES (?, ?, ?, ?, ?, ?)
       `,
       [
@@ -82,14 +90,14 @@ export class UserModel {
    * @param connection 데이터베이스 연결 객체
    * @return 업데이트 결과
    */
-  static async updateLastLogin(
+  static async stampLastLogin(
     userId: string,
     connection: PoolConnection | Pool
   ): Promise<void> {
     const result = await connection.execute(
       `
         UPDATE user
-        SET last_login = NOW()
+        SET last_login_at = NOW()
         WHERE user_id = ?
       `,
       [userId]

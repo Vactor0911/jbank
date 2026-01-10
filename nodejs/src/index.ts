@@ -4,7 +4,7 @@ import cookieParser from "cookie-parser";
 import { errorHandler } from "./middlewares/errorHandler";
 import bodyParser from "body-parser";
 import { authRouter } from "./routes";
-import passport from "passport";
+import passport from "./config/passport";
 import "dotenv/config";
 
 const app = express();

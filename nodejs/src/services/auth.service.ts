@@ -4,7 +4,6 @@ import {
   generateRefreshToken,
   verifyRefreshToken,
 } from "../utils/jwt";
-import { v4 as uuidv4 } from "uuid";
 import TransactionHandler from "../utils/transactionHandler";
 import { dbPool } from "../config/db";
 import { ForbiddenError, NotFoundError } from "../errors/CustomErrors";
@@ -12,34 +11,28 @@ import { ForbiddenError, NotFoundError } from "../errors/CustomErrors";
 export class AuthService {
   /**
    * 로그인 처리
-   * @param userData 사용자 데이터
+   * @param steamId 사용자 Steam ID
    * @returns Access Token 및 Refresh Token
    */
-  static async login(userData: any) {
+  static async login(steamId: any) {
     const tokens = await TransactionHandler.executeInTransaction(
       dbPool,
       async (connection) => {
         // 사용자 조회
-        const user = await UserModel.findBySteamId(
-          userData.steamId,
-          connection
-        );
+        const user = await UserModel.findBySteamId(steamId, connection);
         if (!user) {
           throw new NotFoundError("사용자를 찾을 수 없습니다.");
         }
 
         // Access Token 및 Refresh Token 생성
-        const accessToken = generateAccessToken(userData);
-        const refreshToken = generateRefreshToken(userData);
+        const accessToken = generateAccessToken(user);
+        const refreshToken = generateRefreshToken(user);
+
+        // Refresh Token 저장
+        await UserModel.storeRefreshToken(user.id, refreshToken, connection);
 
         // 마지막 로그인 시간 업데이트
-        await UserModel.create(
-          {
-            ...userData,
-            lastLogin: new Date(),
-          },
-          dbPool
-        );
+        await UserModel.stampLastLogin(user.id, connection);
 
         // 토큰 반환
         const tokens = { accessToken, refreshToken };

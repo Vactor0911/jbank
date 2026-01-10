@@ -3,7 +3,7 @@ import { APIResponse, AuthRequest } from "../types";
 import { UserModel } from "../models/user.model";
 import { asyncHandler } from "../utils/asyncHandler";
 import { AuthService } from "../services/auth.service";
-import { verifyAccessToken, verifyRefreshToken } from "../utils/jwt";
+import { verifyRefreshToken } from "../utils/jwt";
 import { dbPool } from "../config/db";
 import { NotFoundError } from "../errors/CustomErrors";
 
@@ -19,7 +19,7 @@ export class AuthController {
     }
 
     // 로그인 처리
-    const tokens = await AuthService.login(user);
+    const tokens = await AuthService.login(user.steamId);
 
     // Refresh Token을 HttpOnly 쿠키로 설정
     res.cookie("refreshToken", tokens.refreshToken, {
