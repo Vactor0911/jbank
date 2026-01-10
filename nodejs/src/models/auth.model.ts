@@ -28,7 +28,7 @@ export class AuthModel {
    * @param connection Redis 연결 객체
    * @return 삭제 결과
    */
-  static async deleteRefreshTokenByUserId(
+  static async deleteRefreshToken(
     userId: string,
     connection: Redis
   ): Promise<number> {

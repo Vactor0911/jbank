@@ -72,20 +72,18 @@ export class AuthController {
    */
   static logout = asyncHandler(
     async (req: AuthRequest, res: Response<APIResponse>) => {
-      // 쿠키에서 Refresh Token 추출
       const { refreshToken } = req.cookies;
-      if (!refreshToken) {
-        return;
-      }
 
-      // 토큰 삭제
-      const decoded = verifyRefreshToken(refreshToken);
-      if (decoded) {
-        // Refresh Token 삭제
-        await AuthModel.deleteRefreshTokenByUserId(decoded.userUuid, redis);
+      // Refresh Token 삭제
+      if (refreshToken) {
+        const decoded = verifyRefreshToken(refreshToken);
+        if (decoded) {
+          // Refresh Token 삭제
+          await AuthModel.deleteRefreshToken(decoded.userUuid, redis);
 
-        // CSRF 토큰 삭제
-        await deleteCsrfToken(decoded.userUuid);
+          // CSRF 토큰 삭제
+          await deleteCsrfToken(decoded.userUuid);
+        }
       }
 
       // 쿠키 삭제
