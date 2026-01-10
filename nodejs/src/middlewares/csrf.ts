@@ -29,7 +29,7 @@ export const generateCsrfToken = async (userId: string) => {
  * @returns 검증 결과
  */
 export const verifyCsrfToken = async (userId: string, token: string) => {
-  const key = `csrf_token:${userId}`;
+  const key = `csrfToken:${userId}`;
   const storedToken = await redis.get(key);
 
   if (!storedToken || storedToken !== token) {
@@ -43,7 +43,7 @@ export const verifyCsrfToken = async (userId: string, token: string) => {
  * @param userId 사용자 id
  */
 export const deleteCsrfToken = async (userId: string) => {
-  const key = `csrf_token:${userId}`;
+  const key = `csrfToken:${userId}`;
   await redis.del(key);
 };
 
@@ -52,20 +52,20 @@ export const deleteCsrfToken = async (userId: string) => {
  * @param req 요청 객체
  * @returns 사용자 ID 또는 null
  */
-const extractUserIdFromToken = (req: Request): number | null => {
+const extractUserIdFromToken = (req: Request): string | null => {
   // 헤더에서 토큰 추출
   const authHeader = req.headers["authorization"];
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return null;
   }
-  const token = authHeader && authHeader.split(" ")[1];
+  const token = authHeader.split(" ")[1];
   if (!token) {
     return null;
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET!) as any;
-    return decoded.id;
+    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET) as any;
+    return decoded.userId;
   } catch (error) {
     return null;
   }
@@ -94,7 +94,7 @@ export const csrfProtection = async (
   }
 
   // CSRF 토큰 검증
-  const isValid = await verifyCsrfToken(userId.toString(), csrfToken);
+  const isValid = await verifyCsrfToken(userId, csrfToken);
   if (!isValid) {
     return res.status(403).json({ error: "CSRF 토큰이 유효하지 않습니다." });
   }

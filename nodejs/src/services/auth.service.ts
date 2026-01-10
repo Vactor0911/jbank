@@ -9,12 +9,13 @@ import { mariaDB } from "../config/mariadb";
 import { ForbiddenError, NotFoundError } from "../errors/CustomErrors";
 import { redis } from "../config/redis";
 import { AuthModel } from "../models/auth.model";
+import { generateCsrfToken } from "../middlewares/csrf";
 
 export class AuthService {
   /**
    * 로그인 처리
    * @param steamId 사용자 Steam ID
-   * @returns Access Token 및 Refresh Token
+   * @returns Access Token ,Refresh Token 및 CSRF Token
    */
   static async login(steamId: any) {
     const tokens = await TransactionHandler.executeInTransaction(
@@ -33,11 +34,14 @@ export class AuthService {
         // Refresh Token 저장
         await AuthModel.storeRefreshToken(user.id, refreshToken, redis);
 
+        // CSRF 토큰 생성 및 저장
+        const csrfToken = await generateCsrfToken(user.id);
+
         // 마지막 로그인 시간 업데이트
         await UserModel.stampLastLogin(user.id, connection);
 
         // 토큰 반환
-        const tokens = { accessToken, refreshToken };
+        const tokens = { accessToken, refreshToken, csrfToken };
         return tokens;
       }
     );
@@ -63,7 +67,7 @@ export class AuthService {
     }
 
     // 사용자 정보 조회
-    const user = await UserModel.findBySteamId(decoded.userUuid, mariaDB);
+    const user = await UserModel.findByUuid(decoded.userUuid, mariaDB);
     if (!user) {
       throw new NotFoundError("사용자를 찾을 수 없습니다.");
     }

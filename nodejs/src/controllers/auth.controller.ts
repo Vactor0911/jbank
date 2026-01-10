@@ -37,6 +37,7 @@ export class AuthController {
       success: true,
       message: "로그인 성공",
       accessToken: tokens.accessToken,
+      csrfToken: tokens.csrfToken,
     });
   });
 

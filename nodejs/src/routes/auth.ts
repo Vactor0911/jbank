@@ -2,6 +2,8 @@ import { Router } from "express";
 import passport from "passport";
 import { AuthController } from "../controllers/auth.controller";
 import { authenticateJWT } from "../middlewares/auth";
+import { csrfProtection } from "../middlewares/csrf";
+import { redis } from "../config/redis";
 
 const authRouter = Router();
 
@@ -19,9 +21,19 @@ authRouter.get(
 );
 
 // Refresh Token으로 Access Token 재발급
-authRouter.post("/refresh", authenticateJWT, AuthController.refreshToken);
+authRouter.post(
+  "/refresh",
+  authenticateJWT,
+  csrfProtection,
+  AuthController.refreshToken
+);
 
 // 로그아웃
-authRouter.post("/logout", authenticateJWT, AuthController.logout);
+authRouter.post(
+  "/logout",
+  authenticateJWT,
+  csrfProtection,
+  AuthController.logout
+);
 
 export default authRouter;
