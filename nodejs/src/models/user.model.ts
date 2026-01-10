@@ -28,11 +28,15 @@ export class UserModel {
     steamId: string,
     connection: PoolConnection | Pool
   ): Promise<UserModel | null> {
-    // TODO: DB 조회 로직 구현
-
-    // 임시 반환
-    console.log("Finding user by Steam ID:", steamId);
-    return null;
+    const user = await connection.execute(
+      `
+        SELECT *
+        FROM user
+        WHERE steam_id = ?
+      `,
+      [steamId]
+    );
+    return user;
   }
 
   /**
@@ -45,10 +49,20 @@ export class UserModel {
     userData: UserData,
     connection: PoolConnection | Pool
   ): Promise<UserModel> {
-    // TODO: 저장 로직 구현
-
-    // 임시 반환
-    console.log("Creating user with data:", userData);
+    await connection.execute(
+      `
+        INSERT INTO user (user_uuid, steam_id, steam_name, avatar, created_at, last_login) 
+        VALUES (?, ?, ?, ?, ?, ?)
+      `,
+      [
+        userData.uuid,
+        userData.steamId,
+        userData.steamName,
+        userData.avatar,
+        userData.createdAt,
+        userData.lastLogin,
+      ]
+    );
     return new UserModel(userData);
   }
 
@@ -56,15 +70,21 @@ export class UserModel {
    * 마지막 로그인 시간 업데이트
    * @param userId 사용자 id
    * @param connection 데이터베이스 연결 객체
+   * @return 업데이트 결과
    */
   static async updateLastLogin(
     userId: string,
     connection: PoolConnection | Pool
   ): Promise<void> {
-    // TODO: 업데이트 로직 구현
-
-    // 임시 반환
-    console.log("Updating last login for user ID:", userId);
+    const result = await connection.execute(
+      `
+        UPDATE user
+        SET last_login = NOW()
+        WHERE user_id = ?
+      `,
+      [userId]
+    );
+    return result;
   }
 
   /**
@@ -72,35 +92,42 @@ export class UserModel {
    * @param userId 사용자 id
    * @param refreshToken 리프레시 토큰
    * @param connection 데이터베이스 연결 객체
+   * @return 저장 결과
    */
   static async storeRefreshToken(
     userId: string,
     refreshToken: string,
     connection: PoolConnection | Pool
   ): Promise<void> {
-    // TODO: 저장 로직 구현
-
-    // 임시 반환
-    console.log(
-      "Storing refresh token for user ID:",
-      userId,
-      "Token:",
-      refreshToken
+    const result = await connection.execute(
+      `
+        UPDATE user
+        SET refresh_token = ?
+        WHERE user_id = ?
+      `,
+      [refreshToken, userId]
     );
+    return result;
   }
 
   /**
    * 사용자 id로 리프레시 토큰 삭제
    * @param userId 사용자 id
    * @param connection 데이터베이스 연결 객체
+   * @return 삭제 결과
    */
   static async deleteRefreshTokenByUuid(
     userId: string,
     connection: PoolConnection | Pool
   ): Promise<void> {
-    // TODO: 삭제 로직 구현
-
-    // 임시 반환
-    console.log("Deleting refresh token for user ID:", userId);
+    const result = await connection.execute(
+      `
+        UPDATE user
+        SET refresh_token = NULL
+        WHERE user_id = ?
+      `,
+      [userId]
+    );
+    return result;
   }
 }
