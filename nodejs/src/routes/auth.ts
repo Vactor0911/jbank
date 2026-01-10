@@ -25,8 +25,15 @@ authRouter.post(
   "/refresh",
   authenticateJWT,
   csrfProtection,
-  AuthController.refreshToken
+  AuthController.refreshJwtToken
 );
+
+// CSRF 토큰 재발급
+authRouter.post(
+  "/csrf",
+  authenticateJWT,
+  AuthController.refreshCsrfToken
+)
 
 // 로그아웃
 authRouter.post(
