@@ -8,7 +8,7 @@ import { mariaDB } from "../config/mariadb";
 import { NotFoundError } from "../errors/CustomErrors";
 import { AuthModel } from "../models/auth.model";
 import { redis } from "../config/redis";
-import { deleteCsrfToken } from "../middlewares/csrf";
+import { deleteCsrfToken, generateCsrfToken } from "../middlewares/csrf";
 
 export class AuthController {
   /**
@@ -44,7 +44,7 @@ export class AuthController {
   /**
    * Refresh Token으로 Access Token 재발급
    */
-  static refreshToken = asyncHandler(
+  static refreshJwtToken = asyncHandler(
     async (req: AuthRequest, res: Response<APIResponse>) => {
       const { refreshToken } = req.cookies;
 
@@ -63,6 +63,22 @@ export class AuthController {
         success: true,
         message: "토큰이 재발급되었습니다.",
         accessToken: tokens.accessToken,
+      });
+    }
+  );
+
+  static refreshCsrfToken = asyncHandler(
+    async (req: AuthRequest, res: Response<APIResponse>) => {
+      const { userId } = req.user as { userId: string };
+
+      // 새로운 CSRF 토큰 발급
+      const csrfToken = await generateCsrfToken(userId);
+
+      // 응답 전송
+      res.json({
+        success: true,
+        message: "CSRF 토큰이 재발급되었습니다.",
+        csrfToken,
       });
     }
   );
