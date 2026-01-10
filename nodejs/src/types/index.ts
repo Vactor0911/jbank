@@ -5,6 +5,7 @@ import { JwtPayload } from "jsonwebtoken";
  * 사용자 데이터 인터페이스
  */
 export interface UserData {
+  id?: string;
   uuid: string;
   steamId: string;
   steamName: string;
@@ -17,6 +18,7 @@ export interface UserData {
  * JWT Access Token 페이로드 인터페이스
  */
 export interface AccessTokenPayload {
+  userId: string;
   userUuid: string;
   userSteamId: string;
   userSteamName: string;

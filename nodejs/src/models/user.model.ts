@@ -21,10 +21,36 @@ export class UserModel {
   }
 
   /**
+   * 사용자 uuid로 사용자 조회
+   * @param userUuid 사용자 uuid
+   * @param connection MariaDB 연결 객체
+   * @returns 사용자 객체 또는 null
+   */
+  static async findByUuid(userUuid: string, connection: PoolConnection | Pool) {
+    const [result] = await connection.execute(
+      `
+        SELECT *
+        FROM user
+        WHERE user_uuid = ?
+      `,
+      [userUuid]
+    );
+
+    // 사용자가 없으면 null 반환
+    if (!result) {
+      return null;
+    }
+
+    // 사용자 객체 생성
+    const user = this.formatUser(result);
+    return user;
+  }
+
+  /**
    * Steam ID로 사용자 조회
    * @param steamId 사용자 Steam ID
-   * @param connection 데이터베이스 연결 객체
-   * @returns 사용자 데이터 또는 null
+   * @param connection MariaDB 연결 객체
+   * @returns 사용자 객체 또는 null
    */
   static async findBySteamId(
     steamId: string,
@@ -45,12 +71,14 @@ export class UserModel {
     }
 
     // 사용자 객체 생성
-    const user = new UserModel({
-      id: result.user_id,
-      uuid: result.user_uuid,
-      steamId: result.steam_id,
-      steamName: result.steam_name,
-      avatar: result.avatar,
+    const user = this.formatUser(result);
+    return user;
+  }
+
+  /**
+   * 사용자 생성
+   * @param userData 사용자 데이터
+   * @param connection MariaDB 연결 객체
       createdAt: result.created_at,
       lastLogin: result.last_login_at,
     });
@@ -60,7 +88,7 @@ export class UserModel {
   /**
    * 사용자 생성
    * @param userData 사용자 데이터
-   * @param connection 데이터베이스 연결 객체
+   * @param connection MariaDB 연결 객체
    * @returns 사용자 모델 객체
    */
   static async create(
@@ -87,7 +115,7 @@ export class UserModel {
   /**
    * 마지막 로그인 시간 업데이트
    * @param userId 사용자 id
-   * @param connection 데이터베이스 연결 객체
+   * @param connection MariaDB 연결 객체
    * @return 업데이트 결과
    */
   static async stampLastLogin(
@@ -106,46 +134,20 @@ export class UserModel {
   }
 
   /**
-   * 리프레시 토큰 저장
-   * @param userId 사용자 id
-   * @param refreshToken 리프레시 토큰
-   * @param connection 데이터베이스 연결 객체
-   * @return 저장 결과
+   * 사용자 데이터 객체 포맷팅
+   * @param data DB 쿼리 결과
+   * @returns 사용자 객체
    */
-  static async storeRefreshToken(
-    userId: string,
-    refreshToken: string,
-    connection: PoolConnection | Pool
-  ): Promise<void> {
-    const result = await connection.execute(
-      `
-        UPDATE user
-        SET refresh_token = ?
-        WHERE user_id = ?
-      `,
-      [refreshToken, userId]
-    );
-    return result;
-  }
-
-  /**
-   * 사용자 id로 리프레시 토큰 삭제
-   * @param userId 사용자 id
-   * @param connection 데이터베이스 연결 객체
-   * @return 삭제 결과
-   */
-  static async deleteRefreshTokenByUuid(
-    userId: string,
-    connection: PoolConnection | Pool
-  ): Promise<void> {
-    const result = await connection.execute(
-      `
-        UPDATE user
-        SET refresh_token = NULL
-        WHERE user_id = ?
-      `,
-      [userId]
-    );
-    return result;
+  private static formatUser(data: any): UserModel {
+    const user = new UserModel({
+      id: String(data.user_id),
+      uuid: data.user_uuid,
+      steamId: data.steam_id,
+      steamName: data.steam_name,
+      avatar: data.avatar,
+      createdAt: data.created_at,
+      lastLogin: data.last_login_at,
+    });
+    return user;
   }
 }

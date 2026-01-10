@@ -3,7 +3,7 @@ import { Strategy as SteamStrategy } from "passport-steam";
 import { UserModel } from "../models/user.model";
 import { SteamProfile, UserData } from "../types";
 import { v4 as uuidv4 } from "uuid";
-import { dbPool } from "./db";
+import { mariaDB } from "./mariadb";
 import TransactionHandler from "../utils/transactionHandler";
 
 /**
@@ -18,7 +18,7 @@ passport.serializeUser((user: any, done) => {
  */
 passport.deserializeUser(async (steamId: string, done) => {
   try {
-    const user = await UserModel.findBySteamId(steamId, dbPool);
+    const user = await UserModel.findBySteamId(steamId, mariaDB);
     done(null, user);
   } catch (error) {
     done(error, null);
@@ -53,7 +53,7 @@ passport.use(
         };
 
         const user = await TransactionHandler.executeInTransaction(
-          dbPool,
+          mariaDB,
           async (connection) => {
             // 사용자 조회
             const user = await UserModel.findBySteamId(steamId, connection);

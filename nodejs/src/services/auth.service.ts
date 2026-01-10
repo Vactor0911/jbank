@@ -5,18 +5,21 @@ import {
   verifyRefreshToken,
 } from "../utils/jwt";
 import TransactionHandler from "../utils/transactionHandler";
-import { dbPool } from "../config/db";
+import { mariaDB } from "../config/mariadb";
 import { ForbiddenError, NotFoundError } from "../errors/CustomErrors";
+import { redis } from "../config/redis";
+import { AuthModel } from "../models/auth.model";
+import { generateCsrfToken } from "../middlewares/csrf";
 
 export class AuthService {
   /**
    * 로그인 처리
    * @param steamId 사용자 Steam ID
-   * @returns Access Token 및 Refresh Token
+   * @returns Access Token ,Refresh Token 및 CSRF Token
    */
   static async login(steamId: any) {
     const tokens = await TransactionHandler.executeInTransaction(
-      dbPool,
+      mariaDB,
       async (connection) => {
         // 사용자 조회
         const user = await UserModel.findBySteamId(steamId, connection);
@@ -29,13 +32,16 @@ export class AuthService {
         const refreshToken = generateRefreshToken(user);
 
         // Refresh Token 저장
-        await UserModel.storeRefreshToken(user.id, refreshToken, connection);
+        await AuthModel.storeRefreshToken(user.id, refreshToken, redis);
+
+        // CSRF 토큰 생성 및 저장
+        const csrfToken = await generateCsrfToken(user.id);
 
         // 마지막 로그인 시간 업데이트
         await UserModel.stampLastLogin(user.id, connection);
 
         // 토큰 반환
-        const tokens = { accessToken, refreshToken };
+        const tokens = { accessToken, refreshToken, csrfToken };
         return tokens;
       }
     );
@@ -61,7 +67,7 @@ export class AuthService {
     }
 
     // 사용자 정보 조회
-    const user = await UserModel.findBySteamId(decoded.userUuid, dbPool);
+    const user = await UserModel.findByUuid(decoded.userUuid, mariaDB);
     if (!user) {
       throw new NotFoundError("사용자를 찾을 수 없습니다.");
     }
@@ -71,6 +77,9 @@ export class AuthService {
 
     // Refresh Token 로테이션
     const newRefreshToken = generateRefreshToken(user);
+
+    // 새로운 Refresh Token 저장
+    await AuthModel.storeRefreshToken(user.id, newRefreshToken, redis);
 
     // 새로운 토큰 반환
     const tokens = {

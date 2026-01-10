@@ -8,13 +8,20 @@ import { verifyAccessToken } from "../utils/jwt";
  * @param res API 응답 객체
  * @param next 다음 미들웨어 호출 함수
  */
-export const authenticateToken = (
+export const authenticateJWT = (
   req: AuthRequest,
   res: Response<APIResponse>,
   next: NextFunction
 ): void => {
   // 헤더에서 토큰 추출
   const authHeader = req.headers["authorization"];
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    res.status(401).json({
+      success: false,
+      message: "인증 토큰이 필요합니다.",
+    });
+    return;
+  }
   const token = authHeader && authHeader.split(" ")[1];
   if (!token) {
     res.status(401).json({
@@ -52,6 +59,11 @@ export const optionalAuth = (
 ): void => {
   // 헤더에서 토큰 추출
   const authHeader = req.headers["authorization"];
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    // 토큰이 없으면 다음 미들웨어 호출
+    next();
+    return;
+  }
   const token = authHeader && authHeader.split(" ")[1];
 
   // 토큰이 있으면 검증 시도
