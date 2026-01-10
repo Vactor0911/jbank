@@ -4,7 +4,7 @@ import { UserModel } from "../models/user.model";
 import { asyncHandler } from "../utils/asyncHandler";
 import { AuthService } from "../services/auth.service";
 import { verifyRefreshToken } from "../utils/jwt";
-import { dbPool } from "../config/db";
+import { mariaDB } from "../config/mariadb";
 import { NotFoundError } from "../errors/CustomErrors";
 
 export class AuthController {
@@ -77,7 +77,7 @@ export class AuthController {
       // DB에서 Refresh Token 삭제
       const decoded = verifyRefreshToken(refreshToken);
       if (decoded) {
-        await UserModel.deleteRefreshTokenByUuid(decoded.userUuid, dbPool);
+        await UserModel.deleteRefreshTokenByUuid(decoded.userUuid, mariaDB);
       }
 
       // 쿠키 삭제
@@ -99,7 +99,7 @@ export class AuthController {
       const { userUuid } = req.user as { userUuid: string };
 
       // 사용자 정보 조회
-      const user = await UserModel.findBySteamId(userUuid, dbPool);
+      const user = await UserModel.findBySteamId(userUuid, mariaDB);
       if (!user) {
         throw new NotFoundError("사용자를 찾을 수 없습니다.");
       }

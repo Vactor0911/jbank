@@ -5,7 +5,7 @@ import dotenv from "dotenv"; // 환경 변수 사용한 민감한 정보 관리
 dotenv.config();
 
 // MariaDB 연결
-export const dbPool = MariaDB.createPool({
+export const mariaDB = MariaDB.createPool({
   host: process.env.DB_HOST,
   port: Number(process.env.DB_PORT),
   user: process.env.DB_USERNAME,
@@ -16,7 +16,7 @@ export const dbPool = MariaDB.createPool({
 });
 
 // MariadbPool 연결 확인
-dbPool
+mariaDB
   .getConnection()
   .then((conn) => {
     console.log("데이터베이스가 성공적으로 연결되었습니다!");

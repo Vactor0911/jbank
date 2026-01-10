@@ -5,7 +5,7 @@ import {
   verifyRefreshToken,
 } from "../utils/jwt";
 import TransactionHandler from "../utils/transactionHandler";
-import { dbPool } from "../config/db";
+import { mariaDB } from "../config/mariadb";
 import { ForbiddenError, NotFoundError } from "../errors/CustomErrors";
 
 export class AuthService {
@@ -16,7 +16,7 @@ export class AuthService {
    */
   static async login(steamId: any) {
     const tokens = await TransactionHandler.executeInTransaction(
-      dbPool,
+      mariaDB,
       async (connection) => {
         // 사용자 조회
         const user = await UserModel.findBySteamId(steamId, connection);
@@ -61,7 +61,7 @@ export class AuthService {
     }
 
     // 사용자 정보 조회
-    const user = await UserModel.findBySteamId(decoded.userUuid, dbPool);
+    const user = await UserModel.findBySteamId(decoded.userUuid, mariaDB);
     if (!user) {
       throw new NotFoundError("사용자를 찾을 수 없습니다.");
     }
