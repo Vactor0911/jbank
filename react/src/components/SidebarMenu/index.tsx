@@ -15,7 +15,7 @@ import Footer from "../Footer";
 import { useCallback } from "react";
 import { Home } from "./Tabs";
 import { useAtomValue } from "jotai";
-import { navigationValueAtom } from "../../states";
+import { navigationValueAtom, isAuthenticatedAtom } from "../../states";
 import JbankLogo from "../../assets/logo/jbank.svg?react";
 import AuthService from "../../services/authService";
 
@@ -24,10 +24,16 @@ const SidebarMenu = () => {
   const navigate = useNavigate();
 
   const navigationValue = useAtomValue(navigationValueAtom);
+  const isAuthenticated = useAtomValue(isAuthenticatedAtom);
 
   // 프로필 정보 클릭 핸들러
   const handleProfileClick = useCallback(() => {
     navigate("/profile");
+  }, [navigate]);
+
+  // 로그인 클릭 핸들러
+  const handleLoginClick = useCallback(() => {
+    navigate("/login");
   }, [navigate]);
 
   // 로그아웃 클릭 핸들러
@@ -81,27 +87,37 @@ const SidebarMenu = () => {
       >
         <Stack direction="row" width="100%" gap={2} alignItems="center">
           {/* 프로필 이미지 */}
-          <Avatar
-            src={SampleProfileImage}
-            variant="rounded"
-            sx={{
-              width: "40px",
-              height: "40px",
-            }}
-          />
+          {isAuthenticated && (
+            <Avatar
+              src={SampleProfileImage}
+              variant="rounded"
+              sx={{
+                width: "40px",
+                height: "40px",
+              }}
+            />
+          )}
 
           {/* 사용자 정보 */}
-          <Stack flex={1} overflow="hidden">
-            {/* Jbank 사용자 닉네임 */}
-            <Typography variant="body1" fontWeight={500} noWrap>
-              백터
-            </Typography>
+          {isAuthenticated ? (
+            <Stack flex={1} overflow="hidden">
+              {/* Jbank 사용자 닉네임 */}
+              <Typography variant="body1" fontWeight={500} noWrap>
+                백터
+              </Typography>
 
-            {/* Steam 닉네임 */}
-            <Typography variant="caption" color="text.secondary" noWrap>
-              76561198012345678
-            </Typography>
-          </Stack>
+              {/* Steam 닉네임 */}
+              <Typography variant="caption" color="text.secondary" noWrap>
+                76561198012345678
+              </Typography>
+            </Stack>
+          ) : (
+            <Stack direction="row" height="40px" alignItems="center" flex={1}>
+              <Typography variant="body1" fontWeight="bold">
+                로그인하세요
+              </Typography>
+            </Stack>
+          )}
 
           {/* 아이콘 */}
           <NavigateNextOutlinedIcon />
@@ -117,17 +133,31 @@ const SidebarMenu = () => {
         p={1}
         borderRadius={2}
       >
-        <ButtonBase
-          sx={{
-            flex: 1,
-            borderRadius: 1.5,
-          }}
-          onClick={handleLogoutClick}
-        >
-          <Typography variant="body1" textAlign="center" color="text.primary">
-            로그아웃
-          </Typography>
-        </ButtonBase>
+        {isAuthenticated ? (
+          <ButtonBase
+            sx={{
+              flex: 1,
+              borderRadius: 1.5,
+            }}
+            onClick={handleLogoutClick}
+          >
+            <Typography variant="body1" textAlign="center" color="text.primary">
+              로그아웃
+            </Typography>
+          </ButtonBase>
+        ) : (
+          <ButtonBase
+            sx={{
+              flex: 1,
+              borderRadius: 1.5,
+            }}
+            onClick={handleLoginClick}
+          >
+            <Typography variant="body1" textAlign="center" color="text.primary">
+              로그인
+            </Typography>
+          </ButtonBase>
+        )}
 
         <ButtonBase
           sx={{

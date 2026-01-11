@@ -6,9 +6,13 @@ import { useCallback } from "react";
 import LinkedSectionContainer from "../../components/LinkedSectionContainer";
 import AccountSection from "./AccountSection";
 import AdsSection from "./AdsSection";
+import { useAtomValue } from "jotai";
+import { isAuthenticatedAtom } from "../../states";
 
 const HomeMobile = () => {
   const navigate = useNavigate();
+
+  const isAuthenticated = useAtomValue(isAuthenticatedAtom);
 
   // 프로필 정보 클릭 핸들러
   const handleProfileClick = useCallback(() => {
@@ -29,35 +33,37 @@ const HomeMobile = () => {
       >
         <Stack direction="row" width="100%" gap={2} alignItems="center">
           {/* 프로필 이미지 */}
-          <Avatar
-            src={SampleProfileImage}
-            variant="rounded"
-            sx={{
-              width: "40px",
-              height: "40px",
-            }}
-          />
+          {isAuthenticated && (
+            <Avatar
+              src={SampleProfileImage}
+              variant="rounded"
+              sx={{
+                width: "40px",
+                height: "40px",
+              }}
+            />
+          )}
 
           {/* 사용자 정보 */}
-          <Stack flex={1} overflow="hidden">
-            {/* Jbank 사용자 닉네임 */}
-            <Typography
-              variant="body1"
-              fontWeight={500}
-              noWrap
-            >
-              백터
-            </Typography>
+          {isAuthenticated ? (
+            <Stack flex={1} overflow="hidden">
+              {/* Jbank 사용자 닉네임 */}
+              <Typography variant="body1" fontWeight={500} noWrap>
+                백터
+              </Typography>
 
-            {/* Steam 닉네임 */}
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              noWrap
-            >
-              백터 (Vactor0911)
-            </Typography>
-          </Stack>
+              {/* Steam 닉네임 */}
+              <Typography variant="caption" color="text.secondary" noWrap>
+                76561198012345678
+              </Typography>
+            </Stack>
+          ) : (
+            <Stack direction="row" height="40px" alignItems="center" flex={1}>
+              <Typography variant="body1" fontWeight="bold">
+                로그인하세요
+              </Typography>
+            </Stack>
+          )}
 
           {/* 아이콘 */}
           <NavigateNextOutlinedIcon />

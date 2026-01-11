@@ -4,6 +4,10 @@ import type {
   InternalAxiosRequestConfig,
 } from "axios";
 import axios from "axios";
+import { getDefaultStore } from "jotai";
+import { isAuthenticatedAtom } from "../states";
+
+const store = getDefaultStore();
 
 const SERVER_HOST = import.meta.env.VITE_SERVER_HOST;
 
@@ -251,12 +255,14 @@ class ApiClient {
     this.accessToken = accessToken;
     // TODO: console log 제거 필요
     console.log("Access Token 저장됨!");
+    store.set(isAuthenticatedAtom, this.isAuthenticated());
   }
 
   public setCsrfToken(csrfToken: string) {
     this.csrfToken = csrfToken;
     // TODO: console log 제거 필요
     console.log("CSRF Token 저장됨!");
+    store.set(isAuthenticatedAtom, this.isAuthenticated());
   }
 
   // 메모리에서 토큰 삭제
@@ -266,6 +272,7 @@ class ApiClient {
 
     // TODO: console log 제거 필요
     console.log("토큰 제거됨!");
+    store.set(isAuthenticatedAtom, false);
   }
 
   /**
