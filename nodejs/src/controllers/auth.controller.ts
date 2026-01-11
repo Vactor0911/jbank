@@ -10,6 +10,7 @@ import { AuthModel } from "../models/auth.model";
 import { redis } from "../config/redis";
 import { deleteCsrfToken, generateCsrfToken } from "../middlewares/csrf";
 import crypto from "crypto";
+import { UserService } from "../services/user.service";
 
 export class AuthController {
   /**
@@ -24,6 +25,9 @@ export class AuthController {
 
     // 로그인 처리
     const tokens = await AuthService.login(user.steamId);
+
+    // 사용자 스팀 프로필 업데이트
+    await UserService.autoRefreshProfile(user.id);
 
     // 로그인 정보 교환용 임시 코드 생성
     const tempAuthCode = crypto.randomBytes(32).toString("hex");

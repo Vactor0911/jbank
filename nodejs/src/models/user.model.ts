@@ -9,6 +9,7 @@ export class UserModel {
   avatar: string;
   createdAt: Date;
   lastLogin: Date;
+  lastProfileRefresh: Date;
 
   constructor(data: any) {
     this.id = data.id || "";
@@ -18,6 +19,7 @@ export class UserModel {
     this.avatar = data.avatar;
     this.createdAt = data.createdAt || new Date();
     this.lastLogin = data.lastLogin || new Date();
+    this.lastProfileRefresh = data.lastProfileRefresh || new Date();
   }
 
   /**
@@ -155,7 +157,7 @@ export class UserModel {
     const result = await connection.execute(
       `
         UPDATE user
-        SET steam_name = ?, avatar = ?
+        SET steam_name = ?, avatar = ?, last_profile_refresh_at = NOW()
         WHERE user_id = ?
       `,
       [steamName, avatar, userId]
@@ -198,6 +200,7 @@ export class UserModel {
       avatar: data.avatar,
       createdAt: data.created_at,
       lastLogin: data.last_login_at,
+      lastProfileRefresh: data.last_profile_refresh_at,
     });
     return user;
   }
