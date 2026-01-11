@@ -1,18 +1,19 @@
-import { Avatar, ButtonBase, Stack, Typography } from "@mui/material";
+import { ButtonBase, Stack, Typography } from "@mui/material";
 import NavigateNextOutlinedIcon from "@mui/icons-material/NavigateNextOutlined";
-import SampleProfileImage from "../../assets/sample-user-profile.png";
 import { useNavigate } from "react-router";
 import { useCallback } from "react";
 import LinkedSectionContainer from "../../components/LinkedSectionContainer";
 import AccountSection from "./AccountSection";
 import AdsSection from "./AdsSection";
 import { useAtomValue } from "jotai";
-import { isAuthenticatedAtom } from "../../states";
+import { isAuthenticatedAtom, userDataAtom } from "../../states";
+import ImageBox from "../../components/ImageBox";
 
 const HomeMobile = () => {
   const navigate = useNavigate();
 
   const isAuthenticated = useAtomValue(isAuthenticatedAtom);
+  const userData = useAtomValue(userDataAtom);
 
   // 프로필 정보 클릭 핸들러
   const handleProfileClick = useCallback(() => {
@@ -34,9 +35,9 @@ const HomeMobile = () => {
         <Stack direction="row" width="100%" gap={2} alignItems="center">
           {/* 프로필 이미지 */}
           {isAuthenticated && (
-            <Avatar
-              src={SampleProfileImage}
-              variant="rounded"
+            <ImageBox
+              src={userData?.avatar}
+              borderRadius="4px"
               sx={{
                 width: "40px",
                 height: "40px",
@@ -49,12 +50,12 @@ const HomeMobile = () => {
             <Stack flex={1} overflow="hidden">
               {/* Jbank 사용자 닉네임 */}
               <Typography variant="body1" fontWeight={500} noWrap>
-                백터
+                {userData?.steamName}
               </Typography>
 
               {/* Steam 닉네임 */}
               <Typography variant="caption" color="text.secondary" noWrap>
-                76561198012345678
+                {userData?.steamId}
               </Typography>
             </Stack>
           ) : (
