@@ -15,11 +15,18 @@ import HelpOutlineRoundedIcon from "@mui/icons-material/HelpOutlineRounded";
 import ImageBox from "../../components/ImageBox";
 import { useAtomValue } from "jotai";
 import { userDataAtom } from "../../states";
+import { useCallback } from "react";
+import UserService from "../../services/userService";
 
 const Profile = () => {
   const navigate = useNavigate();
 
   const userData = useAtomValue(userDataAtom);
+
+  // 정보 새로고침 클릭 핸들러
+  const handleRefreshClick = useCallback(async () => {
+    await UserService.refreshMe();
+  }, []);
 
   return (
     <Paper
@@ -141,7 +148,12 @@ const Profile = () => {
               </Stack>
 
               {/* 정보 새로고침 버튼 */}
-              <Button variant="contained" color="secondary" disableElevation>
+              <Button
+                variant="contained"
+                color="secondary"
+                disableElevation
+                onClick={handleRefreshClick}
+              >
                 <Typography variant="body1" fontWeight={500}>
                   정보 새로고침
                 </Typography>

@@ -4,6 +4,9 @@ import { UserController } from "../controllers/user.controller";
 
 const userRouter = Router();
 
+// 사용자 본인 정보 새로고침
+userRouter.patch("/me/refresh", authenticateJWT, UserController.refreshMe);
+
 // 사용자 본인 정보 조회
 userRouter.get("/me", authenticateJWT, UserController.me);
 

@@ -139,6 +139,31 @@ export class UserModel {
   }
 
   /**
+   * 사용자 스팀 정보 업데이트
+   * @param userId 사용자 id
+   * @param steamName 스팀 이름
+   * @param avatar 아바타 URL
+   * @param connection MariaDB 연결 객체
+   * @returns
+   */
+  static async updateSteamInfo(
+    userId: string,
+    steamName: string,
+    avatar: string,
+    connection: PoolConnection | Pool
+  ) {
+    const result = await connection.execute(
+      `
+        UPDATE user
+        SET steam_name = ?, avatar = ?
+        WHERE user_id = ?
+      `,
+      [steamName, avatar, userId]
+    );
+    return result;
+  }
+
+  /**
    * 마지막 로그인 시간 업데이트
    * @param userId 사용자 id
    * @param connection MariaDB 연결 객체
@@ -147,7 +172,7 @@ export class UserModel {
   static async stampLastLogin(
     userId: string,
     connection: PoolConnection | Pool
-  ): Promise<void> {
+  ) {
     const result = await connection.execute(
       `
         UPDATE user
