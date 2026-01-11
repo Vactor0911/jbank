@@ -37,7 +37,8 @@ class AuthService {
     const csrfToken = response.data.csrfToken;
 
     if (accessToken && csrfToken) {
-      apiClient.setTokens(accessToken, csrfToken);
+      apiClient.setAccessToken(accessToken);
+      apiClient.setCsrfToken(csrfToken);
       return true;
     }
 
@@ -54,16 +55,6 @@ class AuthService {
   }
 
   /**
-   * 토큰 갱신 (수동 갱신)
-   */
-  static async rotateToken() {
-    const response = await axiosInstance.post<LoginResponse>(
-      "/api/auth/refresh"
-    );
-    apiClient.setTokens(response.data.accessToken, response.data.csrfToken);
-  }
-
-  /**
    * 로그아웃 핸들링
    */
   static async logout() {
@@ -73,7 +64,6 @@ class AuthService {
       console.error("로그아웃 실패:", error);
     } finally {
       apiClient.clearTokens();
-      window.location.href = "/login";
     }
   }
 

@@ -17,6 +17,7 @@ import { Home } from "./Tabs";
 import { useAtomValue } from "jotai";
 import { navigationValueAtom } from "../../states";
 import JbankLogo from "../../assets/logo/jbank.svg?react";
+import AuthService from "../../services/authService";
 
 const SidebarMenu = () => {
   const theme = useTheme();
@@ -27,6 +28,12 @@ const SidebarMenu = () => {
   // 프로필 정보 클릭 핸들러
   const handleProfileClick = useCallback(() => {
     navigate("/profile");
+  }, [navigate]);
+
+  // 로그아웃 클릭 핸들러
+  const handleLogoutClick = useCallback(() => {
+    AuthService.logout();
+    navigate("/");
   }, [navigate]);
 
   // 모바일 화면에서는 사이드바 메뉴를 표시하지 않음
@@ -86,20 +93,12 @@ const SidebarMenu = () => {
           {/* 사용자 정보 */}
           <Stack flex={1} overflow="hidden">
             {/* Jbank 사용자 닉네임 */}
-            <Typography
-              variant="body1"
-              fontWeight={500}
-              noWrap
-            >
+            <Typography variant="body1" fontWeight={500} noWrap>
               백터
             </Typography>
 
             {/* Steam 닉네임 */}
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              noWrap
-            >
+            <Typography variant="caption" color="text.secondary" noWrap>
               76561198012345678
             </Typography>
           </Stack>
@@ -123,6 +122,7 @@ const SidebarMenu = () => {
             flex: 1,
             borderRadius: 1.5,
           }}
+          onClick={handleLogoutClick}
         >
           <Typography variant="body1" textAlign="center" color="text.primary">
             로그아웃

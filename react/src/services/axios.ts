@@ -143,7 +143,7 @@ class ApiClient {
 
             return this.axiosInstance(originalRequest);
           } catch (refreshError) {
-            this.handleAuthError();
+            this.clearTokens();
             return Promise.reject(refreshError);
           } finally {
             this.isRefreshing = false;
@@ -176,7 +176,7 @@ class ApiClient {
 
             return this.axiosInstance(originalRequest);
           } catch (refreshError) {
-            this.handleAuthError();
+            this.clearTokens();
             return Promise.reject(refreshError);
           }
         }
@@ -244,14 +244,6 @@ class ApiClient {
       console.error("토큰 갱신 실패:", error);
       throw error;
     }
-  }
-
-  /**
-   * 인증 오류 처리
-   */
-  private handleAuthError() {
-    this.clearTokens();
-    window.location.href = "/login";
   }
 
   // 메모리에 토큰 저장
