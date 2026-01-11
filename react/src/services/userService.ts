@@ -23,6 +23,7 @@ class UserService {
     const response = await axiosInstance.get("/api/user/me");
     const userData = response.data.data.user as UserData;
     store.set(userDataAtom, userData);
+    return response.data;
   }
 
   /**
@@ -37,6 +38,14 @@ class UserService {
     if (currentUserData) {
       store.set(userDataAtom, { ...currentUserData, steamName, avatar });
     }
+    return response.data;
+  }
+
+  static async deleteAccount() {
+    console.log("Deleting user account...");
+
+    const response = await axiosInstance.delete("/api/user/me");
+    return response.data;
   }
 }
 

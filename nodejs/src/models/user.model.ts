@@ -7,6 +7,7 @@ export class UserModel {
   steamId: string;
   steamName: string;
   avatar: string;
+  status: "active" | "deleted" | "banned";
   createdAt: Date;
   lastLogin: Date;
   lastProfileRefresh: Date;
@@ -17,6 +18,7 @@ export class UserModel {
     this.steamId = data.steamId;
     this.steamName = data.steamName;
     this.avatar = data.avatar;
+    this.status = data.status;
     this.createdAt = data.createdAt || new Date();
     this.lastLogin = data.lastLogin || new Date();
     this.lastProfileRefresh = data.lastProfileRefresh || new Date();
@@ -166,6 +168,24 @@ export class UserModel {
   }
 
   /**
+   * 사용자 삭제 (회원 탈퇴)
+   * @param userId 사용자 id
+   * @param connection MariaDB 연결 객체
+   * @returns 삭제 결과
+   */
+  static async deleteById(userId: string, connection: PoolConnection | Pool) {
+    const result = await connection.execute(
+      `
+        UPDATE user
+        SET status = 'deleted'
+        WHERE user_id = ?
+      `,
+      [userId]
+    );
+    return result;
+  }
+
+  /**
    * 마지막 로그인 시간 업데이트
    * @param userId 사용자 id
    * @param connection MariaDB 연결 객체
@@ -184,6 +204,27 @@ export class UserModel {
       [userId]
     );
     return result;
+  }
+
+  /**
+   * 사용자 id로 사용자 상태 조회
+   * @param userId 사용자 id
+   * @param connection MariaDB 연결 객체
+   * @returns 사용자 상태
+   */
+  static async getStatusById(
+    userId: string,
+    connection: PoolConnection | Pool
+  ) {
+    const [result] = await connection.execute(
+      `
+        SELECT status
+        FROM user
+        WHERE user_id = ?
+      `,
+      [userId]
+    );
+    return (result as any).status;
   }
 
   /**

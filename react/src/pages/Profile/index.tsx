@@ -13,20 +13,30 @@ import { useNavigate } from "react-router";
 import SectionContainer from "./SectionContainer";
 import HelpOutlineRoundedIcon from "@mui/icons-material/HelpOutlineRounded";
 import ImageBox from "../../components/ImageBox";
-import { useAtomValue } from "jotai";
+import { getDefaultStore, useAtomValue } from "jotai";
 import { userDataAtom } from "../../states";
 import { useCallback } from "react";
 import UserService from "../../services/userService";
+import apiClient from "../../services/axios";
 
 const Profile = () => {
   const navigate = useNavigate();
 
+  const store = getDefaultStore();
   const userData = useAtomValue(userDataAtom);
 
   // 정보 새로고침 클릭 핸들러
   const handleRefreshClick = useCallback(async () => {
     await UserService.refreshMe();
   }, []);
+
+  // 회원 탈퇴 클릭 핸들러
+  const handleDeleteAccountClick = useCallback(async () => {
+    await UserService.deleteAccount();
+    apiClient.clearTokens();
+    store.set(userDataAtom, null);
+    navigate("/");
+  }, [navigate, store]);
 
   return (
     <Paper
@@ -167,7 +177,12 @@ const Profile = () => {
 
         {/* 회원 탈퇴 */}
         <Box alignSelf="flex-end">
-          <Button variant="outlined" color="error" disableElevation>
+          <Button
+            variant="outlined"
+            color="error"
+            disableElevation
+            onClick={handleDeleteAccountClick}
+          >
             <Typography variant="body1" fontWeight={500}>
               회원 탈퇴하기
             </Typography>

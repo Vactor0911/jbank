@@ -5,12 +5,13 @@ import { asyncHandler } from "../utils/asyncHandler";
 import { AuthService } from "../services/auth.service";
 import { verifyRefreshToken } from "../utils/jwt";
 import { mariaDB } from "../config/mariadb";
-import { NotFoundError } from "../errors/CustomErrors";
+import { ForbiddenError, NotFoundError } from "../errors/CustomErrors";
 import { AuthModel } from "../models/auth.model";
 import { redis } from "../config/redis";
 import { deleteCsrfToken, generateCsrfToken } from "../middlewares/csrf";
 import crypto from "crypto";
 import { UserService } from "../services/user.service";
+import AppError from "../errors/AppError";
 
 export class AuthController {
   /**
@@ -24,10 +25,35 @@ export class AuthController {
     }
 
     // 로그인 처리
-    const tokens = await AuthService.login(user.steamId);
+    let tokens;
+    try {
+      tokens = await AuthService.login(user.steamId);
+    } catch (error) {
+      // 예상치 못한 오류는 그대로 반환
+      if (!(error instanceof AppError)) {
+        res.redirect(`${process.env.FRONTEND_URL}/login?error=internal_error`);
+      }
+
+      // 오류에 따른 리다이렉트 처리
+      if (error instanceof NotFoundError) {
+        res.redirect(`${process.env.FRONTEND_URL}/login?error=user_not_found`);
+      } else if (
+        error instanceof ForbiddenError &&
+        error.message === "삭제된 계정입니다."
+      ) {
+        res.redirect(`${process.env.FRONTEND_URL}/login?error=account_deleted`);
+      } else if (
+        error instanceof ForbiddenError &&
+        error.message === "차단된 계정입니다."
+      ) {
+        res.redirect(`${process.env.FRONTEND_URL}/login?error=account_banned`);
+      }
+    }
 
     // 사용자 스팀 프로필 업데이트
-    await UserService.autoRefreshProfile(user.id);
+    try {
+      await UserService.autoRefreshProfile(user.id);
+    } catch {}
 
     // 로그인 정보 교환용 임시 코드 생성
     const tempAuthCode = crypto.randomBytes(32).toString("hex");
@@ -35,13 +61,13 @@ export class AuthController {
       `auth:${tempAuthCode}`,
       60,
       JSON.stringify({
-        accessToken: tokens.accessToken,
-        csrfToken: tokens.csrfToken,
+        accessToken: tokens!.accessToken,
+        csrfToken: tokens!.csrfToken,
       })
     );
 
     // Refresh Token을 HttpOnly 쿠키로 설정
-    res.cookie("refreshToken", tokens.refreshToken, {
+    res.cookie("refreshToken", tokens!.refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",

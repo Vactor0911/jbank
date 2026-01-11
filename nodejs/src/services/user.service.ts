@@ -103,4 +103,27 @@ export class UserService {
     );
     return steamProfile;
   }
+
+  /**
+   * 사용자 id로 회원 탈퇴 처리
+   * @param userId 사용자 id
+   * @returns 탈퇴 처리 결과
+   */
+  static async deleteUserAccount(userId: string) {
+    const result = await TransactionHandler.executeInTransaction(
+      mariaDB,
+      async (connection) => {
+        // 사용자 조회
+        const user = await UserModel.findById(userId, connection);
+        if (!user) {
+          throw new NotFoundError("사용자를 찾을 수 없습니다.");
+        }
+
+        // 사용자 삭제
+        const result = await UserModel.deleteById(userId, connection);
+        return result;
+      }
+    );
+    return result;
+  }
 }
