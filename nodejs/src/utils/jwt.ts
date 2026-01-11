@@ -36,8 +36,13 @@ export const generateAccessToken = (user: UserData): string => {
  * @returns 생성된 JWT Refresh Token
  */
 export const generateRefreshToken = (user: UserData): string => {
+  if (!user.id) {
+    throw new Error("사용자 ID가 필요합니다.");
+  }
+
   // JWT 페이로드 생성
   const payload: RefreshTokenPayload = {
+    userId: user.id,
     userUuid: user.uuid,
   };
 

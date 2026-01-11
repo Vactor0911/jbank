@@ -3,7 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { errorHandler } from "./middlewares/errorHandler";
 import bodyParser from "body-parser";
-import { authRouter } from "./routes";
+import { authRouter, userRouter } from "./routes";
 import passport from "./config/passport";
 import "dotenv/config";
 
@@ -17,7 +17,7 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 // CORS 설정
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
+    origin: process.env.FRONTEND_URL,
     credentials: true,
   })
 );
@@ -40,6 +40,7 @@ app.get("/api/health", (_req: Request, res: Response) => {
 
 // 라우트 정의
 app.use("/api/auth", authRouter);
+app.use("/api/user", userRouter);
 
 // 전역 오류 처리 미들웨어 등록
 app.use(errorHandler);

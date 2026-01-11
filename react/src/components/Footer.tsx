@@ -7,9 +7,28 @@ import {
   useTheme,
 } from "@mui/material";
 import BuyMeACoffee from "../assets/buy-me-a-coffee.webp";
+import { useNavigate } from "react-router";
+import { useCallback } from "react";
+import AuthService from "../services/authService";
+import { useAtomValue } from "jotai";
+import { isAuthenticatedAtom } from "../states";
 
 const Footer = () => {
   const theme = useTheme();
+  const navigate = useNavigate();
+
+  const isAuthenticated = useAtomValue(isAuthenticatedAtom);
+
+  // 로그인 클릭 핸들러
+  const handleLoginClick = useCallback(() => {
+    navigate("/login");
+  }, [navigate]);
+
+  // 로그아웃 클릭 핸들러
+  const handleLogoutClick = useCallback(() => {
+    AuthService.logout();
+    navigate("/");
+  }, [navigate]);
 
   return (
     <Stack gap={3} mt={3}>
@@ -58,16 +77,31 @@ const Footer = () => {
         p={1}
         borderRadius={2}
       >
-        <ButtonBase
-          sx={{
-            flex: 1,
-            borderRadius: 1.5,
-          }}
-        >
-          <Typography variant="body1" textAlign="center" color="text.primary">
-            로그아웃
-          </Typography>
-        </ButtonBase>
+        {isAuthenticated ? (
+          <ButtonBase
+            sx={{
+              flex: 1,
+              borderRadius: 1.5,
+            }}
+            onClick={handleLogoutClick}
+          >
+            <Typography variant="body1" textAlign="center" color="text.primary">
+              로그아웃
+            </Typography>
+          </ButtonBase>
+        ) : (
+          <ButtonBase
+            sx={{
+              flex: 1,
+              borderRadius: 1.5,
+            }}
+            onClick={handleLoginClick}
+          >
+            <Typography variant="body1" textAlign="center" color="text.primary">
+              로그인
+            </Typography>
+          </ButtonBase>
+        )}
 
         <ButtonBase
           sx={{

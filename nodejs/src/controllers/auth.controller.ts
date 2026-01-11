@@ -1,4 +1,4 @@
-import { Response } from "express";
+import { Request, Response } from "express";
 import { APIResponse, AuthRequest } from "../types";
 import { UserModel } from "../models/user.model";
 import { asyncHandler } from "../utils/asyncHandler";
@@ -9,6 +9,7 @@ import { NotFoundError } from "../errors/CustomErrors";
 import { AuthModel } from "../models/auth.model";
 import { redis } from "../config/redis";
 import { deleteCsrfToken, generateCsrfToken } from "../middlewares/csrf";
+import crypto from "crypto";
 
 export class AuthController {
   /**
@@ -24,6 +25,17 @@ export class AuthController {
     // 로그인 처리
     const tokens = await AuthService.login(user.steamId);
 
+    // 로그인 정보 교환용 임시 코드 생성
+    const tempAuthCode = crypto.randomBytes(32).toString("hex");
+    await redis.setex(
+      `auth:${tempAuthCode}`,
+      60,
+      JSON.stringify({
+        accessToken: tokens.accessToken,
+        csrfToken: tokens.csrfToken,
+      })
+    );
+
     // Refresh Token을 HttpOnly 쿠키로 설정
     res.cookie("refreshToken", tokens.refreshToken, {
       httpOnly: true,
@@ -32,14 +44,35 @@ export class AuthController {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
     });
 
-    // 응답 반환
-    res.json({
-      success: true,
-      message: "로그인 성공",
-      accessToken: tokens.accessToken,
-      csrfToken: tokens.csrfToken,
-    });
+    // 프론트엔드로 리다이렉트
+    res.redirect(`${process.env.FRONTEND_URL}/login?code=${tempAuthCode}`);
   });
+
+  static exchangeTokens = asyncHandler(
+    async (req: Request, res: Response<APIResponse>) => {
+      const { code } = req.params;
+
+      // 임시 코드로부터 토큰 조회
+      const tokenData = await redis.get(`auth:${code}`);
+      if (!tokenData) {
+        throw new NotFoundError("유효하지 않은 코드입니다.");
+      }
+
+      // 임시 코드 삭제
+      await redis.del(`auth:${code}`);
+
+      // 토큰 파싱
+      const { accessToken, csrfToken } = JSON.parse(tokenData);
+
+      // 응답 전송
+      res.json({
+        success: true,
+        message: "토큰 교환에 성공했습니다.",
+        accessToken,
+        csrfToken,
+      });
+    }
+  );
 
   /**
    * Refresh Token으로 Access Token 재발급
@@ -95,10 +128,10 @@ export class AuthController {
         const decoded = verifyRefreshToken(refreshToken);
         if (decoded) {
           // Refresh Token 삭제
-          await AuthModel.deleteRefreshToken(decoded.userUuid, redis);
+          await AuthModel.deleteRefreshToken(decoded.userId, redis);
 
           // CSRF 토큰 삭제
-          await deleteCsrfToken(decoded.userUuid);
+          await deleteCsrfToken(decoded.userId);
         }
       }
 
@@ -129,7 +162,7 @@ export class AuthController {
       // 응답 전송
       res.json({
         success: true,
-        message: "사용자 정보 조회 성공.",
+        message: "사용자 정보 조회에 성공했습니다.",
         data: {
           user: {
             uuid: user.uuid,
