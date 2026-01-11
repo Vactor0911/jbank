@@ -21,6 +21,32 @@ export class UserModel {
   }
 
   /**
+   * 사용자 id로 사용자 조회
+   * @param userId 사용자 id
+   * @param connection MariaDB 연결 객체
+   * @returns 사용자 객체 또는 null
+   */
+  static async findById(userId: string, connection: PoolConnection | Pool) {
+    const [result] = await connection.execute(
+      `
+        SELECT *
+        FROM user
+        WHERE user_id = ?
+      `,
+      [userId]
+    );
+
+    // 사용자가 없으면 null 반환
+    if (!result) {
+      return null;
+    }
+
+    // 사용자 객체 생성
+    const user = this.formatUser(result);
+    return user;
+  }
+
+  /**
    * 사용자 uuid로 사용자 조회
    * @param userUuid 사용자 uuid
    * @param connection MariaDB 연결 객체

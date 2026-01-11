@@ -1,5 +1,4 @@
 import {
-  Avatar,
   Box,
   ButtonBase,
   Divider,
@@ -9,13 +8,16 @@ import {
   useTheme,
 } from "@mui/material";
 import NavigateNextOutlinedIcon from "@mui/icons-material/NavigateNextOutlined";
-import SampleProfileImage from "../../assets/sample-user-profile.png";
 import { useNavigate } from "react-router";
 import Footer from "../Footer";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { Home } from "./Tabs";
 import { useAtomValue } from "jotai";
-import { navigationValueAtom, isAuthenticatedAtom } from "../../states";
+import {
+  navigationValueAtom,
+  isAuthenticatedAtom,
+  userDataAtom,
+} from "../../states";
 import JbankLogo from "../../assets/logo/jbank.svg?react";
 import AuthService from "../../services/authService";
 
@@ -25,6 +27,13 @@ const SidebarMenu = () => {
 
   const navigationValue = useAtomValue(navigationValueAtom);
   const isAuthenticated = useAtomValue(isAuthenticatedAtom);
+  const userData = useAtomValue(userDataAtom);
+
+  useEffect(() => {
+    console.log("프로필 이미지:", userData?.avatar);
+  }, [userData]);
+
+  console.log(userData?.avatar);
 
   // 프로필 정보 클릭 핸들러
   const handleProfileClick = useCallback(() => {
@@ -88,9 +97,10 @@ const SidebarMenu = () => {
         <Stack direction="row" width="100%" gap={2} alignItems="center">
           {/* 프로필 이미지 */}
           {isAuthenticated && (
-            <Avatar
-              src={SampleProfileImage}
-              variant="rounded"
+            <Box
+              component="img"
+              src={userData?.avatar}
+              borderRadius="4px"
               sx={{
                 width: "40px",
                 height: "40px",

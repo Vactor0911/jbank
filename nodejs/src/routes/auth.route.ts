@@ -18,6 +18,7 @@ authRouter.get(
   AuthController.login
 );
 
+// 인증 토큰 교환
 authRouter.get(
   "/steam/tokens/:code",
   validateParams(steamTokensSchema),
@@ -36,7 +37,11 @@ authRouter.post(
 );
 
 // CSRF 토큰 재발급
-authRouter.post("/csrf", authenticateRefreshToken, AuthController.refreshCsrfToken);
+authRouter.post(
+  "/csrf",
+  authenticateRefreshToken,
+  AuthController.refreshCsrfToken
+);
 
 // 로그아웃
 authRouter.post(

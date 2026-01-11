@@ -12,6 +12,7 @@ import JbankIcon from "../assets/logo/icon.svg?react";
 import { useCallback, useEffect } from "react";
 import AuthService from "../services/authService";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import UserService from "../services/userService";
 
 const Login = () => {
   const isMobile = useIsMobile();
@@ -34,6 +35,10 @@ const Login = () => {
     // 서버에서 토큰 교환
     const success = await AuthService.handleLoginSuccess(code);
     if (success) {
+      // 사용자 정보 불러오기
+      await UserService.fetchMe();
+
+      // 메인 페이지로 이동
       navigate("/");
       return;
     } else {
