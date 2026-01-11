@@ -11,11 +11,15 @@ import {
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import { useNavigate } from "react-router";
 import SectionContainer from "./SectionContainer";
-import SampleProfileImage from "../../assets/sample-user-profile.png";
 import HelpOutlineRoundedIcon from "@mui/icons-material/HelpOutlineRounded";
+import ImageBox from "../../components/ImageBox";
+import { useAtomValue } from "jotai";
+import { userDataAtom } from "../../states";
 
 const Profile = () => {
   const navigate = useNavigate();
+
+  const userData = useAtomValue(userDataAtom);
 
   return (
     <Paper
@@ -61,9 +65,8 @@ const Profile = () => {
           <Stack gap={3}>
             <Stack direction="row" gap={5} flexWrap="wrap">
               {/* 프로필 이미지 */}
-              <Box
-                component="img"
-                src={SampleProfileImage}
+              <ImageBox
+                src={userData?.avatar}
                 width="128px"
                 height="128px"
                 borderRadius={2}
@@ -80,7 +83,7 @@ const Profile = () => {
                   Steam 닉네임
                 </Typography>
                 <Typography variant="h5" noWrap>
-                  백터 (Vactor0911)
+                  {userData?.steamName}
                 </Typography>
 
                 {/* 스팀 고유번호 */}
@@ -94,7 +97,7 @@ const Profile = () => {
                   Steam 고유번호
                 </Typography>
                 <Typography variant="h5" noWrap>
-                  123456789
+                  {userData?.steamId}
                 </Typography>
               </Stack>
             </Stack>
