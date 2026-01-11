@@ -62,7 +62,6 @@ const extractUserIdFromToken = (req: Request): string | null => {
         process.env.JWT_REFRESH_SECRET
       ) as any;
 
-      console.log("Decoded refresh token:", decoded);
       return decoded.userId;
     } catch {}
   }
@@ -79,7 +78,6 @@ const extractUserIdFromToken = (req: Request): string | null => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET) as any;
-    console.log("Decoded access token:", decoded);
     return decoded.userId;
   } catch {}
 

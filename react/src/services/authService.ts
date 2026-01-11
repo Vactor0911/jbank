@@ -36,9 +36,6 @@ class AuthService {
     const accessToken = response.data.accessToken;
     const csrfToken = response.data.csrfToken;
 
-    console.log("accessToken:", accessToken);
-    console.log("csrfToken:", csrfToken);
-
     if (accessToken && csrfToken) {
       apiClient.setTokens(accessToken, csrfToken);
       return true;
