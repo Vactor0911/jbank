@@ -1,7 +1,7 @@
 import { Router } from "express";
 import passport from "passport";
 import { AuthController } from "../controllers/auth.controller";
-import { authenticateJWT } from "../middlewares/auth";
+import { authenticateJWT, authenticateRefreshToken } from "../middlewares/auth";
 import { csrfProtection } from "../middlewares/csrf";
 import { validateParams } from "../middlewares/validation";
 import { steamTokensSchema } from "../schema/auth.schema";
@@ -30,13 +30,13 @@ authRouter.get("/steam", passport.authenticate("steam"));
 // Refresh Token으로 Access Token 재발급
 authRouter.post(
   "/refresh",
-  authenticateJWT,
+  authenticateRefreshToken,
   csrfProtection,
   AuthController.refreshJwtToken
 );
 
 // CSRF 토큰 재발급
-authRouter.post("/csrf", authenticateJWT, AuthController.refreshCsrfToken);
+authRouter.post("/csrf", authenticateRefreshToken, AuthController.refreshCsrfToken);
 
 // 로그아웃
 authRouter.post(

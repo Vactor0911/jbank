@@ -45,9 +45,7 @@ export class AuthController {
     });
 
     // 프론트엔드로 리다이렉트
-    res.redirect(
-      `${process.env.FRONTEND_URL}/login/success?code=${tempAuthCode}`
-    );
+    res.redirect(`${process.env.FRONTEND_URL}/login?code=${tempAuthCode}`);
   });
 
   static exchangeTokens = asyncHandler(
@@ -130,10 +128,10 @@ export class AuthController {
         const decoded = verifyRefreshToken(refreshToken);
         if (decoded) {
           // Refresh Token 삭제
-          await AuthModel.deleteRefreshToken(decoded.userUuid, redis);
+          await AuthModel.deleteRefreshToken(decoded.userId, redis);
 
           // CSRF 토큰 삭제
-          await deleteCsrfToken(decoded.userUuid);
+          await deleteCsrfToken(decoded.userId);
         }
       }
 

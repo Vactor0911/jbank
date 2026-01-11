@@ -17,7 +17,7 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 // CORS 설정
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
+    origin: process.env.FRONTEND_URL,
     credentials: true,
   })
 );

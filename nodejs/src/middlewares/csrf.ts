@@ -48,12 +48,26 @@ export const deleteCsrfToken = async (userId: string) => {
 };
 
 /**
- * JWT에서 사용자 ID 추출
+ * JWT 토큰에서 사용자 ID 추출
  * @param req 요청 객체
  * @returns 사용자 ID 또는 null
  */
 const extractUserIdFromToken = (req: Request): string | null => {
-  // 헤더에서 토큰 추출
+  // Refresh Token에서 먼저 추출 시도
+  const refreshToken = req.cookies["refreshToken"];
+  if (refreshToken) {
+    try {
+      const decoded = jwt.verify(
+        refreshToken,
+        process.env.JWT_REFRESH_SECRET
+      ) as any;
+
+      console.log("Decoded refresh token:", decoded);
+      return decoded.userId;
+    } catch {}
+  }
+
+  // Access Token에서 추출 시도
   const authHeader = req.headers["authorization"];
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return null;
@@ -65,10 +79,11 @@ const extractUserIdFromToken = (req: Request): string | null => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET) as any;
+    console.log("Decoded access token:", decoded);
     return decoded.userId;
-  } catch (error) {
-    return null;
-  }
+  } catch {}
+
+  return null;
 };
 
 export const csrfProtection = async (

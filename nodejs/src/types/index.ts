@@ -28,6 +28,7 @@ export interface AccessTokenPayload {
  * JWT Refresh Token 페이로드 인터페이스
  */
 export interface RefreshTokenPayload {
+  userId: string;
   userUuid: string;
 }
 

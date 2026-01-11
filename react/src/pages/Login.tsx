@@ -9,9 +9,55 @@ import {
 import { useIsMobile } from "../hooks";
 import SteamLogo from "../assets/steam.svg?react";
 import JbankIcon from "../assets/logo/icon.svg?react";
+import { useCallback, useEffect } from "react";
+import AuthService from "../services/authService";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const Login = () => {
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const code = searchParams.get("code");
+  const error = searchParams.get("error");
+
+  // Steam 로그인 버튼 클릭
+  const handleSteamLoginClick = useCallback(() => {
+    AuthService.loginWithSteam();
+  }, []);
+
+  // 로그인 성공 처리
+  const handleLoginSuccess = useCallback(async () => {
+    if (!code) {
+      return;
+    }
+
+    // 서버에서 토큰 교환
+    const success = await AuthService.handleLoginSuccess(code);
+    if (success) {
+      navigate("/");
+      return;
+    } else {
+      alert("로그인에 실패했습니다. 다시 시도해주세요.");
+      navigate("/login");
+    }
+  }, [code, navigate]);
+
+  // 로그인 실패 처리
+  const handleLoginError = useCallback(() => {
+    if (error) {
+      alert("로그인에 실패했습니다. 다시 시도해주세요.");
+      navigate("/login");
+    }
+  }, [error, navigate]);
+
+  // 페이지 로드 시 로그인 성공 또는 실패 처리
+  useEffect(() => {
+    if (code) {
+      handleLoginSuccess();
+    } else if (error) {
+      handleLoginError();
+    }
+  }, [code, error, handleLoginError, handleLoginSuccess]);
 
   return (
     <Paper
@@ -69,6 +115,7 @@ const Login = () => {
                 textTransform: "none",
                 borderRadius: 2,
               }}
+              onClick={handleSteamLoginClick}
             >
               <Stack
                 width="100%"
