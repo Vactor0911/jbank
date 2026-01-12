@@ -1,6 +1,7 @@
 import { getDefaultStore } from "jotai";
 import { userDataAtom } from "../states";
 import apiClient, { axiosInstance } from "./axios";
+import { accountDataAtom } from "../states/account";
 
 const SERVER_HOST = import.meta.env.VITE_SERVER_HOST;
 
@@ -65,6 +66,7 @@ class AuthService {
     try {
       await axiosInstance.post("/api/auth/logout");
       store.set(userDataAtom, null);
+      store.set(accountDataAtom, []);
     } catch (error) {
       console.error("로그아웃 실패:", error);
     } finally {
