@@ -8,7 +8,7 @@ import PasswordConfirmForm from "./PasswordConfirmForm";
 import CreateAccountLoading from "./CreateAccountLoading";
 import CreateAccountSuccess from "./CreateAccountSuccess";
 import CreateAccountFailed from "./CreateAccountFailed";
-import AccountSerice from "../../services/accountService";
+import AccountService from "../../services/accountService";
 import { AxiosError } from "axios";
 
 const AccountNew = () => {
@@ -35,7 +35,7 @@ const AccountNew = () => {
     const createAccount = async () => {
       // 계좌 생성 API 호출
       try {
-        const response = await AccountSerice.createAccount(password);
+        const response = await AccountService.createAccount(password);
 
         if (response.data.success) {
           // 계좌 생성 성공
@@ -52,7 +52,7 @@ const AccountNew = () => {
           );
 
           // 기존 계좌가 있을 수 있으므로 계좌 목록 새로고침
-          await AccountSerice.fetchAccounts();
+          await AccountService.fetchAccounts();
         }
       }
     };

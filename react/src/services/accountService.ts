@@ -12,7 +12,7 @@ export interface AccountData {
 
 const store = getDefaultStore();
 
-class AccountSerice {
+class AccountService {
   /**
    * 계좌 목록 조회
    * @returns 계좌 목록
@@ -20,6 +20,29 @@ class AccountSerice {
   static async fetchAccounts() {
     const response = await axiosInstance.get("/api/account/");
     store.set(accountDataAtom, response.data.data.accounts as AccountData[]);
+    return response;
+  }
+
+  /**
+   * 계좌 상세 조회
+   * @param accountUuid 계좌 uuid
+   * @returns 계좌 정보
+   */
+  static async fetchAccount(accountUuid: string) {
+    const response = await axiosInstance.get(`/api/account/${accountUuid}`);
+
+    // 계좌 정보 업데이트
+    const accounts = store.get(accountDataAtom);
+    const newAccounts = accounts.map((account) => {
+      if (account.uuid === accountUuid) {
+        return response.data.data.account as AccountData;
+      }
+      return account;
+    });
+    store.set(accountDataAtom, newAccounts);
+
+    // 응답 반환
+    return response;
   }
 
   /**
@@ -34,4 +57,4 @@ class AccountSerice {
   }
 }
 
-export default AccountSerice;
+export default AccountService;

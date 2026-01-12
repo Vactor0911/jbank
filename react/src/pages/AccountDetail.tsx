@@ -6,16 +6,21 @@ import {
   IconButton,
   keyframes,
   Paper,
+  Skeleton,
   Stack,
   Typography,
   Zoom,
 } from "@mui/material";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import RefreshRoundedIcon from "@mui/icons-material/RefreshRounded";
 import { useCallback, useEffect, useState } from "react";
 import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
+import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
+import AccountService, { type AccountData } from "../services/accountService";
+import { AxiosError } from "axios";
+import { formatNumberString } from "../utils";
 
 const RefreshAnimation = keyframes`
   0% {
@@ -28,17 +33,51 @@ const RefreshAnimation = keyframes`
 
 const AccountDetail = () => {
   const navigate = useNavigate();
-
-  const accountData = {
-    accountNumber: "123-456-7890",
-    balance: 123456,
-  };
+  const { accountUuid } = useParams();
 
   const [isFetching, setIsFetching] = useState(false);
-  const [isFetchSuccess, setIsFetchSuccess] = useState(false);
+  const [isFetchSuccess, setIsFetchSuccess] = useState<boolean | null>(null);
+  const [accountData, setAccountData] = useState<AccountData | null>(null);
+  console.log("accountData:", accountData);
+
+  // 계좌 정보 조회 핸들러
+  const handleFetchAccountData = useCallback(async () => {
+    if (!accountUuid) {
+      return;
+    }
+
+    try {
+      // 적어도 1초 대기
+      const response = await Promise.all([
+        // 계좌 정보 조회 API 호출
+        AccountService.fetchAccount(accountUuid),
+        new Promise((resolve) => setTimeout(resolve, 1000)),
+      ]);
+
+      // 조회 응답 처리
+      const accountResponse = response[0];
+      setIsFetchSuccess(accountResponse.data.success);
+      if (accountResponse.data.success) {
+        setAccountData(accountResponse.data.data.account as AccountData);
+      }
+
+      // 3초 후 초기화
+      const timer = setTimeout(() => {
+        setIsFetchSuccess(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        console.error(
+          "계좌 정보 조회 중 오류 발생:",
+          error.response?.data.error
+        );
+      }
+    }
+  }, [accountUuid]);
 
   // 계좌 정보 새로고침 버튼 클릭 핸들러
-  const handleRefreshAccountClick = useCallback(() => {
+  const handleRefreshAccountClick = useCallback(async () => {
     // 이미 새로고침 중이라면 종료
     if (isFetching) {
       return;
@@ -46,23 +85,27 @@ const AccountDetail = () => {
 
     // 계좌 정보 새로고침
     setIsFetching(true);
-    // fetchAccountData();
-
-    // TODO: 애니메이션 테스트용 코드 | 제거 예정
-    setTimeout(() => {
-      setIsFetchSuccess(true);
-
-      setTimeout(() => {
-        setIsFetchSuccess(false);
-        setIsFetching(false);
-      }, 2000);
-    }, 2000);
-  }, [isFetching]);
+    await handleFetchAccountData();
+    setIsFetching(false);
+  }, [handleFetchAccountData, isFetching]);
 
   // 페이지 로드 시 계좌 정보 조회
   useEffect(() => {
-    // fetchAccountData();
-  }, []);
+    let ignore = false;
+
+    const fetchData = async () => {
+      if (ignore) return;
+      setIsFetching(true);
+      await handleFetchAccountData();
+      setIsFetching(false);
+    };
+
+    fetchData();
+
+    return () => {
+      ignore = true;
+    };
+  }, [handleFetchAccountData]);
 
   return (
     <Paper
@@ -118,11 +161,12 @@ const AccountDetail = () => {
               width: 35,
               height: 35,
             }}
+            disabled={isFetching || isFetchSuccess !== null}
             onClick={handleRefreshAccountClick}
           >
             {/* 새로고침 아이콘 */}
             <Zoom
-              in={!isFetchSuccess}
+              in={isFetchSuccess === null}
               timeout={250}
               unmountOnExit
               style={{
@@ -140,7 +184,7 @@ const AccountDetail = () => {
 
             {/* 새로고침 성공 아이콘 */}
             <Zoom
-              in={isFetchSuccess}
+              in={isFetchSuccess === true}
               timeout={250}
               unmountOnExit
               style={{
@@ -156,6 +200,24 @@ const AccountDetail = () => {
                 }}
               />
             </Zoom>
+
+            {/* 새로고침 실패 아이콘 */}
+            <Zoom
+              in={isFetchSuccess === false}
+              timeout={250}
+              unmountOnExit
+              style={{
+                transitionDelay: isFetchSuccess ? "250ms" : "0ms",
+              }}
+            >
+              <WarningAmberRoundedIcon
+                fontSize="large"
+                color="warning"
+                sx={{
+                  position: "absolute",
+                }}
+              />
+            </Zoom>
           </IconButton>
         </Stack>
 
@@ -165,30 +227,47 @@ const AccountDetail = () => {
             {/* 계좌 정보 */}
             <Stack mt={2} gap={1}>
               {/* 계좌번호 */}
-              <Button
-                sx={{
-                  color: "text.primary",
-                  p: 0,
-                  px: 0.5,
-                  textTransform: "none",
-                  alignSelf: "flex-start",
-                }}
-              >
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
+              {accountData?.accountNumber ? (
+                <Button
                   sx={{
-                    textDecoration: "underline",
+                    color: "text.primary",
+                    p: 0,
+                    px: 0.5,
+                    textTransform: "none",
+                    alignSelf: "flex-start",
                   }}
                 >
-                  Jbank {accountData?.accountNumber}
-                </Typography>
-              </Button>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{
+                      textDecoration: "underline",
+                    }}
+                  >
+                    Jbank {accountData?.accountNumber}
+                  </Typography>
+                </Button>
+              ) : (
+                <Skeleton variant="rounded" width="120px" height="20px" />
+              )}
 
               {/* 잔액 */}
-              <Typography variant="h4" noWrap>
-                {accountData?.balance.toLocaleString("en-US")} 크레딧
-              </Typography>
+              {accountData?.credit ? (
+                <Typography variant="h4" noWrap>
+                  {formatNumberString(accountData?.credit as string)} 크레딧
+                </Typography>
+              ) : (
+                <Skeleton
+                  variant="rounded"
+                  width="200px"
+                  sx={{
+                    height: {
+                      xs: "30px",
+                      md: "40px",
+                    },
+                  }}
+                />
+              )}
             </Stack>
 
             {/* 구분선 */}
