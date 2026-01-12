@@ -112,34 +112,34 @@ const AccountNew = () => {
               {/* 상품 정보 */}
               <Grid container spacing={3}>
                 {/* 상품명 */}
-                <Grid size={4}>
+                <Grid size={3}>
                   <Typography variant="body1" fontWeight={500}>
                     상품명
                   </Typography>
                 </Grid>
-                <Grid size={8}>
+                <Grid size={9}>
                   <Typography variant="body1">Jbank 예금 계좌</Typography>
                 </Grid>
 
                 {/* 가입대상 */}
-                <Grid size={4}>
+                <Grid size={3}>
                   <Typography variant="body1" fontWeight={500}>
                     가입대상
                   </Typography>
                 </Grid>
-                <Grid size={8}>
+                <Grid size={9}>
                   <Typography variant="body1">
                     Jellen 서버 유저 (1인 1계좌)
                   </Typography>
                 </Grid>
 
                 {/* 계약기간 */}
-                <Grid size={4}>
+                <Grid size={3}>
                   <Typography variant="body1" fontWeight={500}>
                     계약기간
                   </Typography>
                 </Grid>
-                <Grid size={8}>
+                <Grid size={9}>
                   <Typography variant="body1">무기한</Typography>
                 </Grid>
               </Grid>
