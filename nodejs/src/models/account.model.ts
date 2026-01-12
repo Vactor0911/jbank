@@ -2,6 +2,7 @@ import { Pool, PoolConnection } from "mariadb/*";
 
 class AccountModel {
   uuid: string;
+  userId: string;
   accountNumber: string;
   password: string;
   status: string;
@@ -10,11 +11,33 @@ class AccountModel {
 
   constructor(data: any) {
     this.uuid = data.uuid;
+    this.userId = String(data.userId);
     this.accountNumber = data.accountNumber;
     this.password = data.password;
     this.status = data.status;
     this.credit = String(data.credit);
     this.createdAt = data.createdAt || new Date();
+  }
+
+  /**
+   * 계좌 uuid로 계좌 조회
+   * @param accountUuid 계좌 uuid
+   * @param connection MariaDB 연결 객체
+   * @returns 계좌 모델
+   */
+  static async findByUuid(
+    accountUuid: string,
+    connection: PoolConnection | Pool
+  ) {
+    const [account] = await connection.execute(
+      `
+        SELECT *
+        FROM account
+        WHERE account_uuid = ?
+      `,
+      [accountUuid]
+    );
+    return this.formatAccount(account);
   }
 
   /**
@@ -68,8 +91,13 @@ class AccountModel {
    * @returns 포맷팅된 계좌 모델
    */
   private static formatAccount(data: any) {
+    if (!data) {
+      return null;
+    }
+
     return new AccountModel({
       uuid: data.account_uuid,
+      userId: data.user_id,
       accountNumber: data.account_number,
       password: data.password,
       status: data.status,

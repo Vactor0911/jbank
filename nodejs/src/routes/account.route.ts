@@ -2,10 +2,21 @@ import { Router } from "express";
 import { authenticateJWT } from "../middlewares/auth";
 import AccountController from "../controllers/account.controller";
 import { csrfProtection } from "../middlewares/csrf";
-import { validateBody } from "../middlewares/validation";
-import { createAccountSchema } from "../schema/account.schema";
+import { validateBody, validateParams } from "../middlewares/validation";
+import {
+  createAccountSchema,
+  getAccountSchema,
+} from "../schema/account.schema";
 
 const accountRouter = Router();
+
+// 계좌 정보 조회
+accountRouter.get(
+  "/:accountUuid",
+  authenticateJWT,
+  validateParams(getAccountSchema),
+  AccountController.getAccount
+);
 
 // 계좌 목록 조회
 accountRouter.get("/", authenticateJWT, AccountController.getAccounts);
