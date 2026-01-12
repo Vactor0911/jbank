@@ -28,8 +28,12 @@ const Profile = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const handleRefreshClick = useCallback(async () => {
     setIsRefreshing(true);
-    await UserService.refreshMe();
-    setIsRefreshing(false);
+
+    try {
+      await UserService.refreshMe();
+    } finally {
+      setIsRefreshing(false);
+    }
   }, []);
 
   // 회원 탈퇴 클릭 핸들러
