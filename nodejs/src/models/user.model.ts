@@ -232,7 +232,11 @@ export class UserModel {
    * @param data DB 쿼리 결과
    * @returns 사용자 객체
    */
-  private static formatUser(data: any): UserModel {
+  private static formatUser(data: any) {
+    if (!data) {
+      return null;
+    }
+
     const user = new UserModel({
       id: String(data.user_id),
       uuid: data.user_uuid,
