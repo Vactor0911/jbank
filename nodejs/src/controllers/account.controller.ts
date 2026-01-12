@@ -26,6 +26,28 @@ class AccountController {
   );
 
   /**
+   * 계좌 정보 조회
+   */
+  static getAccount = asyncHandler(
+    async (req: AuthRequest, res: Response<APIResponse>) => {
+      const { userId } = req.user as { userId: string };
+      const { accountUuid } = req.params;
+
+      // 계좌 정보 조회
+      const account = await AccountService.getAccount(userId, accountUuid);
+
+      // 응답 전송
+      res.json({
+        success: true,
+        message: "계좌 정보가 조회되었습니다.",
+        data: {
+          account,
+        },
+      });
+    }
+  );
+
+  /**
    * 새 계좌 개설
    */
   static createAccount = asyncHandler(

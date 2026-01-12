@@ -10,7 +10,7 @@ import LinkedSectionContainer from "../../components/LinkedSectionContainer";
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import JbankIcon from "../../assets/logo/icon.svg?react";
-import AccountSerice from "../../services/accountService";
+import AccountService from "../../services/accountService";
 import { useAtomValue } from "jotai";
 import { accountDataAtom } from "../../states/account";
 
@@ -22,7 +22,7 @@ const AccountSection = () => {
   // 페이지 로드 시 계좌 목록 조회
   useEffect(() => {
     const fetchAccountList = async () => {
-      await AccountSerice.fetchAccounts();
+      await AccountService.fetchAccounts();
     };
 
     fetchAccountList();

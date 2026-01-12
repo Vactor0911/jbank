@@ -1,5 +1,9 @@
 import { mariaDB } from "../config/mariadb";
-import { ConflictError, NotFoundError } from "../errors/CustomErrors";
+import {
+  ConflictError,
+  ForbiddenError,
+  NotFoundError,
+} from "../errors/CustomErrors";
 import AccountModel from "../models/account.model";
 import { UserModel } from "../models/user.model";
 import { generateAccountNumber } from "../utils";
@@ -23,7 +27,42 @@ class AccountService {
     // 계좌 목록 조회
     const accounts = await AccountModel.findByUserId(userId, mariaDB);
 
-    return accounts;
+    // 계좌 정보 반환
+    const formattedAccounts = [];
+    for (const account of accounts) {
+      const formattedAccount = await this.formatAccountData(account);
+      formattedAccounts.push(formattedAccount);
+    }
+    return formattedAccounts;
+  }
+
+  /**
+   * 사용자 계좌 정보 조회
+   * @param userId 사용자 id
+   * @param accountUuid 계좌 uuid
+   * @returns 계좌 정보
+   */
+  static async getAccount(userId: string, accountUuid: string) {
+    // 사용자 조회
+    const user = await UserModel.findById(userId, mariaDB);
+    if (!user) {
+      throw new NotFoundError("사용자를 찾을 수 없습니다.");
+    }
+
+    // 계좌 정보 조회
+    const account = await AccountModel.findByUuid(accountUuid, mariaDB);
+    if (!account) {
+      throw new NotFoundError("계좌를 찾을 수 없습니다.");
+    }
+
+    // 계좌 소유자 확인
+    if (account.userId !== userId) {
+      throw new ForbiddenError("해당 계좌에 접근할 권한이 없습니다.");
+    }
+
+    // 계좌 정보 반환
+    const formattedAccount = await this.formatAccountData(account);
+    return formattedAccount;
   }
 
   /**
@@ -76,6 +115,16 @@ class AccountService {
         }
       }
     );
+  }
+
+  static async formatAccountData(account: AccountModel) {
+    return {
+      uuid: account.uuid,
+      accountNumber: account.accountNumber,
+      status: account.status,
+      credit: account.credit,
+      createdAt: account.createdAt,
+    };
   }
 }
 
