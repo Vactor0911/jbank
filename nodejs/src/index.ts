@@ -3,7 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { errorHandler } from "./middlewares/errorHandler";
 import bodyParser from "body-parser";
-import { authRouter, userRouter } from "./routes";
+import { accountRouter, authRouter, userRouter } from "./routes";
 import passport from "./config/passport";
 import "dotenv/config";
 
@@ -41,6 +41,7 @@ app.get("/api/health", (_req: Request, res: Response) => {
 // 라우트 정의
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
+app.use("/api/account", accountRouter);
 
 // 전역 오류 처리 미들웨어 등록
 app.use(errorHandler);
