@@ -101,10 +101,18 @@ const Login = () => {
 
             {/* 슬로건 */}
             <Stack alignItems="center" gap={1.5}>
-              <Typography variant="h5">
+              <Typography
+                variant="h5"
+                textAlign="center"
+                sx={{
+                  textWrap: "pretty",
+                }}
+              >
                 게임을 뛰어넘는 포인트 거래 시스템
               </Typography>
-              <Typography variant="h6">포인트의 새로운 세상을 열다</Typography>
+              <Typography variant="h6" textAlign="center">
+                포인트의 새로운 세상을 열다
+              </Typography>
             </Stack>
 
             {/* 구분선 */}
