@@ -180,7 +180,8 @@ const AccountNew = () => {
               variant="outlined"
               sx={{
                 mb: 5,
-                bgcolor: "divider",
+                p: 0.5,
+                bgcolor: "action.disabledBackground",
                 borderRadius: 2,
                 cursor: "pointer",
               }}
@@ -188,45 +189,47 @@ const AccountNew = () => {
             >
               <Stack direction="row" alignItems="center">
                 <Checkbox checked={confirmed} />
-                <Typography variant="body1">위 내용을 충분히 확인하고 동의했어요</Typography>
+                <Typography variant="body1">
+                  위 내용을 충분히 확인하고 동의했어요
+                </Typography>
               </Stack>
             </Paper>
-
-            {/* 계좌 만들기 버튼 */}
-            <Stack
-              width="100%"
-              height="64px"
-              justifyContent="center"
-              position={{
-                xs: "fixed",
-                md: "static",
-              }}
-              bottom="64px"
-              left={0}
-              mt="auto"
-              px={{
-                xs: 3,
-                md: 0,
-              }}
-            >
-              <Button
-                variant="contained"
-                disableElevation
-                fullWidth
-                sx={{
-                  p: 1.5,
-                  borderRadius: 2,
-                }}
-                disabled={!confirmed}
-                onClick={() => {}}
-              >
-                <Typography variant="h5">
-                  {confirmed ? "계좌 만들기" : "약관에 동의해주세요"}
-                </Typography>
-              </Button>
-            </Stack>
           </Stack>
         </Box>
+
+        {/* 계좌 만들기 버튼 */}
+        <Stack
+          width="100%"
+          height="64px"
+          justifyContent="center"
+          position={{
+            xs: "fixed",
+            md: "static",
+          }}
+          bottom="64px"
+          left={0}
+          mt="auto"
+          px={{
+            xs: 3,
+            md: 0,
+          }}
+        >
+          <Button
+            variant="contained"
+            disableElevation
+            fullWidth
+            sx={{
+              p: 1.5,
+              borderRadius: 2,
+            }}
+            disabled={!confirmed}
+            onClick={() => {}}
+          >
+            <Typography variant="h5">
+              {confirmed ? "계좌 만들기" : "약관에 동의해주세요"}
+            </Typography>
+          </Button>
+        </Stack>
       </Stack>
     </Paper>
   );
