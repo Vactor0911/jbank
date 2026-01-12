@@ -1,5 +1,6 @@
 import { mariaDB } from "../config/mariadb";
 import { NotFoundError } from "../errors/CustomErrors";
+import AccountModel from "../models/account.model";
 import { UserModel } from "../models/user.model";
 import { fetchSteamProfile } from "../utils/steam";
 import TransactionHandler from "../utils/transactionHandler";
@@ -133,6 +134,14 @@ export class UserService {
    * @returns 예금주 정보
    */
   static async getAccountHolder(accountNumber: string) {
+    const account = await AccountModel.findByAccountNumber(
+      accountNumber,
+      mariaDB
+    );
+    if (!account) {
+      throw new NotFoundError("계좌를 찾을 수 없습니다.");
+    }
+
     const accountHolder = await UserModel.findByAccountNumber(
       accountNumber,
       mariaDB

@@ -59,6 +59,27 @@ class AccountModel {
   }
 
   /**
+   * 계좌번호로 계좌 조회
+   * @param accountNumber 계좌 번호
+   * @param connection MariaDB 연결 객체
+   * @returns 계좌 모델
+   */
+  static async findByAccountNumber(
+    accountNumber: string,
+    connection: PoolConnection | Pool
+  ) {
+    const [account] = await connection.execute(
+      `
+        SELECT *
+        FROM account
+        WHERE account_number = ?
+      `,
+      [accountNumber]
+    );
+    return this.formatAccount(account);
+  }
+
+  /**
    * 계좌 생성
    * @param accountUuid 계좌 uuid
    * @param userId 사용자 id
