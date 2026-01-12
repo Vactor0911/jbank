@@ -23,6 +23,29 @@ class UserService {
     const response = await axiosInstance.get("/api/user/me");
     const userData = response.data.data.user as UserData;
     store.set(userDataAtom, userData);
+    return response.data;
+  }
+
+  /**
+   * 현재 사용자 스팀 프로필 정보 새로고침 및 저장
+   */
+  static async refreshMe() {
+    console.log("Refreshing user data...");
+
+    const response = await axiosInstance.patch("/api/user/me/refresh");
+    const { steamName, avatar } = response.data.data.user;
+    const currentUserData = store.get(userDataAtom);
+    if (currentUserData) {
+      store.set(userDataAtom, { ...currentUserData, steamName, avatar });
+    }
+    return response.data;
+  }
+
+  static async deleteAccount() {
+    console.log("Deleting user account...");
+
+    const response = await axiosInstance.delete("/api/user/me");
+    return response.data;
   }
 }
 

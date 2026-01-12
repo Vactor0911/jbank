@@ -7,8 +7,10 @@ export class UserModel {
   steamId: string;
   steamName: string;
   avatar: string;
+  status: "active" | "deleted" | "banned";
   createdAt: Date;
   lastLogin: Date;
+  lastProfileRefresh: Date;
 
   constructor(data: any) {
     this.id = data.id || "";
@@ -16,8 +18,10 @@ export class UserModel {
     this.steamId = data.steamId;
     this.steamName = data.steamName;
     this.avatar = data.avatar;
+    this.status = data.status;
     this.createdAt = data.createdAt || new Date();
     this.lastLogin = data.lastLogin || new Date();
+    this.lastProfileRefresh = data.lastProfileRefresh || new Date();
   }
 
   /**
@@ -139,6 +143,49 @@ export class UserModel {
   }
 
   /**
+   * 사용자 스팀 정보 업데이트
+   * @param userId 사용자 id
+   * @param steamName 스팀 이름
+   * @param avatar 아바타 URL
+   * @param connection MariaDB 연결 객체
+   * @returns
+   */
+  static async updateSteamInfo(
+    userId: string,
+    steamName: string,
+    avatar: string,
+    connection: PoolConnection | Pool
+  ) {
+    const result = await connection.execute(
+      `
+        UPDATE user
+        SET steam_name = ?, avatar = ?, last_profile_refresh_at = NOW()
+        WHERE user_id = ?
+      `,
+      [steamName, avatar, userId]
+    );
+    return result;
+  }
+
+  /**
+   * 사용자 삭제 (회원 탈퇴)
+   * @param userId 사용자 id
+   * @param connection MariaDB 연결 객체
+   * @returns 삭제 결과
+   */
+  static async deleteById(userId: string, connection: PoolConnection | Pool) {
+    const result = await connection.execute(
+      `
+        UPDATE user
+        SET status = 'deleted'
+        WHERE user_id = ?
+      `,
+      [userId]
+    );
+    return result;
+  }
+
+  /**
    * 마지막 로그인 시간 업데이트
    * @param userId 사용자 id
    * @param connection MariaDB 연결 객체
@@ -147,7 +194,7 @@ export class UserModel {
   static async stampLastLogin(
     userId: string,
     connection: PoolConnection | Pool
-  ): Promise<void> {
+  ) {
     const result = await connection.execute(
       `
         UPDATE user
@@ -157,6 +204,27 @@ export class UserModel {
       [userId]
     );
     return result;
+  }
+
+  /**
+   * 사용자 id로 사용자 상태 조회
+   * @param userId 사용자 id
+   * @param connection MariaDB 연결 객체
+   * @returns 사용자 상태
+   */
+  static async getStatusById(
+    userId: string,
+    connection: PoolConnection | Pool
+  ) {
+    const [result] = await connection.execute(
+      `
+        SELECT status
+        FROM user
+        WHERE user_id = ?
+      `,
+      [userId]
+    );
+    return (result as any).status;
   }
 
   /**
@@ -173,6 +241,7 @@ export class UserModel {
       avatar: data.avatar,
       createdAt: data.created_at,
       lastLogin: data.last_login_at,
+      lastProfileRefresh: data.last_profile_refresh_at,
     });
     return user;
   }

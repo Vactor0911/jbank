@@ -1,3 +1,5 @@
+import { getDefaultStore } from "jotai";
+import { userDataAtom } from "../states";
 import apiClient, { axiosInstance } from "./axios";
 
 const SERVER_HOST = import.meta.env.VITE_SERVER_HOST;
@@ -14,6 +16,8 @@ export interface LoginResponse {
   accessToken: string;
   csrfToken: string;
 }
+
+const store = getDefaultStore();
 
 class AuthService {
   /**
@@ -60,6 +64,7 @@ class AuthService {
   static async logout() {
     try {
       await axiosInstance.post("/api/auth/logout");
+      store.set(userDataAtom, null);
     } catch (error) {
       console.error("로그아웃 실패:", error);
     } finally {

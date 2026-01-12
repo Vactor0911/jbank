@@ -105,6 +105,11 @@ const getComponents = (mode: PaletteMode) => ({
       },
     },
   },
+  MuiSkeleton: {
+    defaultProps: {
+      animation: "wave" as const,
+    },
+  },
 });
 
 // 라이트 테마 생성

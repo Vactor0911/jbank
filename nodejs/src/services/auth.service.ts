@@ -27,6 +27,14 @@ export class AuthService {
           throw new NotFoundError("사용자를 찾을 수 없습니다.");
         }
 
+        // 사용자 계정 상태 확인
+        const userStatus = await UserModel.getStatusById(user.id, connection);
+        if (userStatus === "deleted") {
+          throw new ForbiddenError("삭제된 계정입니다.");
+        } else if (userStatus === "banned") {
+          throw new ForbiddenError("차단된 계정입니다.");
+        }
+
         // Access Token 및 Refresh Token 생성
         const accessToken = generateAccessToken(user);
         const refreshToken = generateRefreshToken(user);

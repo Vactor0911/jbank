@@ -10,7 +10,7 @@ import {
 import NavigateNextOutlinedIcon from "@mui/icons-material/NavigateNextOutlined";
 import { useNavigate } from "react-router";
 import Footer from "../Footer";
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { Home } from "./Tabs";
 import { useAtomValue } from "jotai";
 import {
@@ -20,6 +20,7 @@ import {
 } from "../../states";
 import JbankLogo from "../../assets/logo/jbank.svg?react";
 import AuthService from "../../services/authService";
+import ImageBox from "../ImageBox";
 
 const SidebarMenu = () => {
   const theme = useTheme();
@@ -28,12 +29,6 @@ const SidebarMenu = () => {
   const navigationValue = useAtomValue(navigationValueAtom);
   const isAuthenticated = useAtomValue(isAuthenticatedAtom);
   const userData = useAtomValue(userDataAtom);
-
-  useEffect(() => {
-    console.log("프로필 이미지:", userData?.avatar);
-  }, [userData]);
-
-  console.log(userData?.avatar);
 
   // 프로필 정보 클릭 핸들러
   const handleProfileClick = useCallback(() => {
@@ -97,8 +92,7 @@ const SidebarMenu = () => {
         <Stack direction="row" width="100%" gap={2} alignItems="center">
           {/* 프로필 이미지 */}
           {isAuthenticated && (
-            <Box
-              component="img"
+            <ImageBox
               src={userData?.avatar}
               borderRadius="4px"
               sx={{
@@ -113,12 +107,12 @@ const SidebarMenu = () => {
             <Stack flex={1} overflow="hidden">
               {/* Jbank 사용자 닉네임 */}
               <Typography variant="body1" fontWeight={500} noWrap>
-                백터
+                {userData?.steamName}
               </Typography>
 
               {/* Steam 닉네임 */}
               <Typography variant="caption" color="text.secondary" noWrap>
-                76561198012345678
+                {userData?.steamId}
               </Typography>
             </Stack>
           ) : (
