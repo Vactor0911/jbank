@@ -107,7 +107,7 @@ const PasswordForm = () => {
         <ArrowBackRoundedIcon fontSize="large" />
       </IconButton>
 
-      {/* 비밀번호 입력 문구 */}
+      {/* 계좌 비밀번호 입력 */}
       <Stack
         my={5}
         flex={1}
@@ -115,9 +115,9 @@ const PasswordForm = () => {
         alignItems="center"
         gap={1}
       >
-        {/* 예금주 */}
+        {/* 계좌 비밀번호 입력 문구 */}
         <Typography variant="h5" fontWeight={500}>
-          비밀번호를 눌러주세요
+          계좌 비밀번호를 눌러주세요
         </Typography>
 
         {/* 비밀번호 입력란 */}

@@ -21,6 +21,17 @@ class AccountSerice {
     const response = await axiosInstance.get("/api/account/");
     store.set(accountDataAtom, response.data.data.accounts);
   }
+
+  /**
+   * 계좌 생성
+   * @param password 계좌 비밀번호
+   */
+  static async createAccount(password: string) {
+    const response = await axiosInstance.post("/api/account/", {
+      password: password,
+    });
+    return response;
+  }
 }
 
 export default AccountSerice;
