@@ -32,7 +32,7 @@ class AccountModel {
       `,
       [userId]
     );
-    return accounts.map((account: any) => new AccountModel(account));
+    return accounts.map((account: any) => this.formatAccount(account));
   }
 
   /**
@@ -60,6 +60,22 @@ class AccountModel {
     );
 
     return result;
+  }
+
+  /**
+   * 계좌 데이터 포맷팅
+   * @param data 계좌 데이터
+   * @returns 포맷팅된 계좌 모델
+   */
+  private static formatAccount(data: any) {
+    return new AccountModel({
+      uuid: data.account_uuid,
+      accountNumber: data.account_number,
+      password: data.password,
+      status: data.status,
+      credit: data.credit,
+      createdAt: data.created_at,
+    });
   }
 }
 
