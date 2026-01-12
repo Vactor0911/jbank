@@ -106,6 +106,36 @@ export class UserModel {
   }
 
   /**
+   * 계좌번호로 사용자 조회
+   * @param accountNumber 계좌번호
+   * @param connection MariaDB 연결 객체
+   * @returns 사용자 객체 또는 null
+   */
+  static async findByAccountNumber(
+    accountNumber: string,
+    connection: PoolConnection | Pool
+  ): Promise<UserModel | null> {
+    const [result] = await connection.execute(
+      `
+        SELECT u.*
+        FROM user u
+        JOIN account a ON u.user_id = a.user_id
+        WHERE a.account_number = ?
+      `,
+      [accountNumber]
+    );
+
+    // 사용자가 없으면 null 반환
+    if (!result) {
+      return null;
+    }
+
+    // 사용자 객체 생성
+    const user = this.formatUser(result);
+    return user;
+  }
+
+  /**
    * 사용자 생성
    * @param userData 사용자 데이터
    * @param connection MariaDB 연결 객체

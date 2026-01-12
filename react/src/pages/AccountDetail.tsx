@@ -107,6 +107,13 @@ const AccountDetail = () => {
     };
   }, [handleFetchAccountData]);
 
+  // 계좌번호 복사 핸들러
+  const handleAccountNumberCopy = useCallback(() => {
+    if (accountData?.accountNumber) {
+      navigator.clipboard.writeText(accountData.accountNumber);
+    }
+  }, [accountData]);
+
   return (
     <Paper
       elevation={0}
@@ -236,6 +243,7 @@ const AccountDetail = () => {
                     textTransform: "none",
                     alignSelf: "flex-start",
                   }}
+                  onClick={handleAccountNumberCopy}
                 >
                   <Typography
                     variant="body2"

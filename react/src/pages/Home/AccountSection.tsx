@@ -66,7 +66,7 @@ const AccountSection = () => {
               overflow="hidden"
               textAlign="right"
             >
-              {accountData[0].credit
+              {accountData[0]?.credit
                 ? formatNumberString(accountData[0].credit)
                 : "0"}
             </Typography>
@@ -125,7 +125,7 @@ const AccountSection = () => {
                     noWrap
                     overflow="hidden"
                   >
-                    {account.credit ? formatNumberString(account.credit) : "0"}
+                    {account?.credit ? formatNumberString(account.credit) : "0"}
                   </Typography>
 
                   {/* 크레딧 문구 */}
