@@ -13,7 +13,6 @@ import {
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import { useNavigate } from "react-router";
 import RefreshRoundedIcon from "@mui/icons-material/RefreshRounded";
-import { useAccount } from "../hooks/account";
 import { useCallback, useEffect, useState } from "react";
 import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
@@ -30,7 +29,11 @@ const RefreshAnimation = keyframes`
 const AccountDetail = () => {
   const navigate = useNavigate();
 
-  const { accountData, fetchAccountData } = useAccount();
+  const accountData = {
+    accountNumber: "123-456-7890",
+    balance: 123456,
+  };
+
   const [isFetching, setIsFetching] = useState(false);
   const [isFetchSuccess, setIsFetchSuccess] = useState(false);
 
@@ -43,7 +46,7 @@ const AccountDetail = () => {
 
     // 계좌 정보 새로고침
     setIsFetching(true);
-    fetchAccountData();
+    // fetchAccountData();
 
     // TODO: 애니메이션 테스트용 코드 | 제거 예정
     setTimeout(() => {
@@ -54,12 +57,12 @@ const AccountDetail = () => {
         setIsFetching(false);
       }, 2000);
     }, 2000);
-  }, [fetchAccountData, isFetching]);
+  }, [isFetching]);
 
   // 페이지 로드 시 계좌 정보 조회
   useEffect(() => {
-    fetchAccountData();
-  }, [fetchAccountData]);
+    // fetchAccountData();
+  }, []);
 
   return (
     <Paper

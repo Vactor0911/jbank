@@ -110,6 +110,11 @@ const getComponents = (mode: PaletteMode) => ({
       animation: "wave" as const,
     },
   },
+  MuiButton: {
+    defaultProps: {
+      disableElevation: true,
+    }
+  }
 });
 
 // 라이트 테마 생성

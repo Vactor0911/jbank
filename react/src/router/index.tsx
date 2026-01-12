@@ -3,6 +3,7 @@ import { createBrowserRouter, redirect } from "react-router-dom";
 import apiClient from "../services/axios";
 import {
   AccountDetail,
+  AccountNew,
   Home,
   Login,
   NotFoundError,
@@ -47,6 +48,11 @@ export const router = createBrowserRouter([
       {
         index: true,
         element: <Home />,
+      },
+      {
+        path: "account/new",
+        element: <AccountNew />,
+        loader: requireAuth,
       },
       {
         path: "account/:accountUuid",
