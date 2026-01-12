@@ -53,8 +53,6 @@ class AccountService {
       throw new NotFoundError("계좌를 찾을 수 없습니다.");
     }
 
-    console.log("account in service >>", account);
-
     // 계좌 소유자 확인
     if (account.userId !== userId) {
       throw new ForbiddenError("해당 계좌에 접근할 권한이 없습니다.");

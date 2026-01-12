@@ -19,7 +19,6 @@ class AccountSerice {
    */
   static async fetchAccounts() {
     const response = await axiosInstance.get("/api/account/");
-    console.log("Fetch account:", response.data.data.accounts[0]);
     store.set(accountDataAtom, response.data.data.accounts as AccountData[]);
   }
 
