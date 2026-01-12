@@ -28,9 +28,11 @@ class AccountService {
     const accounts = await AccountModel.findByUserId(userId, mariaDB);
 
     // 계좌 정보 반환
-    const formattedAccounts = accounts.map((account: AccountModel) =>
-      this.formatAccountData(account)
-    );
+    const formattedAccounts = [];
+    for (const account of accounts) {
+      const formattedAccount = await this.formatAccountData(account);
+      formattedAccounts.push(formattedAccount);
+    }
     return formattedAccounts;
   }
 
