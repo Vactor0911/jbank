@@ -31,7 +31,7 @@ export class TransactionModel {
     amount: number,
     connection: PoolConnection | Pool
   ) {
-    const transaction = await connection.execute(
+    await connection.execute(
       `
         INSERT INTO transaction
             (transaction_uuid, sender_account_id, receiver_account_id, currency_id, amount)

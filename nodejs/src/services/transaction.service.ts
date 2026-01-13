@@ -37,26 +37,61 @@ export class TransactionService {
           throw new BadRequestError("송금액이 올바르지 않습니다.");
         }
 
+        // 계좌 번호 정렬
+        const accountNumbers = [
+          senderAccountNumber,
+          receiverAccountNumber,
+        ].sort();
+
+        // 첫 번째 계좌 조회 (쓰기 잠금)
+        const account1 = await AccountModel.findByAccountNumberForUpdate(
+          accountNumbers[0],
+          connection
+        );
+
+        // 두 번째 계좌 조회 (쓰기 잠금)
+        const account2 = await AccountModel.findByAccountNumberForUpdate(
+          accountNumbers[1],
+          connection
+        );
+
+        // 송금자/수취자 계좌 구분
+        const senderAccount =
+          account1?.accountNumber === senderAccountNumber ? account1 : account2;
+        const receiverAccount =
+          account1?.accountNumber === receiverAccountNumber
+            ? account1
+            : account2;
+            
+        // 계좌 존재 여부 확인
+        if (!senderAccount) {
+          throw new NotFoundError("송금 계좌를 찾을 수 없습니다.");
+        }
+        if (!receiverAccount) {
+          throw new NotFoundError("수취 계좌를 찾을 수 없습니다.");
+        }
+
+        // 같은 계좌 간 송금 불가
+        if (senderAccount.id === receiverAccount.id) {
+          throw new UnprocessableEntityError("같은 계좌로 송금할 수 없습니다.");
+        }
+
         // 사용자 조회
         const user = await UserModel.findById(userId, connection);
         if (!user) {
           throw new NotFoundError("사용자를 찾을 수 없습니다.");
         }
 
-        // 송금 계좌 조회
-        const senderAccount = await AccountModel.findByAccountNumber(
-          senderAccountNumber,
-          connection
-        );
-        if (!senderAccount) {
-          throw new NotFoundError("송금 계좌를 찾을 수 없습니다.");
-        } else if (senderAccount.userId !== userId) {
+        // 송금 계좌 검증
+        if (senderAccount.userId !== userId) {
           throw new ForbiddenError("권한이 없습니다.");
-        } else if (senderAccount.status !== "active") {
+        }
+        if (senderAccount.status !== "active") {
           throw new UnprocessableEntityError(
             "계좌의 거래가 정지되어 송금할 수 없습니다."
           );
-        } else if (BigInt(senderAccount.credit) < BigInt(amount)) {
+        }
+        if (BigInt(senderAccount.credit) < BigInt(amount)) {
           throw new UnprocessableEntityError("계좌의 잔액이 부족합니다.");
         }
 
@@ -69,20 +104,9 @@ export class TransactionService {
           throw new ForbiddenError("계좌의 비밀번호가 일치하지 않습니다.");
         }
 
-        // 수취 계좌 조회
-        const receiverAccount = await AccountModel.findByAccountNumber(
-          receiverAccountNumber,
-          connection
-        );
-        if (!receiverAccount) {
-          throw new NotFoundError("수취 계좌를 찾을 수 없습니다.");
-        } else if (receiverAccount.status !== "active") {
+        // 수취 계좌 검증
+        if (receiverAccount.status !== "active") {
           throw new UnprocessableEntityError("해당 계좌로 송금할 수 없습니다.");
-        }
-
-        // 같은 계좌 간 송금 불가
-        if (senderAccount.id === receiverAccount.id) {
-          throw new UnprocessableEntityError("같은 계좌로 송금할 수 없습니다.");
         }
 
         // 거래 생성
@@ -94,6 +118,10 @@ export class TransactionService {
           amount,
           connection
         );
+
+        // 계좌 잔액 업데이트
+        await AccountModel.withdraw(senderAccount.id, amount, connection);
+        await AccountModel.deposit(receiverAccount.id, amount, connection);
 
         // 거래 데이터 생성
         const transaction = {
@@ -110,8 +138,6 @@ export class TransactionService {
           amount: amount,
         };
 
-        // 생성된 거래 정보 반환
-        console.log("생성된 거래 정보:", transaction);
         return transaction;
       }
     );

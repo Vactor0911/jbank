@@ -82,6 +82,28 @@ class AccountModel {
   }
 
   /**
+   * 계좌번호로 계좌 조회 (쓰기 잠금)
+   * @param accountNumber 계좌 번호
+   * @param connection MariaDB 연결 객체
+   * @returns 계좌 모델
+   */
+  static async findByAccountNumberForUpdate(
+    accountNumber: string,
+    connection: PoolConnection | Pool
+  ) {
+    const [account] = await connection.execute(
+      `
+        SELECT *
+        FROM account
+        WHERE account_number = ?
+        FOR UPDATE
+      `,
+      [accountNumber]
+    );
+    return this.formatAccount(account);
+  }
+
+  /**
    * 계좌 생성
    * @param accountUuid 계좌 uuid
    * @param userId 사용자 id
@@ -106,6 +128,48 @@ class AccountModel {
     );
 
     return result;
+  }
+
+  /**
+   * 계좌 내 크레딧 출금
+   * @param accountId 계좌 id
+   * @param amount 출금 금액
+   * @param connection MariaDB 연결 객체
+   */
+  static async withdraw(
+    accountId: string,
+    amount: number,
+    connection: PoolConnection | Pool
+  ) {
+    await connection.execute(
+      `
+        UPDATE account
+        SET credit = credit - ?
+        WHERE account_id = ?;
+      `,
+      [amount, accountId]
+    );
+  }
+
+  /**
+   * 계좌 내 크레딧 입금
+   * @param accountId 계좌 id
+   * @param amount 입금 금액
+   * @param connection MariaDB 연결 객체
+   */
+  static async deposit(
+    accountId: string,
+    amount: number,
+    connection: PoolConnection | Pool
+  ) {
+    await connection.execute(
+      `
+        UPDATE account
+        SET credit = credit + ?
+        WHERE account_id = ?;
+      `,
+      [amount, accountId]
+    );
   }
 
   /**
