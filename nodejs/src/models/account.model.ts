@@ -1,6 +1,7 @@
 import { Pool, PoolConnection } from "mariadb/*";
 
 class AccountModel {
+  id: string;
   uuid: string;
   userId: string;
   accountNumber: string;
@@ -10,6 +11,7 @@ class AccountModel {
   createdAt: Date;
 
   constructor(data: any) {
+    this.id = String(data.id);
     this.uuid = data.uuid;
     this.userId = String(data.userId);
     this.accountNumber = data.accountNumber;
@@ -117,6 +119,7 @@ class AccountModel {
     }
 
     return new AccountModel({
+      id: data.account_id,
       uuid: data.account_uuid,
       userId: data.user_id,
       accountNumber: data.account_number,

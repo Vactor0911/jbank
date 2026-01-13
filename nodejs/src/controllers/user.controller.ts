@@ -99,7 +99,7 @@ export class UserController {
         success: true,
         message: "예금주가 조회되었습니다.",
         data: {
-          accountHolder,
+          user: accountHolder,
         },
       });
     }
