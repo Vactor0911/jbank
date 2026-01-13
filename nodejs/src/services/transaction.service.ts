@@ -50,7 +50,6 @@ export class TransactionService {
       const formattedTransaction = await this.formatTransaction(transaction);
       formattedTransactions.push(formattedTransaction);
     }
-    console.log("조회된 거래 내역:", formattedTransactions);
     return formattedTransactions;
   }
 
@@ -77,7 +76,6 @@ export class TransactionService {
     }
 
     // 거래 내역의 송금자 혹은 수취자가 사용자인지 확인
-    console.log("조회된 거래 내역:", transaction, userId);
     if (
       transaction.senderAccountHolderUuid !== user.uuid &&
       transaction.receiverAccountHolderUuid !== user.uuid

@@ -10,7 +10,7 @@ import Section from "../../components/Section";
 import { useIsMobile } from "../../hooks";
 import TransferSteps from "./TransferSteps";
 import { useAtom, useAtomValue } from "jotai";
-import { transferDataAtom, transferStepAtom } from "../../states/transfer";
+import { transferStepAtom } from "../../states/transfer";
 import { useEffect } from "react";
 import { useTransfer } from "../../hooks/transfer";
 import { accountDataAtom } from "../../states/account";
@@ -27,12 +27,6 @@ const Transfer = () => {
 
   const [transferStep, setTransferStep] = useAtom(transferStepAtom);
   const accountData = useAtomValue(accountDataAtom);
-
-  // TODO: 디버그용
-  const transferData = useAtomValue(transferDataAtom);
-  useEffect(() => {
-    console.log(transferData);
-  }, [transferData]);
 
   // 송금하기 페이지 접속 시 기존 데이터 초기화
   useEffect(() => {
