@@ -13,7 +13,13 @@ import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";
 
 export class TransactionService {
-  static async getAccountTransactions(userId: string, accountNumber: string) {
+  /**
+   * 계좌 거래 내역 목록 조회
+   * @param userId 사용자 id
+   * @param accountUuid 계좌 uuid
+   * @returns 거래 내역 목록
+   */
+  static async getAccountTransactions(userId: string, accountUuid: string) {
     // 사용자 조회
     const user = await UserModel.findById(userId, mariaDB);
     if (!user) {
@@ -21,10 +27,7 @@ export class TransactionService {
     }
 
     // 계좌 조회
-    const account = await AccountModel.findByAccountNumber(
-      accountNumber,
-      mariaDB
-    );
+    const account = await AccountModel.findByUuid(accountUuid, mariaDB);
     if (!account) {
       throw new NotFoundError("계좌를 찾을 수 없습니다.");
     }
@@ -157,6 +160,13 @@ export class TransactionService {
         if (!user) {
           throw new NotFoundError("사용자를 찾을 수 없습니다.");
         }
+        const receiver = await UserModel.findById(
+          receiverAccount.userId,
+          connection
+        );
+        if (!receiver) {
+          throw new NotFoundError("수취 계좌의 사용자를 찾을 수 없습니다.");
+        }
 
         // 송금 계좌 검증
         if (senderAccount.userId !== userId) {
@@ -197,7 +207,16 @@ export class TransactionService {
         if (!updatedSenderAccount) {
           throw new NotFoundError("송금 계좌를 찾을 수 없습니다.");
         }
-        const currentBalance = updatedSenderAccount.credit;
+        const senderCurrentBalance = updatedSenderAccount.credit;
+
+        const updatedReceiverAccount = await AccountModel.findById(
+          receiverAccount.id,
+          connection
+        );
+        if (!updatedReceiverAccount) {
+          throw new NotFoundError("수취 계좌를 찾을 수 없습니다.");
+        }
+        const receiverCurrentBalance = updatedReceiverAccount.credit;
 
         // 거래 생성
         const transactionUuid = uuidv4();
@@ -206,7 +225,8 @@ export class TransactionService {
           senderAccount.id,
           receiverAccount.id,
           amount,
-          currentBalance,
+          senderCurrentBalance,
+          receiverCurrentBalance,
           connection
         );
 
@@ -215,15 +235,18 @@ export class TransactionService {
           uuid: transactionUuid,
           sender: {
             uuid: senderAccount.uuid,
+            steamName: user.steamName,
             accountNumber: senderAccount.accountNumber,
+            currentBalance: senderCurrentBalance,
           },
           receiver: {
             uuid: receiverAccount.uuid,
+            steamName: receiver.steamName,
             accountNumber: receiverAccount.accountNumber,
+            currentBalance: receiverCurrentBalance,
           },
           currencyCode: "CRD",
           amount: amount,
-          currentBalance: currentBalance,
         };
 
         return transaction;
@@ -240,15 +263,16 @@ export class TransactionService {
         uuid: transaction.senderAccountHolderUuid,
         steamName: transaction.senderAccountHolderName,
         accountNumber: transaction.senderAccountNumber,
+        currentBalance: transaction.senderCurrentBalance,
       },
       receiver: {
         uuid: transaction.receiverAccountHolderUuid,
         steamName: transaction.receiverAccountHolderName,
         accountNumber: transaction.receiverAccountNumber,
+        currentBalance: transaction.receiverCurrentBalance,
       },
       currencyCode: transaction.currencyCode || "CRD",
       amount: transaction.amount,
-      currentBalance: transaction.currentBalance,
       createdAt: transaction.createdAt,
     };
     return transactionData;

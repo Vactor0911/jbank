@@ -13,7 +13,8 @@ export class TransactionModel {
   currencyId: string;
   currencyCode?: string;
   amount: number;
-  currentBalance: string;
+  senderCurrentBalance: string;
+  receiverCurrentBalance: string;
   createdAt: Date;
 
   constructor(data: any) {
@@ -31,7 +32,8 @@ export class TransactionModel {
     this.currencyId = String(data.currencyId);
     this.currencyCode = data.currencyCode || undefined;
     this.amount = Number(data.amount);
-    this.currentBalance = String(data.currentBalance);
+    this.senderCurrentBalance = String(data.senderCurrentBalance);
+    this.receiverCurrentBalance = String(data.receiverCurrentBalance);
     this.createdAt = data.createdAt || new Date();
   }
 
@@ -95,7 +97,7 @@ export class TransactionModel {
         JOIN user sender_user ON sender_acc.user_id = sender_user.user_id
         JOIN user receiver_user ON receiver_acc.user_id = receiver_user.user_id
         WHERE t.sender_account_id = ? OR t.receiver_account_id = ?
-        ORDER BY t.created_at DESC
+        ORDER BY t.transaction_id DESC
       `,
       [accountId, accountId]
     );
@@ -108,6 +110,8 @@ export class TransactionModel {
    * @param senderAccountId 송금 계좌 id
    * @param receiverAccountId 수취 계좌 id
    * @param amount 송금 금액
+   * @param senderCurrentBalance 송금자 현재 잔액
+   * @param receiverCurrentBalance 수취자 현재 잔액
    * @param connection MariaDB 연결 객체
    * @returns 거래 내역 모델
    */
@@ -116,21 +120,24 @@ export class TransactionModel {
     senderAccountId: string,
     receiverAccountId: string,
     amount: number,
-    currentBalance: string,
+    senderCurrentBalance: string,
+    receiverCurrentBalance: string,
     connection: PoolConnection | Pool
   ) {
     await connection.execute(
       `
         INSERT INTO transaction
-            (transaction_uuid, sender_account_id, receiver_account_id, currency_id, amount, current_balance)
-            VALUES (?, ?, ?, 1, ?, ?)
+            (transaction_uuid, sender_account_id, receiver_account_id, currency_id, amount,
+            sender_current_balance, receiver_current_balance)
+            VALUES (?, ?, ?, 1, ?, ?, ?)
       `,
       [
         transactionUuid,
         senderAccountId,
         receiverAccountId,
         amount,
-        currentBalance,
+        senderCurrentBalance,
+        receiverCurrentBalance,
       ]
     );
     return this.formatTransaction({
@@ -139,7 +146,7 @@ export class TransactionModel {
       receiver_account_id: receiverAccountId,
       currency_id: 1,
       amount: amount,
-      current_balance: currentBalance,
+      current_balance: senderCurrentBalance,
     });
   }
 
@@ -185,7 +192,8 @@ export class TransactionModel {
       currencyId: data.currency_id,
       currencyCode: data.currency_code,
       amount: data.amount,
-      currentBalance: data.current_balance,
+      senderCurrentBalance: data.sender_current_balance,
+      receiverCurrentBalance: data.receiver_current_balance,
       createdAt: data.created_at,
     });
   }

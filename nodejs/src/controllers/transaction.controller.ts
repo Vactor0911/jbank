@@ -10,12 +10,12 @@ class TransactionController {
   static getAccountTransactions = asyncHandler(
     async (req: AuthRequest, res: Response<APIResponse>) => {
       const { userId } = req.user as { userId: string };
-      const { accountNumber } = req.params;
+      const { accountUuid } = req.params;
 
       // 계좌 거내 내역 조회
       const transactions = await TransactionService.getAccountTransactions(
         userId,
-        accountNumber
+        accountUuid
       );
 
       // 응답 전송

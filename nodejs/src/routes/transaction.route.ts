@@ -13,7 +13,7 @@ const transactionRouter = Router();
 
 // 거래 내역 목록 조회
 transactionRouter.get(
-  "/account/:accountNumber",
+  "/account/:accountUuid",
   authenticateJWT,
   validateParams(getAccountTransactionsSchema),
   TransactionController.getAccountTransactions

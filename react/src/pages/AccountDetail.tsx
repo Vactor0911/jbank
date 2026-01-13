@@ -20,7 +20,10 @@ import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
 import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
 import AccountService, { type AccountData } from "../services/accountService";
 import { AxiosError } from "axios";
-import { formatNumberString } from "../utils";
+import { formatDateToLocal, formatNumberString } from "../utils";
+import TransactionService, {
+  type TransactionData,
+} from "../services/transactionService";
 
 const RefreshAnimation = keyframes`
   0% {
@@ -38,6 +41,9 @@ const AccountDetail = () => {
   const [isFetching, setIsFetching] = useState(false);
   const [isFetchSuccess, setIsFetchSuccess] = useState<boolean | null>(null);
   const [accountData, setAccountData] = useState<AccountData | null>(null);
+  const [transactionsData, setTransactionsData] = useState<TransactionData[]>(
+    []
+  );
 
   // 계좌 정보 조회 핸들러
   const handleFetchAccountData = useCallback(async () => {
@@ -50,14 +56,19 @@ const AccountDetail = () => {
       const response = await Promise.all([
         // 계좌 정보 조회 API 호출
         AccountService.fetchAccount(accountUuid),
+        TransactionService.fetchAccountTransactions(accountUuid),
         new Promise((resolve) => setTimeout(resolve, 1000)),
       ]);
 
       // 조회 응답 처리
       const accountResponse = response[0];
+      const transactionsResponse = response[1];
       setIsFetchSuccess(accountResponse.data.success);
       if (accountResponse.data.success) {
         setAccountData(accountResponse.data.data.account as AccountData);
+        setTransactionsData(
+          transactionsResponse.data.data.transactions as TransactionData[]
+        );
       }
 
       // 3초 후 초기화
@@ -112,6 +123,14 @@ const AccountDetail = () => {
       navigator.clipboard.writeText(accountData.accountNumber);
     }
   }, [accountData]);
+
+  // 거래내역이 수신 거래인지 여부 확인
+  const isReceivedTransaction = useCallback(
+    (transaction: TransactionData) => {
+      return transaction.receiver.accountNumber === accountData?.accountNumber;
+    },
+    [accountData]
+  );
 
   return (
     <Paper
@@ -259,22 +278,25 @@ const AccountDetail = () => {
               )}
 
               {/* 잔액 */}
-              {accountData?.credit ? (
-                <Typography variant="h4" noWrap>
-                  {formatNumberString(accountData?.credit as string)} 크레딧
-                </Typography>
-              ) : (
-                <Skeleton
-                  variant="rounded"
-                  width="200px"
-                  sx={{
-                    height: {
-                      xs: "30px",
-                      md: "40px",
-                    },
-                  }}
-                />
-              )}
+              <Typography variant="h4" display="flex" gap={0.5} noWrap>
+                {accountData?.credit && !isFetching ? (
+                  <span>
+                    {formatNumberString(accountData?.credit as string)}
+                  </span>
+                ) : (
+                  <Skeleton
+                    variant="rounded"
+                    width="120px"
+                    sx={{
+                      height: {
+                        xs: "30px",
+                        md: "40px",
+                      },
+                    }}
+                  />
+                )}
+                크레딧
+              </Typography>
             </Stack>
 
             {/* 구분선 */}
@@ -303,78 +325,129 @@ const AccountDetail = () => {
               </Button>
 
               {/* 거래 내역 */}
-              {Array.from({ length: 10 }).map((_, index) => (
-                // 거래 내역 버튼
-                <ButtonBase
-                  key={`transaction-${index}`}
-                  sx={{
-                    width: "100%",
-                    p: 0.5,
-                    px: 1,
-                    borderRadius: 2,
-                    overflow: "hidden",
-                  }}
-                  onClick={() => navigate("/transaction/transaction-uuid")}
-                >
-                  <Stack direction="row" width="100%" gap={3}>
-                    {/* 날짜 */}
-                    <Typography
-                      variant="body2"
-                      fontWeight={500}
-                      color="text.secondary"
-                      mt="0.4em"
-                    >
-                      01.23
-                    </Typography>
-
-                    {/* 거래 정보 */}
-                    <Stack flexShrink={1} minWidth={0}>
-                      {/* 상대 계좌 예금주 */}
-                      <Typography
-                        variant="h6"
-                        fontWeight={600}
-                        noWrap
-                        textAlign="left"
-                      >
-                        백터 (Vactor0911)
-                      </Typography>
-
-                      {/* 거래 시각 */}
+              {transactionsData.length > 0 &&
+                !isFetching &&
+                transactionsData.map((transaction, index) => (
+                  // 거래 내역 버튼
+                  <ButtonBase
+                    key={`transaction-${index}`}
+                    sx={{
+                      width: "100%",
+                      p: 0.5,
+                      px: 1,
+                      borderRadius: 2,
+                      overflow: "hidden",
+                    }}
+                    onClick={() => navigate("/transaction/transaction-uuid")}
+                  >
+                    <Stack direction="row" width="100%" gap={3}>
+                      {/* 날짜 */}
                       <Typography
                         variant="body2"
+                        fontWeight={500}
                         color="text.secondary"
-                        textAlign="left"
+                        mt="0.4em"
                       >
-                        12:34
+                        {formatDateToLocal(transaction.createdAt, {
+                          month: "2-digit",
+                          day: "2-digit",
+                        })
+                          .replace(". ", ".")
+                          .slice(0, -1)}
                       </Typography>
-                    </Stack>
 
-                    {/* 거래 금액 */}
-                    <Stack>
+                      {/* 거래 정보 */}
+                      <Stack flexShrink={1} minWidth={0}>
+                        {/* 상대 계좌 예금주 */}
+                        <Typography
+                          variant="h6"
+                          fontWeight={600}
+                          noWrap
+                          textAlign="left"
+                        >
+                          {isReceivedTransaction(transaction)
+                            ? transaction.sender.steamName
+                            : transaction.receiver.steamName}
+                        </Typography>
+
+                        {/* 거래 시각 */}
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          textAlign="left"
+                        >
+                          {formatDateToLocal(transaction.createdAt, {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: false,
+                          }).slice(-5)}
+                        </Typography>
+                      </Stack>
+
                       {/* 거래 금액 */}
-                      <Typography
-                        variant="h6"
-                        fontWeight={600}
-                        color="primary"
-                        noWrap
-                        textAlign="right"
-                      >
-                        1,100 크레딧
-                      </Typography>
+                      <Stack flex={1}>
+                        {/* 거래 금액 */}
+                        <Typography
+                          variant="h6"
+                          fontWeight={600}
+                          color={
+                            isReceivedTransaction(transaction)
+                              ? "primary"
+                              : "inherit"
+                          }
+                          noWrap
+                          textAlign="right"
+                        >
+                          <span
+                            css={{
+                              display: isReceivedTransaction(transaction)
+                                ? "none"
+                                : "inline",
+                            }}
+                          >
+                            -
+                          </span>
+                          {transaction.amount.toLocaleString("en-US")} 크레딧
+                        </Typography>
 
-                      {/* 거래 후 잔액 */}
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        noWrap
-                        textAlign="right"
-                      >
-                        123,456 크레딧
-                      </Typography>
+                        {/* 거래 후 잔액 */}
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          noWrap
+                          textAlign="right"
+                        >
+                          {isReceivedTransaction(transaction)
+                            ? formatNumberString(
+                                transaction.receiver.currentBalance
+                              )
+                            : formatNumberString(
+                                transaction.sender.currentBalance
+                              )}{" "}
+                          크레딧
+                        </Typography>
+                      </Stack>
                     </Stack>
-                  </Stack>
-                </ButtonBase>
-              ))}
+                  </ButtonBase>
+                ))}
+              {isFetching && (
+                <>
+                  {Array.from({ length: 3 }).map((_, index) => (
+                    <Skeleton
+                      key={`transaction-skeleton-${index}`}
+                      variant="rounded"
+                      sx={{
+                        height: {
+                          xs: "50px",
+                          md: "60px",
+                        },
+                        m: 0.5,
+                        mx: 1,
+                      }}
+                    />
+                  ))}
+                </>
+              )}
             </Stack>
           </Stack>
         </Box>
