@@ -37,9 +37,24 @@ class UserService {
     return response.data;
   }
 
+  /**
+   * 회원탈퇴
+   */
   static async deleteAccount() {
     const response = await axiosInstance.delete("/api/user/me");
     return response.data;
+  }
+
+  /**
+   * 계좌번호로 사용자 정보 조회
+   * @param accountNumber 계좌번호
+   * @returns 사용자 정보
+   */
+  static async getUserByAccountNumber(accountNumber: string) {
+    const response = await axiosInstance.get(
+      `/api/user/account/${accountNumber}`
+    );
+    return response.data.data.user as UserData;
   }
 }
 

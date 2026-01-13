@@ -38,7 +38,6 @@ const AccountDetail = () => {
   const [isFetching, setIsFetching] = useState(false);
   const [isFetchSuccess, setIsFetchSuccess] = useState<boolean | null>(null);
   const [accountData, setAccountData] = useState<AccountData | null>(null);
-  console.log("accountData:", accountData);
 
   // 계좌 정보 조회 핸들러
   const handleFetchAccountData = useCallback(async () => {
