@@ -5,6 +5,31 @@ import { TransactionService } from "../services/transaction.service";
 
 class TransactionController {
   /**
+   * 계좌 거래 내역 목록 조회
+   */
+  static getAccountTransactions = asyncHandler(
+    async (req: AuthRequest, res: Response<APIResponse>) => {
+      const { userId } = req.user as { userId: string };
+      const { accountNumber } = req.params;
+
+      // 계좌 거내 내역 조회
+      const transactions = await TransactionService.getAccountTransactions(
+        userId,
+        accountNumber
+      );
+
+      // 응답 전송
+      res.json({
+        success: true,
+        message: "거래 내역 목록 조회에 성공했습니다.",
+        data: {
+          transactions,
+        },
+      });
+    }
+  );
+
+  /**
    * 거래 내역 조회
    */
   static getTransaction = asyncHandler(

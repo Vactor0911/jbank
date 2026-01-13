@@ -13,6 +13,44 @@ import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";
 
 export class TransactionService {
+  static async getAccountTransactions(userId: string, accountNumber: string) {
+    // 사용자 조회
+    const user = await UserModel.findById(userId, mariaDB);
+    if (!user) {
+      throw new NotFoundError("사용자를 찾을 수 없습니다.");
+    }
+
+    // 계좌 조회
+    const account = await AccountModel.findByAccountNumber(
+      accountNumber,
+      mariaDB
+    );
+    if (!account) {
+      throw new NotFoundError("계좌를 찾을 수 없습니다.");
+    }
+
+    // 계좌 소유자 확인
+    if (account.userId !== user.id) {
+      throw new ForbiddenError(
+        "해당 계좌의 거래 내역을 조회할 권한이 없습니다."
+      );
+    }
+
+    // 거래 내역 조회
+    const transactions = await TransactionModel.findByAccountId(
+      account.id,
+      mariaDB
+    );
+
+    const formattedTransactions = [];
+    for (const transaction of transactions) {
+      const formattedTransaction = await this.formatTransaction(transaction);
+      formattedTransactions.push(formattedTransaction);
+    }
+    console.log("조회된 거래 내역:", formattedTransactions);
+    return formattedTransactions;
+  }
+
   /**
    * 거래 내역 조회
    * @param userId 사용자 id
@@ -35,71 +73,21 @@ export class TransactionService {
       throw new NotFoundError("거래 내역을 찾을 수 없습니다.");
     }
 
-    // 송금자 및 수취자 계좌 조회
-    const senderAccount = await AccountModel.findById(
-      transaction.senderAccountId,
-      mariaDB
-    );
-    if (!senderAccount) {
-      throw new NotFoundError("송금자 계좌를 찾을 수 없습니다.");
-    }
-    const receiverAccount = await AccountModel.findById(
-      transaction.receiverAccountId,
-      mariaDB
-    );
-    if (!receiverAccount) {
-      throw new NotFoundError("수취자 계좌를 찾을 수 없습니다.");
-    }
-
-    // 송금자 및 수취자 예금주명 조회
-    const senderAccountHolder = await UserModel.findById(
-      senderAccount.userId,
-      mariaDB
-    );
-    if (!senderAccountHolder) {
-      throw new NotFoundError("송금자 예금주를 찾을 수 없습니다.");
-    }
-    const receiverAccountHolder = await UserModel.findById(
-      receiverAccount.userId,
-      mariaDB
-    );
-    if (!receiverAccountHolder) {
-      throw new NotFoundError("수취자 예금주를 찾을 수 없습니다.");
-    }
-
     // 거래 내역의 송금자 혹은 수취자가 사용자인지 확인
     console.log("조회된 거래 내역:", transaction, userId);
     if (
-      senderAccountHolder.id !== user.id &&
-      receiverAccountHolder.id !== user.id
+      transaction.senderAccountHolderUuid !== user.uuid &&
+      transaction.receiverAccountHolderUuid !== user.uuid
     ) {
       throw new ForbiddenError("거래 내역을 확인 할 권한이 없습니다.");
     }
 
     // 거래 내역 데이터 생성
-    const transactionData = {
-      uuid: transaction.uuid,
-      sender: {
-        uuid: senderAccountHolder.uuid,
-        steamName: senderAccountHolder.steamName,
-        accountNumber: senderAccount.accountNumber,
-      },
-      receiver: {
-        uuid: receiverAccountHolder.uuid,
-        steamName: receiverAccountHolder.steamName,
-        accountNumber: receiverAccount.accountNumber,
-      },
-      currencyCode: transaction.currencyCode || "CRD",
-      amount: transaction.amount,
-      currentBalance: transaction.currentBalance,
-      createdAt: transaction.createdAt,
-    };
+    const formattedTransaction = this.formatTransaction(transaction);
 
     // 거래 내역 반환
-    return transactionData;
+    return formattedTransaction;
   }
-
-  static async getTransactions(userId: string, accountNumber: string) {}
 
   /**
    * 송금 거래 생성
@@ -242,5 +230,27 @@ export class TransactionService {
       }
     );
     return transaction;
+  }
+
+  static async formatTransaction(transaction: TransactionModel) {
+    // 거래 내역 데이터 생성
+    const transactionData = {
+      uuid: transaction.uuid,
+      sender: {
+        uuid: transaction.senderAccountHolderUuid,
+        steamName: transaction.senderAccountHolderName,
+        accountNumber: transaction.senderAccountNumber,
+      },
+      receiver: {
+        uuid: transaction.receiverAccountHolderUuid,
+        steamName: transaction.receiverAccountHolderName,
+        accountNumber: transaction.receiverAccountNumber,
+      },
+      currencyCode: transaction.currencyCode || "CRD",
+      amount: transaction.amount,
+      currentBalance: transaction.currentBalance,
+      createdAt: transaction.createdAt,
+    };
+    return transactionData;
   }
 }

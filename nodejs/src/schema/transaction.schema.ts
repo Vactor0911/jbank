@@ -1,6 +1,15 @@
 import z from "zod";
 
 /**
+ * 계좌별 트랜잭션 조회 스키마
+ */
+export const getAccountTransactionsSchema = z.object({
+  accountNumber: z
+    .string("계좌번호는 문자열이어야 합니다.")
+    .regex(/^\d{4}-\d{4}$/, "유효한 계좌번호 형식이 아닙니다."),
+});
+
+/**
  * 트랜잭션 조회 스키마
  */
 export const getTransactionSchema = z.object({

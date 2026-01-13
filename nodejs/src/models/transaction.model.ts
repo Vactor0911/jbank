@@ -3,7 +3,13 @@ import { Pool, PoolConnection } from "mariadb/*";
 export class TransactionModel {
   uuid: string;
   senderAccountId: string;
+  senderAccountHolderUuid?: string;
+  senderAccountHolderName?: string;
+  senderAccountNumber?: string;
   receiverAccountId: string;
+  receiverAccountHolderUuid?: string;
+  receiverAccountHolderName?: string;
+  receiverAccountNumber?: string;
   currencyId: string;
   currencyCode?: string;
   amount: number;
@@ -13,7 +19,15 @@ export class TransactionModel {
   constructor(data: any) {
     this.uuid = data.uuid;
     this.senderAccountId = String(data.senderAccountId);
+    this.senderAccountHolderUuid = data.senderAccountHolderUuid || undefined;
+    this.senderAccountHolderName = data.senderAccountHolderName || undefined;
+    this.senderAccountNumber = data.senderAccountNumber || undefined;
     this.receiverAccountId = String(data.receiverAccountId);
+    this.receiverAccountHolderUuid =
+      data.receiverAccountHolderUuid || undefined;
+    this.receiverAccountHolderName =
+      data.receiverAccountHolderName || undefined;
+    this.receiverAccountNumber = data.receiverAccountNumber || undefined;
     this.currencyId = String(data.currencyId);
     this.currencyCode = data.currencyCode || undefined;
     this.amount = Number(data.amount);
@@ -34,14 +48,58 @@ export class TransactionModel {
     const [transaction] = await connection.execute(
       `
         SELECT t.*,
-          c.code AS currency_code
+          c.code AS currency_code,
+          sender_user.user_uuid AS sender_account_holder_uuid,
+          sender_user.steam_name AS sender_account_holder_name,
+          sender_acc.account_number AS sender_account_number,
+          receiver_user.user_uuid AS receiver_account_holder_uuid,
+          receiver_user.steam_name AS receiver_account_holder_name,
+          receiver_acc.account_number AS receiver_account_number
         FROM transaction t
         JOIN currency c ON t.currency_id = c.currency_id
+        JOIN account sender_acc ON t.sender_account_id = sender_acc.account_id
+        JOIN account receiver_acc ON t.receiver_account_id = receiver_acc.account_id
+        JOIN user sender_user ON sender_acc.user_id = sender_user.user_id
+        JOIN user receiver_user ON receiver_acc.user_id = receiver_user.user_id
         WHERE t.transaction_uuid = ?
       `,
       [transactionUuid]
     );
     return this.formatTransactionDetail(transaction);
+  }
+
+  /**
+   * 계좌 id로 거래 내역 조회
+   * @param accountId 계좌 id
+   * @param connection MariaDB 연결 객체
+   * @returns 거래 내역 모델 배열
+   */
+  static async findByAccountId(
+    accountId: string,
+    connection: PoolConnection | Pool
+  ) {
+    const transactions = await connection.execute(
+      `
+        SELECT t.*,
+          c.code AS currency_code,
+          sender_user.user_uuid AS sender_account_holder_uuid,
+          sender_user.steam_name AS sender_account_holder_name,
+          sender_acc.account_number AS sender_account_number,
+          receiver_user.user_uuid AS receiver_account_holder_uuid,
+          receiver_user.steam_name AS receiver_account_holder_name,
+          receiver_acc.account_number AS receiver_account_number
+        FROM transaction t
+        JOIN currency c ON t.currency_id = c.currency_id
+        JOIN account sender_acc ON t.sender_account_id = sender_acc.account_id
+        JOIN account receiver_acc ON t.receiver_account_id = receiver_acc.account_id
+        JOIN user sender_user ON sender_acc.user_id = sender_user.user_id
+        JOIN user receiver_user ON receiver_acc.user_id = receiver_user.user_id
+        WHERE t.sender_account_id = ? OR t.receiver_account_id = ?
+        ORDER BY t.created_at DESC
+      `,
+      [accountId, accountId]
+    );
+    return transactions.map(this.formatTransactionDetail);
   }
 
   /**
@@ -117,7 +175,13 @@ export class TransactionModel {
     return new TransactionModel({
       uuid: data.transaction_uuid,
       senderAccountId: data.sender_account_id,
+      senderAccountHolderUuid: data.sender_account_holder_uuid,
+      senderAccountHolderName: data.sender_account_holder_name,
+      senderAccountNumber: data.sender_account_number,
       receiverAccountId: data.receiver_account_id,
+      receiverAccountHolderUuid: data.receiver_account_holder_uuid,
+      receiverAccountHolderName: data.receiver_account_holder_name,
+      receiverAccountNumber: data.receiver_account_number,
       currencyId: data.currency_id,
       currencyCode: data.currency_code,
       amount: data.amount,
