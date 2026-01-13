@@ -1,5 +1,6 @@
 import { mariaDB } from "../config/mariadb";
 import { NotFoundError } from "../errors/CustomErrors";
+import AccountModel from "../models/account.model";
 import { UserModel } from "../models/user.model";
 import { fetchSteamProfile } from "../utils/steam";
 import TransactionHandler from "../utils/transactionHandler";
@@ -125,5 +126,34 @@ export class UserService {
       }
     );
     return result;
+  }
+
+  /**
+   * 예금주 조회
+   * @param accountNumber 계좌번호
+   * @returns 예금주 정보
+   */
+  static async getAccountHolder(accountNumber: string) {
+    const account = await AccountModel.findByAccountNumber(
+      accountNumber,
+      mariaDB
+    );
+    if (!account) {
+      throw new NotFoundError("계좌를 찾을 수 없습니다.");
+    }
+
+    const accountHolder = await UserModel.findByAccountNumber(
+      accountNumber,
+      mariaDB
+    );
+    if (!accountHolder) {
+      throw new NotFoundError("해당 계좌번호의 예금주를 찾을 수 없습니다.");
+    }
+
+    // id 필드 제거
+    delete (accountHolder as any).id;
+
+    // 예금주 정보 반환
+    return accountHolder;
   }
 }

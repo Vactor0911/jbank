@@ -6,11 +6,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import {
-  isTransferLoadingAtom,
-  isTransferSuccessAtom,
-  transferDataAtom,
-} from "../../../states/transfer";
+import { transferDataAtom, transferStepAtom } from "../../../states/transfer";
 import { useSetAtom } from "jotai";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import { useCallback, useRef, useState } from "react";
@@ -18,14 +14,11 @@ import { useCallback, useRef, useState } from "react";
 const PasswordForm = () => {
   const theme = useTheme();
 
+  const setTransferStep = useSetAtom(transferStepAtom);
   const setTransferData = useSetAtom(transferDataAtom);
   const passwordInputRef = useRef<HTMLInputElement>(null);
   const [password, setPassword] = useState("");
   const [isPasswordInputFocused, setIsPasswordInputFocused] = useState(false);
-  const setIsTransferLoading = useSetAtom(isTransferLoadingAtom);
-
-  // TODO: 테스트용
-  const setIsTransferSuccess = useSetAtom(isTransferSuccessAtom);
 
   // 뒤로가기 핸들러
   const handleBackClick = useCallback(() => {
@@ -35,12 +28,8 @@ const PasswordForm = () => {
     }
 
     // 이전 화면으로 이동
-    setTransferData((prev) => ({
-      fromAccountNumber: prev.fromAccountNumber,
-      toAccountNumber: prev.toAccountNumber,
-      amount: prev.amount,
-    }));
-  }, [password.length, setTransferData]);
+    setTransferStep(2);
+  }, [password.length, setTransferStep]);
 
   // 비밀번호 입력 핸들러
   const handlePasswordChange = useCallback(
@@ -72,19 +61,10 @@ const PasswordForm = () => {
           ...prev,
           password: rawValue,
         }));
-        setIsTransferLoading(true);
-        setTimeout(() => {
-          setIsTransferLoading(false);
-          setIsTransferSuccess(true);
-        }, 2000);
+        setTransferStep(4);
       }
     },
-    [
-      password.length,
-      setIsTransferLoading,
-      setIsTransferSuccess,
-      setTransferData,
-    ]
+    [password.length, setTransferData, setTransferStep]
   );
 
   return (

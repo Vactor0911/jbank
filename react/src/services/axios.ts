@@ -155,33 +155,52 @@ class ApiClient {
           }
         }
 
-        // CSRF 토큰 오류 핸들링
-        if (
-          error.response?.status === 403 &&
-          error.response?.data &&
-          typeof error.response.data === "object" &&
-          "error" in error.response.data &&
-          typeof error.response.data.error === "string" &&
-          error.response.data.error.toLowerCase().includes("csrf")
-        ) {
+        // 403 에러 핸들링 (CSRF 토큰 또는 권한 오류)
+        if (error.response?.status === 403 && !originalRequest._retry) {
+          originalRequest._retry = true;
+
           // TODO: console log 제거 필요
-          console.error("CSRF 토큰 오류! 토큰 갱신 중...");
+          console.error("403 오류! 토큰 갱신 중...");
+
+          if (this.isRefreshing) {
+            return new Promise((resolve) => {
+              this.refreshSubscribers.push((token: string) => {
+                if (originalRequest.headers) {
+                  originalRequest.headers.Authorization = `Bearer ${token}`;
+                }
+                resolve(this.axiosInstance(originalRequest));
+              });
+            });
+          }
+
+          this.isRefreshing = true;
 
           try {
             // CSRF 토큰 갱신
             const csrfToken = await this.refreshCsrfToken();
-
             // Access Token 갱신
-            await this.refreshAccessToken();
+            const accessToken = await this.refreshAccessToken();
+            this.onRefreshed(accessToken);
 
             if (originalRequest.headers) {
-              originalRequest.headers["X-CSRF-Token"] = csrfToken;
+              originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+              if (
+                originalRequest.method &&
+                !["get", "head", "options"].includes(
+                  originalRequest.method.toLowerCase()
+                )
+              ) {
+                originalRequest.headers["X-CSRF-Token"] = csrfToken;
+              }
             }
 
             return this.axiosInstance(originalRequest);
           } catch (refreshError) {
             this.clearTokens();
             return Promise.reject(refreshError);
+          } finally {
+            this.isRefreshing = false;
+            this.refreshSubscribers = [];
           }
         }
 

@@ -83,4 +83,25 @@ export class UserController {
       });
     }
   );
+
+  /**
+   * 예금주 조회
+   */
+  static getAccountHolder = asyncHandler(
+    async (req: AuthRequest, res: Response<APIResponse>) => {
+      const { accountNumber } = req.params;
+
+      // 예금주 조회
+      const accountHolder = await UserService.getAccountHolder(accountNumber);
+
+      // 응답 전송
+      res.json({
+        success: true,
+        message: "예금주가 조회되었습니다.",
+        data: {
+          user: accountHolder,
+        },
+      });
+    }
+  );
 }

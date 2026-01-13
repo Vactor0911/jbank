@@ -5,7 +5,7 @@ import z from "zod";
  */
 export const createAccountSchema = z.object({
   password: z
-    .string("비밀번호는 숫자 4자리로 이루어진 문자열이어야 합니다.")
+    .string("비밀번호는 문자열이어야 합니다.")
     .regex(/^\d{4}$/, "비밀번호는 숫자 4자리이어야 합니다."),
 });
 

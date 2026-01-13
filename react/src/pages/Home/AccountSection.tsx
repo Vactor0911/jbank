@@ -13,6 +13,7 @@ import JbankIcon from "../../assets/logo/icon.svg?react";
 import AccountService from "../../services/accountService";
 import { useAtomValue } from "jotai";
 import { accountDataAtom } from "../../states/account";
+import { formatNumberString } from "../../utils";
 
 const AccountSection = () => {
   const navigate = useNavigate();
@@ -65,7 +66,9 @@ const AccountSection = () => {
               overflow="hidden"
               textAlign="right"
             >
-              {accountData[0]?.credit || "0"}
+              {accountData[0]?.credit
+                ? formatNumberString(accountData[0].credit)
+                : "0"}
             </Typography>
 
             {/* 크레딧 문구 */}
@@ -122,7 +125,7 @@ const AccountSection = () => {
                     noWrap
                     overflow="hidden"
                   >
-                    {account.credit || "0"}
+                    {account?.credit ? formatNumberString(account.credit) : "0"}
                   </Typography>
 
                   {/* 크레딧 문구 */}

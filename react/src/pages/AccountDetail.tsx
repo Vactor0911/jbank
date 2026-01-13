@@ -38,7 +38,6 @@ const AccountDetail = () => {
   const [isFetching, setIsFetching] = useState(false);
   const [isFetchSuccess, setIsFetchSuccess] = useState<boolean | null>(null);
   const [accountData, setAccountData] = useState<AccountData | null>(null);
-  console.log("accountData:", accountData);
 
   // 계좌 정보 조회 핸들러
   const handleFetchAccountData = useCallback(async () => {
@@ -106,6 +105,13 @@ const AccountDetail = () => {
       ignore = true;
     };
   }, [handleFetchAccountData]);
+
+  // 계좌번호 복사 핸들러
+  const handleAccountNumberCopy = useCallback(() => {
+    if (accountData?.accountNumber) {
+      navigator.clipboard.writeText(accountData.accountNumber);
+    }
+  }, [accountData]);
 
   return (
     <Paper
@@ -236,6 +242,7 @@ const AccountDetail = () => {
                     textTransform: "none",
                     alignSelf: "flex-start",
                   }}
+                  onClick={handleAccountNumberCopy}
                 >
                   <Typography
                     variant="body2"

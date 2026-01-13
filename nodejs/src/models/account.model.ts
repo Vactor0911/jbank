@@ -1,6 +1,7 @@
 import { Pool, PoolConnection } from "mariadb/*";
 
 class AccountModel {
+  id: string;
   uuid: string;
   userId: string;
   accountNumber: string;
@@ -10,6 +11,7 @@ class AccountModel {
   createdAt: Date;
 
   constructor(data: any) {
+    this.id = String(data.id);
     this.uuid = data.uuid;
     this.userId = String(data.userId);
     this.accountNumber = data.accountNumber;
@@ -59,6 +61,49 @@ class AccountModel {
   }
 
   /**
+   * 계좌번호로 계좌 조회
+   * @param accountNumber 계좌 번호
+   * @param connection MariaDB 연결 객체
+   * @returns 계좌 모델
+   */
+  static async findByAccountNumber(
+    accountNumber: string,
+    connection: PoolConnection | Pool
+  ) {
+    const [account] = await connection.execute(
+      `
+        SELECT *
+        FROM account
+        WHERE account_number = ?
+      `,
+      [accountNumber]
+    );
+    return this.formatAccount(account);
+  }
+
+  /**
+   * 계좌번호로 계좌 조회 (쓰기 잠금)
+   * @param accountNumber 계좌 번호
+   * @param connection MariaDB 연결 객체
+   * @returns 계좌 모델
+   */
+  static async findByAccountNumberForUpdate(
+    accountNumber: string,
+    connection: PoolConnection | Pool
+  ) {
+    const [account] = await connection.execute(
+      `
+        SELECT *
+        FROM account
+        WHERE account_number = ?
+        FOR UPDATE
+      `,
+      [accountNumber]
+    );
+    return this.formatAccount(account);
+  }
+
+  /**
    * 계좌 생성
    * @param accountUuid 계좌 uuid
    * @param userId 사용자 id
@@ -86,6 +131,48 @@ class AccountModel {
   }
 
   /**
+   * 계좌 내 크레딧 출금
+   * @param accountId 계좌 id
+   * @param amount 출금 금액
+   * @param connection MariaDB 연결 객체
+   */
+  static async withdraw(
+    accountId: string,
+    amount: number,
+    connection: PoolConnection | Pool
+  ) {
+    await connection.execute(
+      `
+        UPDATE account
+        SET credit = credit - ?
+        WHERE account_id = ?;
+      `,
+      [amount, accountId]
+    );
+  }
+
+  /**
+   * 계좌 내 크레딧 입금
+   * @param accountId 계좌 id
+   * @param amount 입금 금액
+   * @param connection MariaDB 연결 객체
+   */
+  static async deposit(
+    accountId: string,
+    amount: number,
+    connection: PoolConnection | Pool
+  ) {
+    await connection.execute(
+      `
+        UPDATE account
+        SET credit = credit + ?
+        WHERE account_id = ?;
+      `,
+      [amount, accountId]
+    );
+  }
+
+  /**
    * 계좌 데이터 포맷팅
    * @param data 계좌 데이터
    * @returns 포맷팅된 계좌 모델
@@ -96,6 +183,7 @@ class AccountModel {
     }
 
     return new AccountModel({
+      id: data.account_id,
       uuid: data.account_uuid,
       userId: data.user_id,
       accountNumber: data.account_number,
