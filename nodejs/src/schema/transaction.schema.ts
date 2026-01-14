@@ -7,8 +7,8 @@ export const getAccountTransactionsParamsSchema = z.object({
   accountUuid: z.uuid("유효한 uuid 형식이 아닙니다."),
 });
 export const getAccountTransactionsQuerySchema = z.object({
-  page: z.number().min(1, "페이지는 1 이상이어야 합니다.").optional(),
-  limit: z
+  page: z.coerce.number().min(1, "페이지는 1 이상이어야 합니다.").optional(),
+  limit: z.coerce
     .number()
     .min(1, "한 페이지당 항목 수는 1 이상이어야 합니다.")
     .max(100, "한 페이지당 항목 수는 100 이하이어야 합니다.")

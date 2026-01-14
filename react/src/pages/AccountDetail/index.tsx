@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  ButtonBase,
   Divider,
   IconButton,
   keyframes,
@@ -18,12 +17,15 @@ import { useCallback, useEffect, useState } from "react";
 import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
 import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
-import AccountService, { type AccountData } from "../services/accountService";
+import AccountService, {
+  type AccountData,
+} from "../../services/accountService";
 import { AxiosError } from "axios";
-import { formatDateToLocal, formatNumberString } from "../utils";
+import { formatNumberString } from "../../utils";
 import TransactionService, {
   type TransactionData,
-} from "../services/transactionService";
+} from "../../services/transactionService";
+import TransactionButton from "./TransactionButton";
 
 const RefreshAnimation = keyframes`
   0% {
@@ -39,6 +41,9 @@ const AccountDetail = () => {
   const { accountUuid } = useParams();
 
   const [isFetching, setIsFetching] = useState(false);
+  const [isTransactionFetching, setIsTransactionFetching] = useState(false);
+  const [hasMoreTransactions, setHasMoreTransactions] = useState(true);
+  const [page, setPage] = useState(2);
   const [isFetchSuccess, setIsFetchSuccess] = useState<boolean | null>(null);
   const [accountData, setAccountData] = useState<AccountData | null>(null);
   const [transactionsData, setTransactionsData] = useState<TransactionData[]>(
@@ -86,6 +91,44 @@ const AccountDetail = () => {
     }
   }, [accountUuid]);
 
+  // 거래내역 더 불러오기 핸들러
+  const handleFetchMoreTransactions = useCallback(async () => {
+    if (!accountUuid) {
+      return;
+    }
+    if (isTransactionFetching || !hasMoreTransactions) {
+      return;
+    }
+
+    setIsTransactionFetching(true);
+    try {
+      const response = await TransactionService.fetchAccountTransactions(
+        accountUuid,
+        page,
+        10
+      );
+      if (response.data.success) {
+        setTransactionsData((prev) => [
+          ...prev,
+          ...(response.data.data.transactions as TransactionData[]),
+        ]);
+
+        // 더 불러올 거래내역이 있는지 확인
+        const hasMoreTransactions =
+          response.data.data.transactions.length >= 10;
+        setHasMoreTransactions(hasMoreTransactions);
+        if (hasMoreTransactions) {
+          setPage((prev) => prev + 1);
+        }
+      }
+    } catch {
+      // 오류 처리 생략
+      setHasMoreTransactions(false);
+    } finally {
+      setIsTransactionFetching(false);
+    }
+  }, [accountUuid, hasMoreTransactions, isTransactionFetching, page]);
+
   // 계좌 정보 새로고침 버튼 클릭 핸들러
   const handleRefreshAccountClick = useCallback(async () => {
     // 이미 새로고침 중이라면 종료
@@ -95,6 +138,8 @@ const AccountDetail = () => {
 
     // 계좌 정보 새로고침
     setIsFetching(true);
+    setHasMoreTransactions(true);
+    setPage(2);
     await handleFetchAccountData();
     setIsFetching(false);
   }, [handleFetchAccountData, isFetching]);
@@ -123,14 +168,6 @@ const AccountDetail = () => {
       navigator.clipboard.writeText(accountData.accountNumber);
     }
   }, [accountData]);
-
-  // 거래내역이 수신 거래인지 여부 확인
-  const isReceivedTransaction = useCallback(
-    (transaction: TransactionData) => {
-      return transaction.receiver.accountNumber === accountData?.accountNumber;
-    },
-    [accountData]
-  );
 
   return (
     <Paper
@@ -247,7 +284,19 @@ const AccountDetail = () => {
         </Stack>
 
         {/* 스크롤 컨테이너 */}
-        <Box flex={1} overflow="auto">
+        <Box
+          flex={1}
+          overflow="auto"
+          onScroll={(e) => {
+            const target = e.target as HTMLElement;
+            const isBottom =
+              target.scrollHeight - target.scrollTop <=
+              target.clientHeight + 10;
+            if (isBottom) {
+              handleFetchMoreTransactions();
+            }
+          }}
+        >
           <Stack gap={3}>
             {/* 계좌 정보 */}
             <Stack mt={2} gap={1}>
@@ -329,107 +378,14 @@ const AccountDetail = () => {
                 !isFetching &&
                 transactionsData.map((transaction, index) => (
                   // 거래 내역 버튼
-                  <ButtonBase
+                  <TransactionButton
                     key={`transaction-${index}`}
-                    sx={{
-                      width: "100%",
-                      p: 0.5,
-                      px: 1,
-                      borderRadius: 2,
-                      overflow: "hidden",
-                    }}
-                    onClick={() => navigate("/transaction/transaction-uuid")}
-                  >
-                    <Stack direction="row" width="100%" gap={3}>
-                      {/* 날짜 */}
-                      <Typography
-                        variant="body2"
-                        fontWeight={500}
-                        color="text.secondary"
-                        mt="0.4em"
-                      >
-                        {formatDateToLocal(transaction.createdAt, {
-                          month: "2-digit",
-                          day: "2-digit",
-                        })
-                          .replace(". ", ".")
-                          .slice(0, -1)}
-                      </Typography>
-
-                      {/* 거래 정보 */}
-                      <Stack flexShrink={1} minWidth={0}>
-                        {/* 상대 계좌 예금주 */}
-                        <Typography
-                          variant="h6"
-                          fontWeight={600}
-                          noWrap
-                          textAlign="left"
-                        >
-                          {isReceivedTransaction(transaction)
-                            ? transaction.sender.steamName
-                            : transaction.receiver.steamName}
-                        </Typography>
-
-                        {/* 거래 시각 */}
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          textAlign="left"
-                        >
-                          {formatDateToLocal(transaction.createdAt, {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                            hour12: false,
-                          }).slice(-5)}
-                        </Typography>
-                      </Stack>
-
-                      {/* 거래 금액 */}
-                      <Stack flex={1}>
-                        {/* 거래 금액 */}
-                        <Typography
-                          variant="h6"
-                          fontWeight={600}
-                          color={
-                            isReceivedTransaction(transaction)
-                              ? "primary"
-                              : "inherit"
-                          }
-                          noWrap
-                          textAlign="right"
-                        >
-                          <span
-                            css={{
-                              display: isReceivedTransaction(transaction)
-                                ? "none"
-                                : "inline",
-                            }}
-                          >
-                            -
-                          </span>
-                          {transaction.amount.toLocaleString("en-US")} 크레딧
-                        </Typography>
-
-                        {/* 거래 후 잔액 */}
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          noWrap
-                          textAlign="right"
-                        >
-                          {isReceivedTransaction(transaction)
-                            ? formatNumberString(
-                                transaction.receiver.currentBalance
-                              )
-                            : formatNumberString(
-                                transaction.sender.currentBalance
-                              )}{" "}
-                          크레딧
-                        </Typography>
-                      </Stack>
-                    </Stack>
-                  </ButtonBase>
+                    transaction={transaction}
+                    accountData={accountData}
+                  />
                 ))}
+
+              {/* 초기 로딩 스켈레톤 */}
               {isFetching && (
                 <>
                   {Array.from({ length: 3 }).map((_, index) => (
@@ -447,6 +403,15 @@ const AccountDetail = () => {
                     />
                   ))}
                 </>
+              )}
+
+              {/* 추가 로딩 인디케이터 */}
+              {isTransactionFetching && (
+                <Box textAlign="center" py={2}>
+                  <Typography variant="body2" color="text.secondary">
+                    불러오는 중...
+                  </Typography>
+                </Box>
               )}
             </Stack>
           </Stack>
