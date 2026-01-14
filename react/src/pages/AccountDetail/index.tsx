@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  ButtonBase,
   Divider,
   IconButton,
   keyframes,
@@ -18,9 +17,15 @@ import { useCallback, useEffect, useState } from "react";
 import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
 import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
-import AccountService, { type AccountData } from "../services/accountService";
+import AccountService, {
+  type AccountData,
+} from "../../services/accountService";
 import { AxiosError } from "axios";
-import { formatNumberString } from "../utils";
+import { formatNumberString } from "../../utils";
+import TransactionService, {
+  type TransactionData,
+} from "../../services/transactionService";
+import TransactionButton from "./TransactionButton";
 
 const RefreshAnimation = keyframes`
   0% {
@@ -36,8 +41,14 @@ const AccountDetail = () => {
   const { accountUuid } = useParams();
 
   const [isFetching, setIsFetching] = useState(false);
+  const [isTransactionFetching, setIsTransactionFetching] = useState(false);
+  const [hasMoreTransactions, setHasMoreTransactions] = useState(true);
+  const [page, setPage] = useState(2);
   const [isFetchSuccess, setIsFetchSuccess] = useState<boolean | null>(null);
   const [accountData, setAccountData] = useState<AccountData | null>(null);
+  const [transactionsData, setTransactionsData] = useState<TransactionData[]>(
+    []
+  );
 
   // 계좌 정보 조회 핸들러
   const handleFetchAccountData = useCallback(async () => {
@@ -50,14 +61,19 @@ const AccountDetail = () => {
       const response = await Promise.all([
         // 계좌 정보 조회 API 호출
         AccountService.fetchAccount(accountUuid),
+        TransactionService.fetchAccountTransactions(accountUuid),
         new Promise((resolve) => setTimeout(resolve, 1000)),
       ]);
 
       // 조회 응답 처리
       const accountResponse = response[0];
+      const transactionsResponse = response[1];
       setIsFetchSuccess(accountResponse.data.success);
       if (accountResponse.data.success) {
         setAccountData(accountResponse.data.data.account as AccountData);
+        setTransactionsData(
+          transactionsResponse.data.data.transactions as TransactionData[]
+        );
       }
 
       // 3초 후 초기화
@@ -75,6 +91,44 @@ const AccountDetail = () => {
     }
   }, [accountUuid]);
 
+  // 거래내역 더 불러오기 핸들러
+  const handleFetchMoreTransactions = useCallback(async () => {
+    if (!accountUuid) {
+      return;
+    }
+    if (isTransactionFetching || !hasMoreTransactions) {
+      return;
+    }
+
+    setIsTransactionFetching(true);
+    try {
+      const response = await TransactionService.fetchAccountTransactions(
+        accountUuid,
+        page,
+        10
+      );
+      if (response.data.success) {
+        setTransactionsData((prev) => [
+          ...prev,
+          ...(response.data.data.transactions as TransactionData[]),
+        ]);
+
+        // 더 불러올 거래내역이 있는지 확인
+        const hasMoreTransactions =
+          response.data.data.transactions.length >= 10;
+        setHasMoreTransactions(hasMoreTransactions);
+        if (hasMoreTransactions) {
+          setPage((prev) => prev + 1);
+        }
+      }
+    } catch {
+      // 오류 처리 생략
+      setHasMoreTransactions(false);
+    } finally {
+      setIsTransactionFetching(false);
+    }
+  }, [accountUuid, hasMoreTransactions, isTransactionFetching, page]);
+
   // 계좌 정보 새로고침 버튼 클릭 핸들러
   const handleRefreshAccountClick = useCallback(async () => {
     // 이미 새로고침 중이라면 종료
@@ -84,6 +138,8 @@ const AccountDetail = () => {
 
     // 계좌 정보 새로고침
     setIsFetching(true);
+    setHasMoreTransactions(true);
+    setPage(2);
     await handleFetchAccountData();
     setIsFetching(false);
   }, [handleFetchAccountData, isFetching]);
@@ -228,7 +284,19 @@ const AccountDetail = () => {
         </Stack>
 
         {/* 스크롤 컨테이너 */}
-        <Box flex={1} overflow="auto">
+        <Box
+          flex={1}
+          overflow="auto"
+          onScroll={(e) => {
+            const target = e.target as HTMLElement;
+            const isBottom =
+              target.scrollHeight - target.scrollTop <=
+              target.clientHeight + 10;
+            if (isBottom) {
+              handleFetchMoreTransactions();
+            }
+          }}
+        >
           <Stack gap={3}>
             {/* 계좌 정보 */}
             <Stack mt={2} gap={1}>
@@ -259,22 +327,25 @@ const AccountDetail = () => {
               )}
 
               {/* 잔액 */}
-              {accountData?.credit ? (
-                <Typography variant="h4" noWrap>
-                  {formatNumberString(accountData?.credit as string)} 크레딧
-                </Typography>
-              ) : (
-                <Skeleton
-                  variant="rounded"
-                  width="200px"
-                  sx={{
-                    height: {
-                      xs: "30px",
-                      md: "40px",
-                    },
-                  }}
-                />
-              )}
+              <Typography variant="h4" display="flex" gap={0.5} noWrap>
+                {accountData?.credit && !isFetching ? (
+                  <span>
+                    {formatNumberString(accountData?.credit as string)}
+                  </span>
+                ) : (
+                  <Skeleton
+                    variant="rounded"
+                    width="120px"
+                    sx={{
+                      height: {
+                        xs: "30px",
+                        md: "40px",
+                      },
+                    }}
+                  />
+                )}
+                크레딧
+              </Typography>
             </Stack>
 
             {/* 구분선 */}
@@ -303,78 +374,45 @@ const AccountDetail = () => {
               </Button>
 
               {/* 거래 내역 */}
-              {Array.from({ length: 10 }).map((_, index) => (
-                // 거래 내역 버튼
-                <ButtonBase
-                  key={`transaction-${index}`}
-                  sx={{
-                    width: "100%",
-                    p: 0.5,
-                    px: 1,
-                    borderRadius: 2,
-                    overflow: "hidden",
-                  }}
-                  onClick={() => navigate("/transaction/transaction-uuid")}
-                >
-                  <Stack direction="row" width="100%" gap={3}>
-                    {/* 날짜 */}
-                    <Typography
-                      variant="body2"
-                      fontWeight={500}
-                      color="text.secondary"
-                      mt="0.4em"
-                    >
-                      01.23
-                    </Typography>
+              {transactionsData.length > 0 &&
+                !isFetching &&
+                transactionsData.map((transaction, index) => (
+                  // 거래 내역 버튼
+                  <TransactionButton
+                    key={`transaction-${index}`}
+                    transaction={transaction}
+                    accountData={accountData}
+                  />
+                ))}
 
-                    {/* 거래 정보 */}
-                    <Stack flexShrink={1} minWidth={0}>
-                      {/* 상대 계좌 예금주 */}
-                      <Typography
-                        variant="h6"
-                        fontWeight={600}
-                        noWrap
-                        textAlign="left"
-                      >
-                        백터 (Vactor0911)
-                      </Typography>
+              {/* 초기 로딩 스켈레톤 */}
+              {isFetching && (
+                <>
+                  {Array.from({ length: 3 }).map((_, index) => (
+                    <Skeleton
+                      key={`transaction-skeleton-${index}`}
+                      variant="rounded"
+                      sx={{
+                        height: {
+                          xs: "50px",
+                          md: "60px",
+                        },
+                        m: 0.5,
+                        mx: 1,
+                      }}
+                    />
+                  ))}
+                </>
+              )}
 
-                      {/* 거래 시각 */}
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        textAlign="left"
-                      >
-                        12:34
-                      </Typography>
-                    </Stack>
-
-                    {/* 거래 금액 */}
-                    <Stack>
-                      {/* 거래 금액 */}
-                      <Typography
-                        variant="h6"
-                        fontWeight={600}
-                        color="primary"
-                        noWrap
-                        textAlign="right"
-                      >
-                        1,100 크레딧
-                      </Typography>
-
-                      {/* 거래 후 잔액 */}
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        noWrap
-                        textAlign="right"
-                      >
-                        123,456 크레딧
-                      </Typography>
-                    </Stack>
-                  </Stack>
-                </ButtonBase>
-              ))}
+              {/* 추가 로딩 인디케이터 */}
+              {isTransactionFetching && (
+                <Box textAlign="center" py={2}>
+                  <Typography variant="body2" color="text.secondary">
+                    불러오는 중...
+                  </Typography>
+                </Box>
+              )}
             </Stack>
           </Stack>
         </Box>

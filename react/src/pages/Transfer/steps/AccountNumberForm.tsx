@@ -73,7 +73,6 @@ const AccountNumberForm = () => {
     try {
       const user = await UserService.getUserByAccountNumber(accountNumber);
       const accountHolder = user.steamName;
-      console.log("조회된 예금주:", accountHolder);
       return accountHolder;
     } catch {
       throw new Error("해당 계좌를 사용하는 사용자를 찾을 수 없습니다.");
@@ -93,7 +92,6 @@ const AccountNumberForm = () => {
       if (!accountHolder) {
         throw new Error("예금주 조회 실패");
       }
-      console.log("예금주:", accountHolder);
 
       // 계좌 정보 최신화
       await AccountService.fetchAccounts();

@@ -22,6 +22,24 @@ class AccountModel {
   }
 
   /**
+   * 계좌 id로 계좌 조회
+   * @param accountId 계좌 id
+   * @param connection MariaDB 연결 객체
+   * @returns 계좌 모델
+   */
+  static async findById(accountId: string, connection: PoolConnection | Pool) {
+    const [account] = await connection.execute(
+      `
+        SELECT *
+        FROM account
+        WHERE account_id = ?
+      `,
+      [accountId]
+    );
+    return this.formatAccount(account);
+  }
+
+  /**
    * 계좌 uuid로 계좌 조회
    * @param accountUuid 계좌 uuid
    * @param connection MariaDB 연결 객체
