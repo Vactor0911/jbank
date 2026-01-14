@@ -1,4 +1,4 @@
-import { Pool, PoolConnection } from "mariadb/*";
+import { Pool, PoolConnection } from "mysql2/promise";
 
 class AccountModel {
   id: string;
@@ -36,7 +36,13 @@ class AccountModel {
       `,
       [accountId]
     );
-    return this.formatAccount(account);
+
+    if (!(account as any[])[0]) {
+      return null;
+    }
+
+    const formattedAccount = this.formatAccount((account as any[])[0]);
+    return formattedAccount;
   }
 
   /**
@@ -57,7 +63,13 @@ class AccountModel {
       `,
       [accountUuid]
     );
-    return this.formatAccount(account);
+
+    if (!(account as any[])[0]) {
+      return null;
+    }
+
+    const formattedAccount = this.formatAccount((account as any[])[0]);
+    return formattedAccount;
   }
 
   /**
@@ -67,7 +79,7 @@ class AccountModel {
    * @returns 계좌 목록
    */
   static async findByUserId(userId: string, connection: PoolConnection | Pool) {
-    const accounts = await connection.execute(
+    const [accounts] = await connection.execute(
       `
         SELECT *
         FROM account
@@ -75,7 +87,14 @@ class AccountModel {
       `,
       [userId]
     );
-    return accounts.map((account: any) => this.formatAccount(account));
+
+    if (!accounts) {
+      return [];
+    }
+
+    return (accounts as any[]).map((account: any) =>
+      this.formatAccount(account)
+    );
   }
 
   /**
@@ -96,7 +115,13 @@ class AccountModel {
       `,
       [accountNumber]
     );
-    return this.formatAccount(account);
+
+    if (!(account as any[])[0]) {
+      return null;
+    }
+
+    const formattedAccount = this.formatAccount((account as any[])[0]);
+    return formattedAccount;
   }
 
   /**
@@ -118,7 +143,13 @@ class AccountModel {
       `,
       [accountNumber]
     );
-    return this.formatAccount(account);
+
+    if (!(account as any[])[0]) {
+      return null;
+    }
+
+    const formattedAccount = this.formatAccount((account as any[])[0]);
+    return formattedAccount;
   }
 
   /**

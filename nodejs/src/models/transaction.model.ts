@@ -1,4 +1,4 @@
-import { Pool, PoolConnection } from "mariadb/*";
+import { Pool, PoolConnection } from "mysql2/promise";
 
 export class TransactionModel {
   uuid: string;
@@ -67,6 +67,11 @@ export class TransactionModel {
       `,
       [transactionUuid]
     );
+
+    if (!transaction) {
+      return null;
+    }
+
     return this.formatTransactionDetail(transaction);
   }
 
@@ -84,7 +89,7 @@ export class TransactionModel {
     limit: number,
     connection: PoolConnection | Pool
   ) {
-    const transactions = await connection.execute(
+    const [transactions] = await connection.execute(
       `
         SELECT t.*,
           c.code AS currency_code,
@@ -106,7 +111,12 @@ export class TransactionModel {
       `,
       [accountId, accountId, limit, (page - 1) * limit]
     );
-    return transactions.map(this.formatTransactionDetail);
+
+    if (!transactions) {
+      return [];
+    }
+
+    return (transactions as any[]).map(this.formatTransactionDetail);
   }
 
   /**
@@ -145,6 +155,7 @@ export class TransactionModel {
         receiverCurrentBalance,
       ]
     );
+    
     return this.formatTransaction({
       transaction_uuid: transactionUuid,
       sender_account_id: senderAccountId,

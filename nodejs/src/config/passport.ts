@@ -10,15 +10,16 @@ import TransactionHandler from "../utils/transactionHandler";
  * 세션에 사용자 식별자 저장
  */
 passport.serializeUser((user: any, done) => {
-  done(null, user.steamId);
+  // user는 Steam Strategy의 done(null, user)에서 전달된 UserModel
+  done(null, { id: user.id, steamId: user.steamId });
 });
 
 /**
  * 세션에서 사용자 식별자 기반으로 사용자 정보 조회
  */
-passport.deserializeUser(async (steamId: string, done) => {
+passport.deserializeUser(async (data: any, done) => {
   try {
-    const user = await UserModel.findBySteamId(steamId, mariaDB);
+    const user = await UserModel.findById(data.id, mariaDB);
     done(null, user);
   } catch (error) {
     done(error, null);
@@ -65,21 +66,24 @@ passport.use(
 
             // 사용자가 없다면 생성
             const userUuid = uuidv4();
-            const result = await UserModel.create(
+            await UserModel.create(
               {
-                ...userData,
                 uuid: userUuid,
+                steamId: steamId,
+                steamName: profile.displayName,
+                avatar: profile.photos[2]?.value || profile._json.avatarfull,
+                createdAt: new Date(),
+                lastLogin: new Date(),
               },
               connection
             );
 
-            // 사용자 id 삽입
-            const newUser = {
-              ...result,
-              id: result.id,
-            };
+            // 생성 후 다시 조회하여 완전한 데이터 반환
+            const newUser = await UserModel.findByUuid(userUuid, connection);
+            if (!newUser) {
+              throw new Error("사용자 생성 후 조회에 실패했습니다.");
+            }
 
-            // 생성된 사용자 반환
             return newUser;
           }
         );

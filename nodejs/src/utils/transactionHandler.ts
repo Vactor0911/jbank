@@ -1,4 +1,4 @@
-import { Pool, PoolConnection } from "mariadb";
+import { Pool, PoolConnection } from "mysql2/promise";
 
 class TransactionHandler {
   /**

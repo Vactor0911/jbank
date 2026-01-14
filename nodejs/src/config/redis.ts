@@ -1,4 +1,8 @@
 import Redis from "ioredis";
+import dotenv from "dotenv";
+
+// .env 파일 로드
+dotenv.config();
 
 // Redis 연결
 export const redis = new Redis({

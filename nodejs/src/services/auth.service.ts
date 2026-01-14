@@ -5,11 +5,15 @@ import {
   verifyRefreshToken,
 } from "../utils/jwt";
 import TransactionHandler from "../utils/transactionHandler";
-import { mariaDB } from "../config/mariadb";
-import { ForbiddenError, NotFoundError } from "../errors/CustomErrors";
+import {
+  ForbiddenError,
+  NotFoundError,
+  BadRequestError,
+} from "../errors/CustomErrors";
 import { redis } from "../config/redis";
 import { AuthModel } from "../models/auth.model";
 import { generateCsrfToken } from "../middlewares/csrf";
+import { mariaDB } from "../config/mariadb";
 
 export class AuthService {
   /**
@@ -74,8 +78,15 @@ export class AuthService {
       throw new ForbiddenError("유효하지 않거나 만료된 토큰입니다.");
     }
 
+    const { userUuid } = decoded;
+
+    // userUuid 검증 추가
+    if (!userUuid) {
+      throw new BadRequestError("사용자 uuid가 없습니다.");
+    }
+
     // 사용자 정보 조회
-    const user = await UserModel.findByUuid(decoded.userUuid, mariaDB);
+    const user = await UserModel.findByUuid(userUuid, mariaDB);
     if (!user) {
       throw new NotFoundError("사용자를 찾을 수 없습니다.");
     }

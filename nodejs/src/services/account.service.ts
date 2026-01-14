@@ -30,6 +30,10 @@ class AccountService {
     // 계좌 정보 반환
     const formattedAccounts = [];
     for (const account of accounts) {
+      if (!account) {
+        continue;
+      }
+
       const formattedAccount = await this.formatAccountData(account);
       formattedAccounts.push(formattedAccount);
     }
