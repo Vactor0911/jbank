@@ -11,11 +11,17 @@ class TransactionController {
     async (req: AuthRequest, res: Response<APIResponse>) => {
       const { userId } = req.user as { userId: string };
       const { accountUuid } = req.params;
+      const { page = 1, limit = 10 } = req.query as {
+        page?: number;
+        limit?: number;
+      };
 
       // 계좌 거내 내역 조회
       const transactions = await TransactionService.getAccountTransactions(
         userId,
-        accountUuid
+        accountUuid,
+        page,
+        limit
       );
 
       // 응답 전송

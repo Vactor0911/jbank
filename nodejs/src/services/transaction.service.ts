@@ -17,9 +17,16 @@ export class TransactionService {
    * 계좌 거래 내역 목록 조회
    * @param userId 사용자 id
    * @param accountUuid 계좌 uuid
+   * @param page 페이지 번호
+   * @param limit 페이지당 항목 수
    * @returns 거래 내역 목록
    */
-  static async getAccountTransactions(userId: string, accountUuid: string) {
+  static async getAccountTransactions(
+    userId: string,
+    accountUuid: string,
+    page: number,
+    limit: number
+  ) {
     // 사용자 조회
     const user = await UserModel.findById(userId, mariaDB);
     if (!user) {
@@ -42,6 +49,8 @@ export class TransactionService {
     // 거래 내역 조회
     const transactions = await TransactionModel.findByAccountId(
       account.id,
+      page,
+      limit,
       mariaDB
     );
 

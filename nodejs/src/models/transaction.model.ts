@@ -74,10 +74,14 @@ export class TransactionModel {
    * 계좌 id로 거래 내역 조회
    * @param accountId 계좌 id
    * @param connection MariaDB 연결 객체
+   * @param page 페이지 번호
+   * @param limit 페이지당 항목 수
    * @returns 거래 내역 모델 배열
    */
   static async findByAccountId(
     accountId: string,
+    page: number,
+    limit: number,
     connection: PoolConnection | Pool
   ) {
     const transactions = await connection.execute(
@@ -98,8 +102,9 @@ export class TransactionModel {
         JOIN user receiver_user ON receiver_acc.user_id = receiver_user.user_id
         WHERE t.sender_account_id = ? OR t.receiver_account_id = ?
         ORDER BY t.transaction_id DESC
+        LIMIT ? OFFSET ?
       `,
-      [accountId, accountId]
+      [accountId, accountId, limit, (page - 1) * limit]
     );
     return transactions.map(this.formatTransactionDetail);
   }

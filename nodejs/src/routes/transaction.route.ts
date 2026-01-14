@@ -1,10 +1,15 @@
 import { Router } from "express";
 import { authenticateJWT } from "../middlewares/auth";
 import { csrfProtection } from "../middlewares/csrf";
-import { validateBody, validateParams } from "../middlewares/validation";
+import {
+  validateBody,
+  validateParams,
+  validateQuery,
+} from "../middlewares/validation";
 import {
   createTransferTransactionSchema,
-  getAccountTransactionsSchema,
+  getAccountTransactionsParamsSchema,
+  getAccountTransactionsQuerySchema,
   getTransactionSchema,
 } from "../schema/transaction.schema";
 import TransactionController from "../controllers/transaction.controller";
@@ -15,7 +20,8 @@ const transactionRouter = Router();
 transactionRouter.get(
   "/account/:accountUuid",
   authenticateJWT,
-  validateParams(getAccountTransactionsSchema),
+  validateParams(getAccountTransactionsParamsSchema),
+  validateQuery(getAccountTransactionsQuerySchema),
   TransactionController.getAccountTransactions
 );
 
