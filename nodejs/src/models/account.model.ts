@@ -222,6 +222,42 @@ class AccountModel {
   }
 
   /**
+   * 최근 거래 계좌 조회
+   * @param accountId 계좌 id
+   * @param connection MariaDB 연결 객체
+   * @returns 계좌 목록
+   */
+  static async findRecentAccountsByAccountId(
+    accountId: string,
+    connection: PoolConnection | Pool
+  ) {
+    const [accounts] = await connection.execute(
+      `
+        SELECT DISTINCT a.*
+        FROM transaction t
+        JOIN account a ON (t.sender_account_id = a.account_id OR t.receiver_account_id = a.account_id)
+        WHERE (t.sender_account_id = ?
+          OR t.receiver_account_id = ?)
+          AND a.account_id != ?
+        ORDER BY t.transaction_id DESC
+        LIMIT 10;
+      `,
+      [accountId, accountId, accountId]
+    );
+
+    if (!accounts) {
+      return [];
+    }
+
+    console.log(accounts);
+
+    const formattedAccounts = (accounts as any[]).map((account: any) =>
+      this.formatAccount(account)
+    );
+    return formattedAccounts;
+  }
+
+  /**
    * 계좌 데이터 포맷팅
    * @param data 계좌 데이터
    * @returns 포맷팅된 계좌 모델

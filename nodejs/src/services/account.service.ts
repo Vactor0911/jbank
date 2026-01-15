@@ -121,6 +121,54 @@ class AccountService {
     );
   }
 
+  /**
+   * 최근 거래 계좌 조회
+   * @param userId 사용자 id
+   * @param accountNumber 계좌 번호
+   * @returns 최근 거래 계좌 번호 목록
+   */
+  static async getRecentAccounts(userId: string, accountNumber: string) {
+    // 사용자 조회
+    const user = await UserModel.findById(userId, mariaDB);
+    if (!user) {
+      throw new NotFoundError("사용자를 찾을 수 없습니다.");
+    }
+
+    // 계좌 정보 조회
+    const account = await AccountModel.findByAccountNumber(
+      accountNumber,
+      mariaDB
+    );
+    if (!account) {
+      throw new NotFoundError("계좌를 찾을 수 없습니다.");
+    }
+
+    // 계좌 소유자 확인
+    if (account.userId !== userId) {
+      throw new ForbiddenError("해당 계좌에 접근할 권한이 없습니다.");
+    }
+
+    // 최근 거래 계좌 조회
+    const recentAccounts = await AccountModel.findRecentAccountsByAccountId(
+      account.id,
+      mariaDB
+    );
+
+    // 계좌 번호 목록 반환
+    const recentAccountNumbers = [];
+    for (const recentAccount of recentAccounts) {
+      if (!recentAccount) {
+        continue;
+      }
+      if (recentAccount.accountNumber === accountNumber) {
+        continue; // 자기 자신은 제외
+      }
+
+      recentAccountNumbers.push(recentAccount.accountNumber);
+    }
+    return recentAccountNumbers;
+  }
+
   static async formatAccountData(account: AccountModel) {
     return {
       uuid: account.uuid,

@@ -68,6 +68,31 @@ class AccountController {
       });
     }
   );
+
+  /**
+   * 최근 거래 계좌 조회
+   */
+  static getRecentAccounts = asyncHandler(
+    async (req: AuthRequest, res: Response<APIResponse>) => {
+      const { userId } = req.user as { userId: string };
+      const { accountNumber } = req.params;
+
+      // 최근 거래 계좌 조회
+      const recentAccountNumbers = await AccountService.getRecentAccounts(
+        userId,
+        accountNumber
+      );
+
+      // 응답 전송
+      res.json({
+        success: true,
+        message: "최근 거래 계좌 목록이 조회되었습니다.",
+        data: {
+          recentAccountNumbers,
+        },
+      });
+    }
+  );
 }
 
 export default AccountController;

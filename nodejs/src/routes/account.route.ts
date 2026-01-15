@@ -6,9 +6,18 @@ import { validateBody, validateParams } from "../middlewares/validation";
 import {
   createAccountSchema,
   getAccountSchema,
+  getRecentAccountsSchema,
 } from "../schema/account.schema";
 
 const accountRouter = Router();
+
+// 최근 거래 계좌 조회
+accountRouter.get(
+  "/:accountNumber/recent",
+  authenticateJWT,
+  validateParams(getRecentAccountsSchema),
+  AccountController.getRecentAccounts
+);
 
 // 계좌 정보 조회
 accountRouter.get(
