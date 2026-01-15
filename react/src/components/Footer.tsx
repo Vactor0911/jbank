@@ -58,7 +58,13 @@ const Footer = () => {
           />
 
           {/* 텍스트 */}
-          <Typography variant="body1" fontWeight="bold">
+          <Typography
+            variant="body1"
+            fontWeight="bold"
+            sx={{
+              color: "#222222",
+            }}
+          >
             개발자에게 커피 사주기
           </Typography>
         </Stack>

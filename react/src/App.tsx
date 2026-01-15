@@ -18,7 +18,7 @@ const App = () => {
   }, [fetchData]);
 
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={theme} defaultMode="system">
       <CssBaseline enableColorScheme />
       <RouterProvider router={router} />
     </ThemeProvider>
