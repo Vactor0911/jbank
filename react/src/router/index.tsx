@@ -13,6 +13,7 @@ import {
   Transfer,
 } from "../pages";
 import RootLayout from "./RootLayout";
+import AccountService from "../services/accountService";
 
 /**
  * 인증이 필요한 경로 접근 시 인증 상태 확인
@@ -38,6 +39,14 @@ const checkAuth = async () => {
   }
 
   return null;
+};
+
+const checkAccounts = async () => {
+  await requireAuth();
+  const response = await AccountService.fetchAccounts();
+  if (!response.data.success) {
+    return redirect("/account/new");
+  }
 };
 
 export const router = createBrowserRouter([
@@ -76,7 +85,7 @@ export const router = createBrowserRouter([
       {
         path: "transfer",
         element: <Transfer />,
-        loader: requireAuth,
+        loader: checkAccounts,
       },
       {
         path: "login",

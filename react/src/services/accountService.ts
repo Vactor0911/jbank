@@ -55,6 +55,27 @@ class AccountService {
     });
     return response;
   }
+
+  /**
+   * 최근 거래 계좌 조회
+   * @param accountNumber 계좌 번호
+   * @returns 최근 거래 계좌 목록
+   */
+  static async fetchRecentAccountNumbers(accountNumber: string) {
+    const response = await axiosInstance.get(
+      `/api/account/${accountNumber}/recent`
+    );
+
+    if (!response.data.success) {
+      throw new Error("최근 거래 계좌 조회에 실패했습니다.");
+    }
+
+    const accountNumbers = response.data.data.recentAccounts as {
+      accountNumber: string;
+      userName: string | null;
+    }[];
+    return accountNumbers;
+  }
 }
 
 export default AccountService;
