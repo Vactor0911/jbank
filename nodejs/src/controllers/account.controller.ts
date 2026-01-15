@@ -78,7 +78,7 @@ class AccountController {
       const { accountNumber } = req.params;
 
       // 최근 거래 계좌 조회
-      const recentAccountNumbers = await AccountService.getRecentAccounts(
+      const recentAccounts = await AccountService.getRecentAccounts(
         userId,
         accountNumber
       );
@@ -88,7 +88,7 @@ class AccountController {
         success: true,
         message: "최근 거래 계좌 목록이 조회되었습니다.",
         data: {
-          recentAccountNumbers,
+          recentAccounts,
         },
       });
     }

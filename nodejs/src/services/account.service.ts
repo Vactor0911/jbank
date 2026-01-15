@@ -155,7 +155,7 @@ class AccountService {
     );
 
     // 계좌 번호 목록 반환
-    const recentAccountNumbers = [];
+    const formattedRecentAccounts = [];
     for (const recentAccount of recentAccounts) {
       if (!recentAccount) {
         continue;
@@ -164,9 +164,14 @@ class AccountService {
         continue; // 자기 자신은 제외
       }
 
-      recentAccountNumbers.push(recentAccount.accountNumber);
+      const formattedRecentAccount = {
+        accountNumber: recentAccount.accountNumber,
+        userName: recentAccount.userName || null,
+      };
+
+      formattedRecentAccounts.push(formattedRecentAccount);
     }
-    return recentAccountNumbers;
+    return formattedRecentAccounts;
   }
 
   static async formatAccountData(account: AccountModel) {

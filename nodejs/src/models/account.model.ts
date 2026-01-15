@@ -4,6 +4,7 @@ class AccountModel {
   id: string;
   uuid: string;
   userId: string;
+  userName?: string;
   accountNumber: string;
   password: string;
   status: string;
@@ -14,6 +15,7 @@ class AccountModel {
     this.id = String(data.id);
     this.uuid = data.uuid;
     this.userId = String(data.userId);
+    this.userName = data.userName || undefined;
     this.accountNumber = data.accountNumber;
     this.password = data.password;
     this.status = data.status;
@@ -233,9 +235,10 @@ class AccountModel {
   ) {
     const [accounts] = await connection.execute(
       `
-        SELECT DISTINCT a.*
+        SELECT DISTINCT a.*, u.steam_name AS user_name
         FROM transaction t
         JOIN account a ON (t.sender_account_id = a.account_id OR t.receiver_account_id = a.account_id)
+        JOIN user u ON a.user_id = u.user_id
         WHERE (t.sender_account_id = ?
           OR t.receiver_account_id = ?)
           AND a.account_id != ?
@@ -269,6 +272,7 @@ class AccountModel {
       id: data.account_id,
       uuid: data.account_uuid,
       userId: data.user_id,
+      userName: data.user_name || null,
       accountNumber: data.account_number,
       password: data.password,
       status: data.status,
