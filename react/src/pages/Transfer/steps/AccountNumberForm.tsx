@@ -30,6 +30,9 @@ const AccountNumberForm = () => {
   const setTransferData = useSetAtom(transferDataAtom);
   const accountData = useAtomValue(accountDataAtom);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const [recentAccountData, setRecentAccountData] = useState<
+    { accountNumber: string; userName: string | null }[]
+  >([]);
 
   // 계좌번호 입력 핸들러
   const handleAccountNumberChange = useCallback(
@@ -131,6 +134,51 @@ const AccountNumberForm = () => {
     }
   }, [accountNumber]);
 
+  // 최근 거래 계좌 조회
+  useEffect(() => {
+    const fetchRecentAccounts = async () => {
+      try {
+        const accountNumber = accountData[0]?.accountNumber;
+        if (!accountNumber) {
+          return;
+        }
+        const recentAccounts = await AccountService.fetchRecentAccountNumbers(
+          accountNumber
+        );
+
+        setRecentAccountData(
+          recentAccounts.map((account) => ({
+            accountNumber: account.accountNumber,
+            userName: account.userName || null,
+          }))
+        );
+      } catch {
+        //
+      }
+    };
+
+    fetchRecentAccounts();
+  }, [accountData]);
+
+  // 최근 거래 계좌 클릭 핸들러
+  const handleRecentAccountClick = useCallback(
+    (recentAccount: { accountNumber: string; userName: string | null }) => {
+      if (!recentAccount.userName) {
+        return;
+      }
+
+      // 송금 데이터에 계좌번호 저장
+      setTransferData({
+        receiverAccountNumber: recentAccount.accountNumber,
+        receiverAccountHolder: recentAccount.userName,
+      });
+
+      // 다음 단계로 이동
+      setTransferStep(1);
+    },
+    [setTransferData, setTransferStep]
+  );
+
   return (
     <Stack gap={5} flex={1}>
       {/* 헤더 */}
@@ -201,7 +249,7 @@ const AccountNumberForm = () => {
             overflow="auto"
           >
             <Stack>
-              {Array.from({ length: 10 }).map((_, index) => (
+              {recentAccountData.map((recentAccount, index) => (
                 <ButtonBase
                   key={`recent-send-account-${index}`}
                   disabled={accountNumber.length > 0}
@@ -211,6 +259,7 @@ const AccountNumberForm = () => {
                     overflow: "hidden",
                     p: 1,
                   }}
+                  onClick={() => handleRecentAccountClick(recentAccount)}
                 >
                   <Stack
                     width="100%"
@@ -231,7 +280,7 @@ const AccountNumberForm = () => {
                     <Stack flex={1}>
                       {/* 계좌명 */}
                       <Typography variant="body1" fontWeight="bold">
-                        Jbank 계좌
+                        {recentAccount.userName || "알 수 없음"}
                       </Typography>
 
                       {/* 계좌번호 */}
@@ -240,7 +289,7 @@ const AccountNumberForm = () => {
                         fontWeight={500}
                         color="text.secondary"
                       >
-                        Jbank 1234-5678
+                        Jbank {recentAccount.accountNumber}
                       </Typography>
                     </Stack>
                   </Stack>

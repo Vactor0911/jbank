@@ -57,12 +57,12 @@ const AccountDetail = () => {
     }
 
     try {
-      // 적어도 1초 대기
+      // 적어도 0.5초 대기
       const response = await Promise.all([
         // 계좌 정보 조회 API 호출
         AccountService.fetchAccount(accountUuid),
         TransactionService.fetchAccountTransactions(accountUuid),
-        new Promise((resolve) => setTimeout(resolve, 1000)),
+        new Promise((resolve) => setTimeout(resolve, 500)),
       ]);
 
       // 조회 응답 처리

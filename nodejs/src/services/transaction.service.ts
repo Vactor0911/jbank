@@ -56,7 +56,20 @@ export class TransactionService {
 
     const formattedTransactions = [];
     for (const transaction of transactions) {
+      if (!transaction) {
+        continue;
+      }
+
       const formattedTransaction = await this.formatTransaction(transaction);
+
+      // 타인의 거래 잔액 제거
+      if (transaction.senderAccountHolderUuid !== user.uuid) {
+        delete (formattedTransaction.sender as any).currentBalance;
+      }
+      if (transaction.receiverAccountHolderUuid !== user.uuid) {
+        delete (formattedTransaction.receiver as any).currentBalance;
+      }
+
       formattedTransactions.push(formattedTransaction);
     }
     return formattedTransactions;
@@ -93,7 +106,15 @@ export class TransactionService {
     }
 
     // 거래 내역 데이터 생성
-    const formattedTransaction = this.formatTransaction(transaction);
+    const formattedTransaction = await this.formatTransaction(transaction);
+
+    // 타인의 거래 잔액 제거
+    if (transaction.senderAccountHolderUuid !== user.uuid) {
+      delete (formattedTransaction.sender as any).currentBalance;
+    }
+    if (transaction.receiverAccountHolderUuid !== user.uuid) {
+      delete (formattedTransaction.receiver as any).currentBalance;
+    }
 
     // 거래 내역 반환
     return formattedTransaction;

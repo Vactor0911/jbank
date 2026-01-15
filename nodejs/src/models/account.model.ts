@@ -1,9 +1,10 @@
-import { Pool, PoolConnection } from "mariadb/*";
+import { Pool, PoolConnection } from "mysql2/promise";
 
 class AccountModel {
   id: string;
   uuid: string;
   userId: string;
+  userName?: string;
   accountNumber: string;
   password: string;
   status: string;
@@ -14,6 +15,7 @@ class AccountModel {
     this.id = String(data.id);
     this.uuid = data.uuid;
     this.userId = String(data.userId);
+    this.userName = data.userName || undefined;
     this.accountNumber = data.accountNumber;
     this.password = data.password;
     this.status = data.status;
@@ -36,7 +38,13 @@ class AccountModel {
       `,
       [accountId]
     );
-    return this.formatAccount(account);
+
+    if (!(account as any[])[0]) {
+      return null;
+    }
+
+    const formattedAccount = this.formatAccount((account as any[])[0]);
+    return formattedAccount;
   }
 
   /**
@@ -57,7 +65,13 @@ class AccountModel {
       `,
       [accountUuid]
     );
-    return this.formatAccount(account);
+
+    if (!(account as any[])[0]) {
+      return null;
+    }
+
+    const formattedAccount = this.formatAccount((account as any[])[0]);
+    return formattedAccount;
   }
 
   /**
@@ -67,7 +81,7 @@ class AccountModel {
    * @returns 계좌 목록
    */
   static async findByUserId(userId: string, connection: PoolConnection | Pool) {
-    const accounts = await connection.execute(
+    const [accounts] = await connection.execute(
       `
         SELECT *
         FROM account
@@ -75,7 +89,14 @@ class AccountModel {
       `,
       [userId]
     );
-    return accounts.map((account: any) => this.formatAccount(account));
+
+    if (!accounts) {
+      return [];
+    }
+
+    return (accounts as any[]).map((account: any) =>
+      this.formatAccount(account)
+    );
   }
 
   /**
@@ -96,7 +117,13 @@ class AccountModel {
       `,
       [accountNumber]
     );
-    return this.formatAccount(account);
+
+    if (!(account as any[])[0]) {
+      return null;
+    }
+
+    const formattedAccount = this.formatAccount((account as any[])[0]);
+    return formattedAccount;
   }
 
   /**
@@ -118,7 +145,13 @@ class AccountModel {
       `,
       [accountNumber]
     );
-    return this.formatAccount(account);
+
+    if (!(account as any[])[0]) {
+      return null;
+    }
+
+    const formattedAccount = this.formatAccount((account as any[])[0]);
+    return formattedAccount;
   }
 
   /**
@@ -191,6 +224,41 @@ class AccountModel {
   }
 
   /**
+   * 최근 거래 계좌 조회
+   * @param accountId 계좌 id
+   * @param connection MariaDB 연결 객체
+   * @returns 계좌 목록
+   */
+  static async findRecentAccountsByAccountId(
+    accountId: string,
+    connection: PoolConnection | Pool
+  ) {
+    const [accounts] = await connection.execute(
+      `
+        SELECT DISTINCT a.*, u.steam_name AS user_name
+        FROM transaction t
+        JOIN account a ON (t.sender_account_id = a.account_id OR t.receiver_account_id = a.account_id)
+        JOIN user u ON a.user_id = u.user_id
+        WHERE (t.sender_account_id = ?
+          OR t.receiver_account_id = ?)
+          AND a.account_id != ?
+        ORDER BY t.transaction_id DESC
+        LIMIT 10;
+      `,
+      [accountId, accountId, accountId]
+    );
+
+    if (!accounts) {
+      return [];
+    }
+
+    const formattedAccounts = (accounts as any[]).map((account: any) =>
+      this.formatAccount(account)
+    );
+    return formattedAccounts;
+  }
+
+  /**
    * 계좌 데이터 포맷팅
    * @param data 계좌 데이터
    * @returns 포맷팅된 계좌 모델
@@ -204,6 +272,7 @@ class AccountModel {
       id: data.account_id,
       uuid: data.account_uuid,
       userId: data.user_id,
+      userName: data.user_name || null,
       accountNumber: data.account_number,
       password: data.password,
       status: data.status,

@@ -14,7 +14,6 @@ import { transferStepAtom } from "../../states/transfer";
 import { useEffect } from "react";
 import { useTransfer } from "../../hooks/transfer";
 import { accountDataAtom } from "../../states/account";
-import { useNavigate } from "react-router";
 
 // 단계 이름
 const STEPS = ["계좌번호 입력", "송금 금액 입력", "입력 정보 확인"];
@@ -23,7 +22,6 @@ const Transfer = () => {
   const theme = useTheme();
   const isMobile = useIsMobile();
   const { resetTransferData } = useTransfer();
-  const navigate = useNavigate();
 
   const [transferStep, setTransferStep] = useAtom(transferStepAtom);
   const accountData = useAtomValue(accountDataAtom);
@@ -33,13 +31,6 @@ const Transfer = () => {
     resetTransferData();
     setTransferStep(0);
   }, [resetTransferData, setTransferStep]);
-
-  // 개설된 계좌가 없다면 계좌 개설 페이지로 이동
-  useEffect(() => {
-    if (accountData.length === 0) {
-      navigate("/account/new", { replace: true });
-    }
-  }, [accountData, navigate]);
 
   // 개설된 계좌가 없다면 아무것도 표시하지 않음
   if (accountData.length === 0) {

@@ -1,4 +1,4 @@
-import { Pool, PoolConnection } from "mariadb/*";
+import { Pool, PoolConnection } from "mysql2/promise";
 import { UserData } from "../types";
 
 export class UserModel {
@@ -31,7 +31,7 @@ export class UserModel {
    * @returns 사용자 객체 또는 null
    */
   static async findById(userId: string, connection: PoolConnection | Pool) {
-    const [result] = await connection.execute(
+    const [user] = await connection.execute(
       `
         SELECT *
         FROM user
@@ -40,14 +40,12 @@ export class UserModel {
       [userId]
     );
 
-    // 사용자가 없으면 null 반환
-    if (!result) {
+    if (!(user as any[])[0]) {
       return null;
     }
 
-    // 사용자 객체 생성
-    const user = this.formatUser(result);
-    return user;
+    const formattedUser = this.formatUser((user as any[])[0]);
+    return formattedUser;
   }
 
   /**
@@ -57,7 +55,7 @@ export class UserModel {
    * @returns 사용자 객체 또는 null
    */
   static async findByUuid(userUuid: string, connection: PoolConnection | Pool) {
-    const [result] = await connection.execute(
+    const [user] = await connection.execute(
       `
         SELECT *
         FROM user
@@ -66,14 +64,12 @@ export class UserModel {
       [userUuid]
     );
 
-    // 사용자가 없으면 null 반환
-    if (!result) {
+    if (!(user as any[])[0]) {
       return null;
     }
 
-    // 사용자 객체 생성
-    const user = this.formatUser(result);
-    return user;
+    const formattedUser = this.formatUser((user as any[])[0]);
+    return formattedUser;
   }
 
   /**
@@ -86,7 +82,7 @@ export class UserModel {
     steamId: string,
     connection: PoolConnection | Pool
   ): Promise<UserModel | null> {
-    const [result] = await connection.execute(
+    const [user] = await connection.execute(
       `
         SELECT *
         FROM user
@@ -95,14 +91,12 @@ export class UserModel {
       [steamId]
     );
 
-    // 사용자가 없으면 null 반환
-    if (!result) {
+    if (!(user as any[])[0]) {
       return null;
     }
 
-    // 사용자 객체 생성
-    const user = this.formatUser(result);
-    return user;
+    const formattedUser = this.formatUser((user as any[])[0]);
+    return formattedUser;
   }
 
   /**
@@ -115,7 +109,7 @@ export class UserModel {
     accountNumber: string,
     connection: PoolConnection | Pool
   ): Promise<UserModel | null> {
-    const [result] = await connection.execute(
+    const [user] = await connection.execute(
       `
         SELECT u.*
         FROM user u
@@ -125,24 +119,12 @@ export class UserModel {
       [accountNumber]
     );
 
-    // 사용자가 없으면 null 반환
-    if (!result) {
+    if (!(user as any[])[0]) {
       return null;
     }
 
-    // 사용자 객체 생성
-    const user = this.formatUser(result);
-    return user;
-  }
-
-  /**
-   * 사용자 생성
-   * @param userData 사용자 데이터
-   * @param connection MariaDB 연결 객체
-      createdAt: result.created_at,
-      lastLogin: result.last_login_at,
-    });
-    return user;
+    const formattedUser = this.formatUser((user as any[])[0]);
+    return formattedUser;
   }
 
   /**
@@ -157,18 +139,12 @@ export class UserModel {
   ): Promise<UserModel> {
     await connection.execute(
       `
-        INSERT INTO user (user_uuid, steam_id, steam_name, avatar, created_at, last_login_at) 
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO user (user_uuid, steam_id, steam_name, avatar) 
+        VALUES (?, ?, ?, ?)
       `,
-      [
-        userData.uuid,
-        userData.steamId,
-        userData.steamName,
-        userData.avatar,
-        userData.createdAt,
-        userData.lastLogin,
-      ]
+      [userData.uuid, userData.steamId, userData.steamName, userData.avatar]
     );
+
     return new UserModel(userData);
   }
 
@@ -194,6 +170,7 @@ export class UserModel {
       `,
       [steamName, avatar, userId]
     );
+
     return result;
   }
 
@@ -212,6 +189,7 @@ export class UserModel {
       `,
       [userId]
     );
+
     return result;
   }
 
@@ -233,6 +211,7 @@ export class UserModel {
       `,
       [userId]
     );
+
     return result;
   }
 
@@ -254,6 +233,7 @@ export class UserModel {
       `,
       [userId]
     );
+
     return (result as any).status;
   }
 
@@ -273,6 +253,7 @@ export class UserModel {
       steamId: data.steam_id,
       steamName: data.steam_name,
       avatar: data.avatar,
+      status: data.status,
       createdAt: data.created_at,
       lastLogin: data.last_login_at,
       lastProfileRefresh: data.last_profile_refresh_at,

@@ -24,35 +24,63 @@ export class AuthController {
       return res.redirect(`${process.env.FRONTEND_URL}/login?error=no_user`);
     }
 
+    // UserModel 인스턴스에서 steamId 추출
+    const steamId = user.steamId;
+    const userId = user.id;
+
+    if (!steamId) {
+      console.error("No steamId in user:", user);
+      return res.redirect(
+        `${process.env.FRONTEND_URL}/login?error=no_steam_id`
+      );
+    }
+
     // 로그인 처리
     let tokens;
     try {
-      tokens = await AuthService.login(user.steamId);
+      tokens = await AuthService.login(steamId);
     } catch (error) {
+      console.error("Login error:", error);
+
       // 예상치 못한 오류는 그대로 반환
       if (!(error instanceof AppError)) {
-        res.redirect(`${process.env.FRONTEND_URL}/login?error=internal_error`);
+        return res.redirect(
+          `${process.env.FRONTEND_URL}/login?error=internal_error`
+        );
       }
 
       // 오류에 따른 리다이렉트 처리
       if (error instanceof NotFoundError) {
-        res.redirect(`${process.env.FRONTEND_URL}/login?error=user_not_found`);
+        return res.redirect(
+          `${process.env.FRONTEND_URL}/login?error=user_not_found`
+        );
       } else if (
         error instanceof ForbiddenError &&
         error.message === "삭제된 계정입니다."
       ) {
-        res.redirect(`${process.env.FRONTEND_URL}/login?error=account_deleted`);
+        return res.redirect(
+          `${process.env.FRONTEND_URL}/login?error=account_deleted`
+        );
       } else if (
         error instanceof ForbiddenError &&
         error.message === "차단된 계정입니다."
       ) {
-        res.redirect(`${process.env.FRONTEND_URL}/login?error=account_banned`);
+        return res.redirect(
+          `${process.env.FRONTEND_URL}/login?error=account_banned`
+        );
       }
+
+      // 그 외의 에러
+      return res.redirect(
+        `${process.env.FRONTEND_URL}/login?error=internal_error`
+      );
     }
 
     // 사용자 스팀 프로필 업데이트
     try {
-      await UserService.autoRefreshProfile(user.id);
+      if (userId) {
+        await UserService.autoRefreshProfile(userId);
+      }
     } catch {}
 
     // 로그인 정보 교환용 임시 코드 생성
@@ -61,13 +89,13 @@ export class AuthController {
       `auth:${tempAuthCode}`,
       60,
       JSON.stringify({
-        accessToken: tokens!.accessToken,
-        csrfToken: tokens!.csrfToken,
+        accessToken: tokens.accessToken,
+        csrfToken: tokens.csrfToken,
       })
     );
 
     // Refresh Token을 HttpOnly 쿠키로 설정
-    res.cookie("refreshToken", tokens!.refreshToken, {
+    res.cookie("refreshToken", tokens.refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",

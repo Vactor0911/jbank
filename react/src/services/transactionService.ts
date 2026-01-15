@@ -37,6 +37,18 @@ class TransactionService {
     );
     return response;
   }
+
+  /**
+   * 단일 거래내역 조회
+   * @param transactionUuid 거래 uuid
+   * @returns 거래내역 상세 정보
+   */
+  static async fetchTransaction(transactionUuid: string) {
+    const response = await axiosInstance.get(
+      `/api/transaction/${transactionUuid}`
+    );
+    return response;
+  }
 }
 
 export default TransactionService;
