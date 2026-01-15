@@ -68,11 +68,14 @@ export class TransactionModel {
       [transactionUuid]
     );
 
-    if (!transaction) {
+    if (!(transaction as any[])[0]) {
       return null;
     }
 
-    return this.formatTransactionDetail(transaction);
+    const formattedTransaction = this.formatTransactionDetail(
+      (transaction as any[])[0]
+    );
+    return formattedTransaction;
   }
 
   /**
@@ -155,7 +158,7 @@ export class TransactionModel {
         receiverCurrentBalance,
       ]
     );
-    
+
     return this.formatTransaction({
       transaction_uuid: transactionUuid,
       sender_account_id: senderAccountId,
