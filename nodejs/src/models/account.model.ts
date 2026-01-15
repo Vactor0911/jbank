@@ -249,8 +249,6 @@ class AccountModel {
       return [];
     }
 
-    console.log(accounts);
-
     const formattedAccounts = (accounts as any[]).map((account: any) =>
       this.formatAccount(account)
     );
