@@ -45,7 +45,7 @@ const AdsSection = (props: Omit<SectionProps, "label">) => {
         }}
       >
         <Typography variant="h4" color="text.secondary" textAlign="center">
-          금방 추가되요.
+          금방 추가돼요.
           <br />
           조금만 기다려주세요!
         </Typography>
