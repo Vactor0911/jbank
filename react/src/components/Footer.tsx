@@ -30,6 +30,11 @@ const Footer = () => {
     navigate("/");
   }, [navigate]);
 
+  // 개발자에게 커피 사주기 버튼 클릭 핸들러
+  const handleBuyMeACoffeeClick = useCallback(() => {
+    window.open("https://buymeacoffee.com/vactor0911", "_blank");
+  }, []);
+
   return (
     <Stack gap={3} mt={3}>
       {/* Buy me a coffee 버튼 */}
@@ -38,6 +43,7 @@ const Footer = () => {
           borderRadius: 2,
           overflow: "hidden",
         }}
+        onClick={handleBuyMeACoffeeClick}
       >
         <Stack
           direction="row"
