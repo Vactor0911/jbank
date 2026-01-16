@@ -45,14 +45,6 @@ passport.use(
           return done(new Error("Steam ID가 올바르지 않습니다."), undefined);
         }
 
-        // 기존 사용자 데이터 조회
-        const userData: UserData = {
-          uuid: "", // UUID는 나중에 DB에서 생성
-          steamId: steamId,
-          steamName: profile.displayName,
-          avatar: profile.photos[2]?.value || profile._json.avatarfull,
-        };
-
         const user = await TransactionHandler.executeInTransaction(
           mariaDB,
           async (connection) => {
