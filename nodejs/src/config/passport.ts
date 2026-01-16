@@ -1,7 +1,7 @@
 import passport from "passport";
 import { Strategy as SteamStrategy } from "passport-steam";
 import { UserModel } from "../models/user.model";
-import { SteamProfile, UserData } from "../types";
+import { SteamProfile } from "../types";
 import { v4 as uuidv4 } from "uuid";
 import { mariaDB } from "./mariadb";
 import TransactionHandler from "../utils/transactionHandler";
