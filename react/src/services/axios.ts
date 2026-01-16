@@ -88,12 +88,6 @@ class ApiClient {
         return response;
       },
       async (error: AxiosError) => {
-        console.error(
-          // TODO: console log 제거 필요
-          `${error.config?.method?.toUpperCase()} ${error.config?.url}`,
-          error.response?.status
-        );
-
         const originalRequest = error.config as InternalAxiosRequestConfig & {
           _retry?: boolean;
         };
@@ -145,9 +139,6 @@ class ApiClient {
         // 403 에러 핸들링 (CSRF 토큰 또는 권한 오류)
         if (error.response?.status === 403 && !originalRequest._retry) {
           originalRequest._retry = true;
-
-          // TODO: console log 제거 필요
-          console.error("403 오류! 토큰 갱신 중...");
 
           if (this.isRefreshing) {
             return new Promise((resolve) => {

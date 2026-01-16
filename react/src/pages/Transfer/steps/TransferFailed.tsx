@@ -37,7 +37,6 @@ const TransferFailed = () => {
         </Zoom>
 
         {/* 송금 실패 문구 */}
-        {/* TODO: 서버측 오류 메시지 표시 */}
         <Stack gap={1} alignItems="center">
           <Typography variant="h5">송금 중에 문제가 발생했어요.</Typography>
 
