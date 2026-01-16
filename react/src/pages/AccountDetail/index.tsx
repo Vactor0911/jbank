@@ -20,7 +20,6 @@ import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
 import AccountService, {
   type AccountData,
 } from "../../services/accountService";
-import { AxiosError } from "axios";
 import { formatNumberString } from "../../utils";
 import TransactionService, {
   type TransactionData,
@@ -81,13 +80,8 @@ const AccountDetail = () => {
         setIsFetchSuccess(null);
       }, 3000);
       return () => clearTimeout(timer);
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        console.error(
-          "계좌 정보 조회 중 오류 발생:",
-          error.response?.data.error
-        );
-      }
+    } catch {
+      //
     }
   }, [accountUuid]);
 

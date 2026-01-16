@@ -29,7 +29,6 @@ export class AuthController {
     const userId = user.id;
 
     if (!steamId) {
-      console.error("No steamId in user:", user);
       return res.redirect(
         `${process.env.FRONTEND_URL}/login?error=no_steam_id`
       );
@@ -40,8 +39,6 @@ export class AuthController {
     try {
       tokens = await AuthService.login(steamId);
     } catch (error) {
-      console.error("Login error:", error);
-
       // 예상치 못한 오류는 그대로 반환
       if (!(error instanceof AppError)) {
         return res.redirect(
