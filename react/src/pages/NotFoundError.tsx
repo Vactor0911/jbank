@@ -2,9 +2,15 @@ import { Box, Button, Stack, Typography } from "@mui/material";
 import TrafficCone from "../assets/traffic-cone.svg";
 import { useNavigate } from "react-router";
 import JbankIcon from "../assets/logo/icon.svg?react";
+import { useCallback } from "react";
 
 const NotFoundError = () => {
   const navigate = useNavigate();
+
+  // 의견 보내기 버튼 클릭 핸들러
+  const handleSendFeedbackClick = useCallback(() => {
+    window.open("https://forms.gle/pWhCPMB2QhpF3oAX8", "_blank");
+  }, []);
 
   return (
     <Stack
@@ -88,9 +94,7 @@ const NotFoundError = () => {
           sx={{
             borderRadius: 2,
           }}
-          onClick={() => {
-            // TODO: 오류 신고 페이지 링크로 이동
-          }}
+          onClick={() => handleSendFeedbackClick()}
         >
           <Typography variant="h6">오류 신고하기</Typography>
         </Button>
