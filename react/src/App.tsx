@@ -5,6 +5,8 @@ import { router } from "./router";
 import { useCallback, useEffect } from "react";
 import UserService from "./services/userService";
 import AccountService from "./services/accountService";
+import { enqueueSnackbar } from "notistack";
+import StyledSnackbarProvider from "./components/StyledSnackbarProvider";
 
 const App = () => {
   // 사용자 정보 불러오기
@@ -15,12 +17,16 @@ const App = () => {
 
   useEffect(() => {
     fetchData();
+    enqueueSnackbar("환영합니다!", { variant: "success" });
   }, [fetchData]);
 
   return (
     <ThemeProvider theme={theme} defaultMode="system">
       <CssBaseline enableColorScheme />
-      <RouterProvider router={router} />
+
+      <StyledSnackbarProvider>
+        <RouterProvider router={router} />
+      </StyledSnackbarProvider>
     </ThemeProvider>
   );
 };
