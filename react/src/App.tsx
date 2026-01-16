@@ -5,7 +5,6 @@ import { router } from "./router";
 import { useCallback, useEffect } from "react";
 import UserService from "./services/userService";
 import AccountService from "./services/accountService";
-import { enqueueSnackbar } from "notistack";
 import StyledSnackbarProvider from "./components/StyledSnackbarProvider";
 
 const App = () => {
@@ -17,7 +16,6 @@ const App = () => {
 
   useEffect(() => {
     fetchData();
-    enqueueSnackbar("환영합니다!", { variant: "success" });
   }, [fetchData]);
 
   return (

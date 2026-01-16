@@ -2,6 +2,7 @@ import { getDefaultStore } from "jotai";
 import { userDataAtom } from "../states";
 import apiClient, { axiosInstance } from "./axios";
 import { accountDataAtom } from "../states/account";
+import { enqueueSnackbar } from "notistack";
 
 const SERVER_HOST = import.meta.env.VITE_SERVER_HOST;
 
@@ -67,8 +68,9 @@ class AuthService {
       await axiosInstance.post("/api/auth/logout");
       store.set(userDataAtom, null);
       store.set(accountDataAtom, []);
-    } catch (error) {
-      console.error("로그아웃 실패:", error);
+      enqueueSnackbar("성공적으로 로그아웃되었어요.", { variant: "success" });
+    } catch {
+      enqueueSnackbar("로그아웃에 실패했어요.", { variant: "error" });
     } finally {
       apiClient.clearTokens();
     }

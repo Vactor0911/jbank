@@ -32,6 +32,7 @@ const StyledSnackbarProvider = ({ children }: { children: ReactNode }) => {
         "&.notistack-MuiContent": {
           backgroundColor: theme.palette.text.secondary,
           borderRadius: "8px",
+          color: theme.palette.secondary.main,
         },
         "&.notistack-MuiContent div#notistack-snackbar .MuiSvgIcon-root": {
           marginRight: "8px",

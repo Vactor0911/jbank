@@ -26,3 +26,8 @@ export const transferDataAtom = atom<TransferData>({});
  * 송금 결과 상태
  */
 export const isTransferSuccessAtom = atom<boolean | null>(null);
+
+/**
+ * 송금 에러 메시지 상태
+ */
+export const transferErrorMessageAtom = atom<string>("");

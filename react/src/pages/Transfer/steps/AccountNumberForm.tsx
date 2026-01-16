@@ -21,6 +21,7 @@ import JbankIcon from "../../../assets/logo/icon.svg?react";
 import UserService from "../../../services/userService";
 import AccountService from "../../../services/accountService";
 import { accountDataAtom } from "../../../states/account";
+import { enqueueSnackbar } from "notistack";
 
 const AccountNumberForm = () => {
   const navigate = useNavigate();
@@ -111,7 +112,7 @@ const AccountNumberForm = () => {
       // 다음 단계로 이동
       setTransferStep(1);
     } catch {
-      // TODO: 에러 처리 필요
+      enqueueSnackbar("계좌를 찾지 못했어요.", { variant: "error" });
       return;
     }
   }, [
@@ -142,9 +143,8 @@ const AccountNumberForm = () => {
         if (!accountNumber) {
           return;
         }
-        const recentAccounts = await AccountService.fetchRecentAccountNumbers(
-          accountNumber
-        );
+        const recentAccounts =
+          await AccountService.fetchRecentAccountNumbers(accountNumber);
 
         setRecentAccountData(
           recentAccounts.map((account) => ({

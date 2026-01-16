@@ -3,6 +3,7 @@ import { useCallback } from "react";
 import {
   isTransferSuccessAtom,
   transferDataAtom,
+  transferErrorMessageAtom,
   transferStepAtom,
 } from "../states/transfer";
 
@@ -13,6 +14,7 @@ export const useTransfer = () => {
   const setTransferData = useSetAtom(transferDataAtom);
   const setTransferStep = useSetAtom(transferStepAtom);
   const setIsTransferSuccess = useSetAtom(isTransferSuccessAtom);
+  const setTransferErrorMessage = useSetAtom(transferErrorMessageAtom);
 
   /**
    * 송금 상태 초기화
@@ -21,7 +23,13 @@ export const useTransfer = () => {
     setTransferData({});
     setTransferStep(0);
     setIsTransferSuccess(null);
-  }, [setTransferStep, setIsTransferSuccess, setTransferData]);
+    setTransferErrorMessage("");
+  }, [
+    setTransferData,
+    setTransferStep,
+    setIsTransferSuccess,
+    setTransferErrorMessage,
+  ]);
 
   return { resetTransferData };
 };
