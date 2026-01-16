@@ -35,6 +35,11 @@ const Footer = () => {
     window.open("https://buymeacoffee.com/vactor0911", "_blank");
   }, []);
 
+  // 의견 보내기 버튼 클릭 핸들러
+  const handleSendFeedbackClick = useCallback(() => {
+    window.open("https://forms.gle/pWhCPMB2QhpF3oAX8", "_blank");
+  }, []);
+
   return (
     <Stack gap={3} mt={3}>
       {/* Buy me a coffee 버튼 */}
@@ -120,6 +125,7 @@ const Footer = () => {
             flex: 1,
             borderRadius: 1.5,
           }}
+          onClick={handleSendFeedbackClick}
         >
           <Typography
             variant="body1"

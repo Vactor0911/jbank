@@ -46,6 +46,11 @@ const SidebarMenu = () => {
     navigate("/");
   }, [navigate]);
 
+  // 의견 보내기 버튼 클릭 핸들러
+  const handleSendFeedbackClick = useCallback(() => {
+    window.open("https://forms.gle/pWhCPMB2QhpF3oAX8", "_blank");
+  }, []);
+
   // 모바일 화면에서는 사이드바 메뉴를 표시하지 않음
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   if (isMobile) {
@@ -168,6 +173,7 @@ const SidebarMenu = () => {
             flex: 1,
             borderRadius: 1.5,
           }}
+          onClick={handleSendFeedbackClick}
         >
           <Typography
             variant="body1"
