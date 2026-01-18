@@ -200,33 +200,4 @@ export class AuthController {
       });
     }
   );
-
-  /**
-   * 내 정보 조회
-   */
-  static me = asyncHandler(
-    async (req: AuthRequest, res: Response<APIResponse>) => {
-      const { userUuid } = req.user as { userUuid: string };
-
-      // 사용자 정보 조회
-      const user = await UserModel.findBySteamId(userUuid, mariaDB);
-      if (!user) {
-        throw new NotFoundError("사용자를 찾을 수 없습니다.");
-      }
-
-      // 응답 전송
-      res.json({
-        success: true,
-        message: "사용자 정보 조회에 성공했습니다.",
-        data: {
-          user: {
-            uuid: user.uuid,
-            steamId: user.steamId,
-            steamName: user.steamName,
-            avatar: user.avatar,
-          },
-        },
-      });
-    }
-  );
 }
