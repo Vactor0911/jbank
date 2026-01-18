@@ -5,6 +5,7 @@ import { authenticateJWT, authenticateRefreshToken } from "../middlewares/auth";
 import { csrfProtection } from "../middlewares/csrf";
 import { validateParams } from "../middlewares/validation";
 import { steamTokensSchema } from "../schema/auth.schema";
+import { limiter } from "../middlewares/rateLimiter";
 
 const authRouter = Router();
 
@@ -15,14 +16,14 @@ authRouter.get(
     failureRedirect: `${process.env.FRONTEND_URL}/login?error=auth_failed`,
     session: false,
   }),
-  AuthController.login
+  AuthController.login,
 );
 
 // 인증 토큰 교환
 authRouter.get(
   "/steam/tokens/:code",
   validateParams(steamTokensSchema),
-  AuthController.exchangeTokens
+  AuthController.exchangeTokens,
 );
 
 // Steam 로그인
@@ -33,14 +34,16 @@ authRouter.post(
   "/refresh",
   authenticateRefreshToken,
   csrfProtection,
-  AuthController.refreshJwtToken
+  limiter,
+  AuthController.refreshJwtToken,
 );
 
 // CSRF 토큰 재발급
 authRouter.post(
   "/csrf",
   authenticateRefreshToken,
-  AuthController.refreshCsrfToken
+  limiter,
+  AuthController.refreshCsrfToken,
 );
 
 // 로그아웃
@@ -48,7 +51,8 @@ authRouter.post(
   "/logout",
   authenticateJWT,
   csrfProtection,
-  AuthController.logout
+  limiter,
+  AuthController.logout,
 );
 
 export default authRouter;

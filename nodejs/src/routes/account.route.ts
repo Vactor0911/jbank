@@ -8,6 +8,7 @@ import {
   getAccountSchema,
   getRecentAccountsSchema,
 } from "../schema/account.schema";
+import { limiter } from "../middlewares/rateLimiter";
 
 const accountRouter = Router();
 
@@ -15,28 +16,31 @@ const accountRouter = Router();
 accountRouter.get(
   "/:accountNumber/recent",
   authenticateJWT,
+  limiter,
   validateParams(getRecentAccountsSchema),
-  AccountController.getRecentAccounts
+  AccountController.getRecentAccounts,
 );
 
 // 계좌 정보 조회
 accountRouter.get(
   "/:accountUuid",
   authenticateJWT,
+  limiter,
   validateParams(getAccountSchema),
-  AccountController.getAccount
+  AccountController.getAccount,
 );
 
 // 계좌 목록 조회
-accountRouter.get("/", authenticateJWT, AccountController.getAccounts);
+accountRouter.get("/", authenticateJWT, limiter, AccountController.getAccounts);
 
 // 새 계좌 개설
 accountRouter.post(
   "/",
   authenticateJWT,
   csrfProtection,
+  limiter,
   validateBody(createAccountSchema),
-  AccountController.createAccount
+  AccountController.createAccount,
 );
 
 export default accountRouter;
