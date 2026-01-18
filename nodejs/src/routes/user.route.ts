@@ -1,37 +1,40 @@
 import { Router } from "express";
-import UserController from "../controllers/user.controller";
-import { validateBody, validateParams } from "../middlewares/validation";
-import {
-  createUserSchema,
-  refreshUserNameSchema,
-  searchUserSchema,
-} from "../schema/user.schema";
-import { validateApiKey } from "../middlewares/authenticate";
+import { authenticateJWT } from "../middlewares/auth";
+import { UserController } from "../controllers/user.controller";
+import { csrfProtection } from "../middlewares/csrf";
+import { validateParams } from "../middlewares/validation";
+import { getAccountHolderSchema } from "../schema/user.schema";
+import { limiter } from "../middlewares/rateLimiter";
 
 const userRouter = Router();
 
-// 사용자 사용자명 재설정
+// 예금주 조회
 userRouter.get(
-  "/:steamId/refresh",
-  validateApiKey,
-  validateParams(refreshUserNameSchema),
-  UserController.refreshUserName
+  "/account/:accountNumber",
+  authenticateJWT,
+  limiter,
+  validateParams(getAccountHolderSchema),
+  UserController.getAccountHolder,
 );
 
-// 사용자 검색
-userRouter.get(
-  "/:keyword",
-  validateApiKey,
-  validateParams(searchUserSchema),
-  UserController.searchUsers
+// 사용자 본인 정보 새로고침
+userRouter.patch(
+  "/me/refresh",
+  authenticateJWT,
+  limiter,
+  UserController.refreshMe,
 );
 
-// 사용자 생성
-userRouter.post(
-  "/",
-  validateApiKey,
-  validateBody(createUserSchema),
-  UserController.createUser
+// 사용자 본인 정보 조회
+userRouter.get("/me", authenticateJWT, limiter, UserController.me);
+
+// 회원 탈퇴
+userRouter.delete(
+  "/me",
+  authenticateJWT,
+  csrfProtection,
+  limiter,
+  UserController.deleteAccount,
 );
 
 export default userRouter;

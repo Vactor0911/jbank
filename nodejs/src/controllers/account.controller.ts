@@ -1,69 +1,94 @@
-import { Request, Response } from "express";
-import AccountService from "../services/account.service";
+import { Response } from "express";
+import { APIResponse, AuthRequest } from "../types";
 import { asyncHandler } from "../utils/asyncHandler";
-import TransactionService from "../services/transaction.service";
+import AccountService from "../services/account.service";
 
 class AccountController {
   /**
-   * 계좌 조회
+   * 계좌 목록 조회
    */
-  static searchAccount = asyncHandler(async (req: Request, res: Response) => {
-    const { accountNumber } = req.params;
+  static getAccounts = asyncHandler(
+    async (req: AuthRequest, res: Response<APIResponse>) => {
+      const { userId } = req.user as { userId: string };
 
-    // 계좌 조회
-    const account = await AccountService.findAccountByAccountNumber(
-      accountNumber
-    );
+      // 계좌 목록 조회
+      const accounts = await AccountService.getAccounts(userId);
 
-    // 응답 반환
-    res.status(200).json({
-      success: true,
-      message: "계좌 조회에 성공했습니다.",
-      data: {
-        account,
-      },
-    });
-  });
-
-  /**
-   * 예금 조회
-   */
-  static getAccountBalance = asyncHandler(
-    async (req: Request, res: Response) => {
-      const { accountNumber } = req.params;
-
-      // 예금 조회
-      const balance = await AccountService.getAccountBalance(accountNumber);
-
-      // 응답 반환
-      res.status(200).json({
+      // 응답 전송
+      res.json({
         success: true,
-        message: "예금 조회에 성공했습니다.",
+        message: "계좌 목록이 조회되었습니다.",
         data: {
-          balance,
+          accounts,
         },
       });
     }
   );
 
   /**
-   * 거래 내역 조회
+   * 계좌 정보 조회
    */
-  static getAccountTransactions = asyncHandler(
-    async (req: Request, res: Response) => {
+  static getAccount = asyncHandler(
+    async (req: AuthRequest, res: Response<APIResponse>) => {
+      const { userId } = req.user as { userId: string };
+      const { accountUuid } = req.params;
+
+      // 계좌 정보 조회
+      const account = await AccountService.getAccount(userId, accountUuid);
+
+      // 응답 전송
+      res.json({
+        success: true,
+        message: "계좌 정보가 조회되었습니다.",
+        data: {
+          account,
+        },
+      });
+    }
+  );
+
+  /**
+   * 새 계좌 개설
+   */
+  static createAccount = asyncHandler(
+    async (req: AuthRequest, res: Response<APIResponse>) => {
+      const { userId } = req.user as { userId: string };
+      const { password } = req.body;
+
+      // 새 계좌 개설
+      const newAccount = await AccountService.createAccount(userId, password);
+
+      // 응답 전송
+      res.json({
+        success: true,
+        message: "새 계좌가 개설되었습니다.",
+        data: {
+          account: newAccount,
+        },
+      });
+    }
+  );
+
+  /**
+   * 최근 거래 계좌 조회
+   */
+  static getRecentAccounts = asyncHandler(
+    async (req: AuthRequest, res: Response<APIResponse>) => {
+      const { userId } = req.user as { userId: string };
       const { accountNumber } = req.params;
 
-      // 거래 내역 조회
-      const transactions = await TransactionService.getAccountTransactions(
+      // 최근 거래 계좌 조회
+      const recentAccounts = await AccountService.getRecentAccounts(
+        userId,
         accountNumber
       );
 
-      // 응답 반환
-      res.status(200).json({
+      // 응답 전송
+      res.json({
         success: true,
-        message: "거래 내역 조회에 성공했습니다.",
+        message: "최근 거래 계좌 목록이 조회되었습니다.",
         data: {
-          transactions,
+          recentAccounts,
         },
       });
     }

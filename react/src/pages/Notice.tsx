@@ -34,6 +34,7 @@ const Notice = () => {
             }}
           />
         }
+        display="none"
       >
         {Array.from({ length: 10 }).map((_, index) => (
           <ButtonBase

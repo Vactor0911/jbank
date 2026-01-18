@@ -1,63 +1,30 @@
-import { CssBaseline, Stack, ThemeProvider } from "@mui/material";
+import { CssBaseline, ThemeProvider } from "@mui/material";
 import { theme } from "./utils/theme";
-import { BrowserRouter, Route, Routes } from "react-router";
-import {
-  AccountDetail,
-  Home,
-  Login,
-  NotFoundError,
-  Notice,
-  Profile,
-  TransactionDetail,
-  Transfer,
-} from "./pages";
-import NavigationBar from "./components/Navigation";
-import SidebarMenu from "./components/SidebarMenu";
-import Header from "./components/Header";
-import PageWrapper from "./components/PageWrapper";
+import { RouterProvider } from "react-router";
+import { router } from "./router";
+import { useCallback, useEffect } from "react";
+import UserService from "./services/userService";
+import AccountService from "./services/accountService";
+import StyledSnackbarProvider from "./components/StyledSnackbarProvider";
 
 const App = () => {
+  // 사용자 정보 불러오기
+  const fetchData = useCallback(async () => {
+    await UserService.fetchMe();
+    await AccountService.fetchAccounts();
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={theme} defaultMode="system">
       <CssBaseline enableColorScheme />
 
-      <BrowserRouter>
-        <Stack
-          width="100vw"
-          height="100dvh"
-          direction={{
-            xs: "column",
-            md: "row-reverse",
-          }}
-        >
-          {/* 헤더 */}
-          <Header />
-
-          <PageWrapper>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/account/:accountUuid" element={<AccountDetail />} />
-              <Route
-                path="/transaction/:transactionUuid"
-                element={<TransactionDetail />}
-              />
-              <Route path="/account" element={<NotFoundError />} />
-              <Route path="/notice" element={<Notice />} />
-              <Route path="/transfer" element={<Transfer />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/profile" element={<Profile />} />
-
-              <Route path="*" element={<NotFoundError />} />
-            </Routes>
-          </PageWrapper>
-
-          {/* PC용 사이드 바 메뉴 */}
-          <SidebarMenu />
-
-          {/* 네비게이션 바 */}
-          <NavigationBar />
-        </Stack>
-      </BrowserRouter>
+      <StyledSnackbarProvider>
+        <RouterProvider router={router} />
+      </StyledSnackbarProvider>
     </ThemeProvider>
   );
 };

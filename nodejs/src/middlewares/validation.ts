@@ -28,7 +28,6 @@ export const validateBody = (schema: ZodObject) => {
       // 검증된 데이터로 body 교체
       req.body = validated.data;
 
-      // 다음 미들웨어로 이동
       next();
     } catch (error) {
       // 에러 핸들링 미들웨어로 전달
@@ -54,10 +53,9 @@ export const validateParams = (schema: ZodObject) => {
         );
       }
 
-      // 검증된 데이터로 params 교체
-      req.params = validated.data as any;
+      // 검증된 데이터로 params 업데이트
+      Object.assign(req.params, validated.data);
 
-      // 다음 미들웨어로 이동
       next();
     } catch (error) {
       // 에러 핸들링 미들웨어로 전달
@@ -83,10 +81,9 @@ export const validateQuery = (schema: ZodObject) => {
         );
       }
 
-      // 검증된 데이터로 query 교체
-      req.query = validated.data as any;
+      // 검증된 데이터로 query 업데이트
+      Object.assign(req.query, validated.data);
 
-      // 다음 미들웨어로 이동
       next();
     } catch (error) {
       // 에러 핸들링 미들웨어로 전달

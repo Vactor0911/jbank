@@ -5,10 +5,11 @@ import FeedRoundedIcon from "@mui/icons-material/FeedRounded";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import AccountBalanceRoundedIcon from "@mui/icons-material/AccountBalanceRounded";
 import { grey, orange } from "@mui/material/colors";
-import { useAccount } from "../../../hooks/account";
+import { useAtomValue } from "jotai";
+import { accountDataAtom } from "../../../states/account";
 
 const Home = () => {
-  const { accountData } = useAccount();
+  const accountData = useAtomValue(accountDataAtom);
 
   return (
     <>
@@ -47,7 +48,11 @@ const Home = () => {
         <LinkButton
           title="계좌"
           icon={<AccountBalanceRoundedIcon sx={{ color: orange[500] }} />}
-          linkTo={`/account/${accountData?.uuid}`}
+          linkTo={
+            accountData.length > 0
+              ? `/account/${accountData[0].uuid}`
+              : "/account/new"
+          }
         />
       </LinkButtonContainer>
     </>

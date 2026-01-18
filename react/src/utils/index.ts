@@ -37,3 +37,29 @@ export const formatNumberKor = (number: number): string => {
 export const isAccountNumberValid = (accountNumber: string): boolean => {
   return /^\d{4}-\d{4}$/.test(accountNumber);
 };
+
+/**
+ * 숫자 문자열 포맷팅 함수 (천 단위 콤마 추가)
+ * @param value 포맷팅할 숫자 문자열
+ * @returns 포맷팅된 숫자 문자열
+ */
+export const formatNumberString = (value: string): string => {
+  // 숫자가 아닌 문자 제거
+  const cleaned = value.replace(/[^\d]/g, "");
+
+  // 천 단위 콤마 추가
+  return cleaned.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
+
+/**
+ * 현지 시각에 맞게 날짜를 포맷팅하는 함수
+ * @param dateString 포맷팅할 날짜 문자열
+ * @returns 포맷팅된 날짜 문자열
+ */
+export const formatDateToLocal = (
+  dateString: string,
+  option?: object
+): string => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString(undefined, option);
+};

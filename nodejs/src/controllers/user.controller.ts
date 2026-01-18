@@ -1,66 +1,107 @@
-import { Request, Response } from "express";
+import { Response } from "express";
+import { APIResponse, AuthRequest } from "../types";
 import { asyncHandler } from "../utils/asyncHandler";
-import UserService from "../services/user.service";
-import LogService from "../services/log.service";
+import { UserService } from "../services/user.service";
+import { verifyRefreshToken } from "../utils/jwt";
+import { AuthModel } from "../models/auth.model";
+import { deleteCsrfToken } from "../middlewares/csrf";
+import { redis } from "../config/redis";
 
-class UserController {
+export class UserController {
   /**
-   * 사용자 목록 조회
+   * 사용자 본인 정보 조회
    */
-  static createUser = asyncHandler(async (req: Request, res: Response) => {
-    const { steamId, password } = req.body;
+  static me = asyncHandler(
+    async (req: AuthRequest, res: Response<APIResponse>) => {
+      const { userId } = req.user as { userId: string };
 
-    // 사용자 생성
-    const userUuid = await UserService.createUser(steamId, password);
+      const user = await UserService.getMe(userId);
 
-    // 로그 기록
-    const apiKey = req.headers["x-api-key"] as string;
-    await LogService.logUserCreation(apiKey, userUuid);
-
-    // 응답 반환
-    res.status(201).json({
-      success: true,
-      message: "사용자가 성공적으로 생성되었습니다.",
-      data: { userUuid },
-    });
-  });
-
-  /**
-   * 사용자 검색
-   */
-  static searchUsers = asyncHandler(async (req: Request, res: Response) => {
-    const { keyword } = req.params;
-
-    // 사용자 검색
-    const users = await UserService.searchUsers(keyword);
-
-    // 응답 반환
-    res.status(200).json({
-      success: true,
-      message: "사용자가 성공적으로 검색되었습니다.",
-      data: { users },
-    });
-  });
+      res.json({
+        success: true,
+        message: "사용자 정보를 성공적으로 조회했습니다.",
+        data: {
+          user,
+        },
+      });
+    }
+  );
 
   /**
-   * 사용자명 재설정
+   * 사용자 본인 정보 새로고침
    */
-  static refreshUserName = asyncHandler(async (req: Request, res: Response) => {
-    const { steamId } = req.params;
+  static refreshMe = asyncHandler(
+    async (req: AuthRequest, res: Response<APIResponse>) => {
+      const { userId } = req.user as { userId: string };
 
-    // 사용자 사용자명 재설정
-    const newUserName = await UserService.refreshUserName(steamId);
+      const steamProfile = await UserService.refreshMe(userId);
+      const userData = {
+        steamName: steamProfile.steamID,
+        avatar: steamProfile.avatarFull,
+      };
 
-    // 로그 기록
-    const apiKey = req.headers["x-api-key"] as string;
-    await LogService.logUserNameRefresh(apiKey, steamId, newUserName);
+      res.json({
+        success: true,
+        message: "사용자 정보를 성공적으로 새로고침했습니다.",
+        data: {
+          user: userData,
+        },
+      });
+    }
+  );
 
-    // 응답 반환
-    res.status(200).json({
-      success: true,
-      message: "사용자 사용자명이 성공적으로 재설정되었습니다.",
-    });
-  });
+  /**
+   * 회원 탈퇴
+   */
+  static deleteAccount = asyncHandler(
+    async (req: AuthRequest, res: Response<APIResponse>) => {
+      const { userId } = req.user as { userId: string };
+      const { refreshToken } = req.cookies;
+
+      // 회원 탈퇴 처리
+      await UserService.deleteUserAccount(userId);
+
+      // Refresh Token 삭제
+      if (refreshToken) {
+        const decoded = verifyRefreshToken(refreshToken);
+        if (decoded) {
+          // Refresh Token 삭제
+          await AuthModel.deleteRefreshToken(decoded.userId, redis);
+
+          // CSRF 토큰 삭제
+          await deleteCsrfToken(decoded.userId);
+        }
+      }
+
+      // 쿠키 삭제
+      res.clearCookie("refreshToken");
+
+      // 응답 전송
+      res.json({
+        success: true,
+        message: "회원 탈퇴되었습니다.",
+      });
+    }
+  );
+
+  /**
+   * 예금주 조회
+   */
+  static getAccountHolder = asyncHandler(
+    async (req: AuthRequest, res: Response<APIResponse>) => {
+      const { accountNumber } = req.params;
+
+      // 예금주 조회
+      const accountHolder = await UserService.getAccountHolder(accountNumber);
+
+      // 응답 전송
+      res.json({
+        success: true,
+        message: "예금주가 조회되었습니다.",
+        data: {
+          user: accountHolder,
+        },
+      });
+    }
+  );
 }
-
-export default UserController;

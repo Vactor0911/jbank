@@ -4,21 +4,26 @@ import {
   type PaletteMode,
 } from "@mui/material";
 
-// 공통 팔레트 값
-const palette = {
-  primary: {
-    main: "#4880EE",
-  },
-  secondary: {
-    main: "#ECEEF1",
-  },
-  text: {
-    primary: "#424E5E",
-    secondary: "#677383",
-  },
-  warning: {
-    main: "#F7D16C",
-  },
+// 팔레트 스타일
+const getPalette = (mode: PaletteMode) => {
+  return {
+    primary: {
+      main: "#4880EE",
+    },
+    secondary: {
+      main: mode === "light" ? "#ECEEF1" : "#2C2E33",
+    },
+    text: {
+      primary: mode === "light" ? "#424E5E" : "#E4E6E9",
+      secondary: mode === "light" ? "#677383" : "#A8B1BC",
+    },
+    warning: {
+      main: "#F7D16C",
+    },
+    background: {
+      default: mode === "light" ? "#F6F7F9" : "#18181A",
+    },
+  };
 };
 
 // 공통 타이포그래피
@@ -105,6 +110,16 @@ const getComponents = (mode: PaletteMode) => ({
       },
     },
   },
+  MuiSkeleton: {
+    defaultProps: {
+      animation: "wave" as const,
+    },
+  },
+  MuiButton: {
+    defaultProps: {
+      disableElevation: true,
+    },
+  },
 });
 
 // 라이트 테마 생성
@@ -113,10 +128,7 @@ export const createLightTheme = () =>
     createTheme({
       palette: {
         mode: "light",
-        background: {
-          default: "#F6F7F9",
-        },
-        ...palette,
+        ...getPalette("light"),
       },
       typography,
       shape,
@@ -130,10 +142,7 @@ export const createDarkTheme = () =>
     createTheme({
       palette: {
         mode: "dark",
-        background: {
-          default: "#18181A",
-        },
-        ...palette,
+        ...getPalette("dark"),
       },
       typography,
       shape,

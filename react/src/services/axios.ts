@@ -1,0 +1,275 @@
+import type {
+  AxiosError,
+  AxiosInstance,
+  InternalAxiosRequestConfig,
+} from "axios";
+import axios from "axios";
+import { getDefaultStore } from "jotai";
+import { isAuthenticatedAtom } from "../states";
+
+const store = getDefaultStore();
+
+const SERVER_HOST = import.meta.env.VITE_SERVER_HOST;
+
+class ApiClient {
+  private axiosInstance: AxiosInstance;
+  private accessToken: string | null = null;
+  private csrfToken: string | null = null;
+  private isRefreshing = false; // 토큰 갱신 중 여부
+  private refreshSubscribers: Array<(token: string) => void> = []; // 토큰 갱신 대기 중인 요청 콜백
+  private isInitialized = false; // 초기화 완료 여부
+
+  constructor() {
+    this.axiosInstance = axios.create({
+      baseURL: SERVER_HOST,
+      timeout: 10000,
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    this.setupInterceptors();
+  }
+
+  /**
+   * 페이지 로드 시 자동 토큰 갱신
+   * @returns 토큰 유효 여부
+   */
+  public async initialize(): Promise<boolean> {
+    if (this.isInitialized) {
+      return this.isAuthenticated();
+    }
+
+    try {
+      // refreshToken 쿠키가 있다면 자동으로 토큰 갱신
+      await this.refreshCsrfToken();
+      await this.refreshAccessToken();
+      this.isInitialized = true;
+
+      return true;
+    } catch {
+      // Refresh Token이 없거나 만료된 경우
+      this.isInitialized = true;
+      return false;
+    }
+  }
+
+  /**
+   * Axios 인터셉터 설정
+   */
+  private setupInterceptors() {
+    // 요청 인터셉터
+    this.axiosInstance.interceptors.request.use(
+      (config: InternalAxiosRequestConfig) => {
+        // Access Token 추가
+        if (this.accessToken && config.headers) {
+          config.headers.Authorization = `Bearer ${this.accessToken}`;
+        }
+
+        // CSRF 토큰 추가 (GET, HEAD, OPTIONS 제외)
+        if (
+          this.csrfToken &&
+          config.method &&
+          !["get", "head", "options"].includes(config.method.toLowerCase()) &&
+          config.headers
+        ) {
+          config.headers["X-CSRF-Token"] = this.csrfToken;
+        }
+
+        return config;
+      },
+      (error) => Promise.reject(error)
+    );
+
+    // 응답 인터셉터
+    this.axiosInstance.interceptors.response.use(
+      (response) => {
+        return response;
+      },
+      async (error: AxiosError) => {
+        const originalRequest = error.config as InternalAxiosRequestConfig & {
+          _retry?: boolean;
+        };
+
+        // 401 에러 핸들링 (토큰 갱신)
+        if (error.response?.status === 401 && !originalRequest._retry) {
+          originalRequest._retry = true;
+
+          if (this.isRefreshing) {
+            return new Promise((resolve) => {
+              this.refreshSubscribers.push((token: string) => {
+                if (originalRequest.headers) {
+                  originalRequest.headers.Authorization = `Bearer ${token}`;
+                }
+                resolve(this.axiosInstance(originalRequest));
+              });
+            });
+          }
+
+          this.isRefreshing = true;
+
+          try {
+            const csrfToken = await this.refreshCsrfToken();
+            const accessToken = await this.refreshAccessToken();
+            this.onRefreshed(accessToken);
+
+            if (originalRequest.headers) {
+              originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+              if (
+                originalRequest.method &&
+                !["get", "head", "options"].includes(
+                  originalRequest.method.toLowerCase()
+                )
+              ) {
+                originalRequest.headers["X-CSRF-Token"] = csrfToken;
+              }
+            }
+
+            return this.axiosInstance(originalRequest);
+          } catch (refreshError) {
+            this.clearTokens();
+            return Promise.reject(refreshError);
+          } finally {
+            this.isRefreshing = false;
+            this.refreshSubscribers = [];
+          }
+        }
+
+        // 403 에러 핸들링 (CSRF 토큰 또는 권한 오류)
+        if (error.response?.status === 403 && !originalRequest._retry) {
+          originalRequest._retry = true;
+
+          if (this.isRefreshing) {
+            return new Promise((resolve) => {
+              this.refreshSubscribers.push((token: string) => {
+                if (originalRequest.headers) {
+                  originalRequest.headers.Authorization = `Bearer ${token}`;
+                }
+                resolve(this.axiosInstance(originalRequest));
+              });
+            });
+          }
+
+          this.isRefreshing = true;
+
+          try {
+            // CSRF 토큰 갱신
+            const csrfToken = await this.refreshCsrfToken();
+            // Access Token 갱신
+            const accessToken = await this.refreshAccessToken();
+            this.onRefreshed(accessToken);
+
+            if (originalRequest.headers) {
+              originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+              if (
+                originalRequest.method &&
+                !["get", "head", "options"].includes(
+                  originalRequest.method.toLowerCase()
+                )
+              ) {
+                originalRequest.headers["X-CSRF-Token"] = csrfToken;
+              }
+            }
+
+            return this.axiosInstance(originalRequest);
+          } catch (refreshError) {
+            this.clearTokens();
+            return Promise.reject(refreshError);
+          } finally {
+            this.isRefreshing = false;
+            this.refreshSubscribers = [];
+          }
+        }
+
+        return Promise.reject(error);
+      }
+    );
+  }
+
+  /**
+   * 토큰 갱신 후 대기 중인 요청들 실행
+   * @param token 새로운 Access Token
+   */
+  private onRefreshed(token: string) {
+    this.refreshSubscribers.forEach((callback) => callback(token));
+  }
+
+  /**
+   * CSRF Token 갱신 요청
+   * @returns 새로운 CSRF Token
+   */
+  private async refreshCsrfToken(): Promise<string> {
+    const response = await axios.post(
+      `${SERVER_HOST}/api/auth/csrf`,
+      {},
+      {
+        withCredentials: true,
+        headers: this.csrfToken ? { "X-CSRF-Token": this.csrfToken } : {},
+      }
+    );
+
+    const csrfToken = response.data.csrfToken;
+    this.setCsrfToken(csrfToken);
+    return csrfToken;
+  }
+
+  /**
+   * Access Token 갱신 요청
+   * @returns 새로운 Access Token
+   */
+  private async refreshAccessToken(): Promise<string> {
+    const response = await axios.post(
+      `${SERVER_HOST}/api/auth/refresh`,
+      {},
+      {
+        withCredentials: true,
+        headers: this.csrfToken ? { "X-CSRF-Token": this.csrfToken } : {},
+      }
+    );
+
+    const accessToken = response.data.accessToken;
+    this.setAccessToken(accessToken);
+    return accessToken;
+  }
+
+  // 메모리에 토큰 저장
+  public setAccessToken(accessToken: string) {
+    this.accessToken = accessToken;
+    store.set(isAuthenticatedAtom, this.isAuthenticated());
+  }
+
+  public setCsrfToken(csrfToken: string) {
+    this.csrfToken = csrfToken;
+    store.set(isAuthenticatedAtom, this.isAuthenticated());
+  }
+
+  // 메모리에서 토큰 삭제
+  public clearTokens() {
+    this.accessToken = null;
+    this.csrfToken = null;
+    store.set(isAuthenticatedAtom, false);
+  }
+
+  /**
+   * 인증 상태 확인
+   * @returns 인증 여부
+   */
+  public isAuthenticated(): boolean {
+    return !!this.accessToken && !!this.csrfToken;
+  }
+
+  /**
+   * Axios 인스턴스 반환
+   * @returns Axios 인스턴스
+   */
+  public getAxiosInstance(): AxiosInstance {
+    return this.axiosInstance;
+  }
+}
+
+// 싱글톤 ApiClient 인스턴스
+const apiClient = new ApiClient();
+
+export const axiosInstance = apiClient.getAxiosInstance();
+export default apiClient;
