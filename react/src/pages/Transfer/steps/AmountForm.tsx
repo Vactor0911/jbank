@@ -67,7 +67,7 @@ const AmountForm = () => {
 
       setAmount(rawValue + " 크레딧");
     },
-    [getRawAmount]
+    [getRawAmount],
   );
 
   // 다음 단계로 이동 핸들러
@@ -137,7 +137,7 @@ const AmountForm = () => {
               fontWeight: "bold",
             }}
           >
-            {formatNumberString(accountData[0].credit)}
+            {formatNumberString(accountData[0]?.credit ?? 0)}
           </span>{" "}
           크레딧
         </Typography>
