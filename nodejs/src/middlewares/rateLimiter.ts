@@ -5,6 +5,6 @@ import { createRateLimiter } from "../config/rateLimiter";
 export const limiter = createRateLimiter({
   prefix: "rateLimiter:ip:",
   windowMs: 60 * 1000, // 1분
-  max: 100, // 100회
+  max: 300,
   keyGenerator: (req: Request): string => req.ip || "unknown",
 });
