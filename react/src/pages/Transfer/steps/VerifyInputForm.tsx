@@ -1,11 +1,12 @@
 import { Button, IconButton, Stack, Typography, useTheme } from "@mui/material";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
-import { useAtom } from "jotai";
-import { transferDataAtom } from "../../../states/transfer";
+import { useAtom, useSetAtom } from "jotai";
+import { transferDataAtom, transferStepAtom } from "../../../states/transfer";
 
 const VerifyInputForm = () => {
   const theme = useTheme();
 
+  const setTransferStep = useSetAtom(transferStepAtom);
   const [transferData, setTransferData] = useAtom(transferDataAtom);
 
   return (
@@ -17,12 +18,7 @@ const VerifyInputForm = () => {
           alignSelf: "flex-start",
           transform: "translateX(-10px)",
         }}
-        onClick={() =>
-          setTransferData((prev) => ({
-            fromAccountNumber: prev.fromAccountNumber,
-            toAccountNumber: prev.toAccountNumber,
-          }))
-        }
+        onClick={() => setTransferStep(1)}
       >
         <ArrowBackRoundedIcon fontSize="large" />
       </IconButton>
@@ -42,7 +38,7 @@ const VerifyInputForm = () => {
               color: theme.palette.primary.main,
             }}
           >
-            홍길동
+            {transferData.receiverAccountHolder}
           </span>
           님에게
         </Typography>
@@ -64,7 +60,7 @@ const VerifyInputForm = () => {
             출금 계좌
           </Typography>
           <Typography variant="body1">
-            Jbank {transferData.fromAccountNumber}
+            Jbank {transferData.senderAccountNumber}
           </Typography>
         </Stack>
 
@@ -78,7 +74,7 @@ const VerifyInputForm = () => {
             입금 계좌
           </Typography>
           <Typography variant="body1">
-            Jbank {transferData.toAccountNumber}
+            Jbank {transferData.receiverAccountNumber}
           </Typography>
         </Stack>
       </Stack>
@@ -92,12 +88,13 @@ const VerifyInputForm = () => {
           p: 1.5,
           borderRadius: 3,
         }}
-        onClick={() =>
+        onClick={() => {
           setTransferData((prev) => ({
             ...prev,
             inputVerified: true,
-          }))
-        }
+          }));
+          setTransferStep(3);
+        }}
       >
         <Typography variant="h6" fontWeight={500}>
           보내기

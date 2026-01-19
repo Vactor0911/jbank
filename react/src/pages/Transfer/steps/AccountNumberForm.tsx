@@ -14,17 +14,26 @@ import ResponsiveTextField from "../../../components/ResponsiveTextField";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import { useNavigate } from "react-router";
-import { useSetAtom } from "jotai";
-import { transferDataAtom } from "../../../states/transfer";
+import { useAtomValue, useSetAtom } from "jotai";
+import { transferDataAtom, transferStepAtom } from "../../../states/transfer";
 import { isAccountNumberValid } from "../../../utils";
 import JbankIcon from "../../../assets/logo/icon.svg?react";
+import UserService from "../../../services/userService";
+import AccountService from "../../../services/accountService";
+import { accountDataAtom } from "../../../states/account";
+import { enqueueSnackbar } from "notistack";
 
 const AccountNumberForm = () => {
   const navigate = useNavigate();
 
   const [accountNumber, setAccountNumber] = useState("");
+  const setTransferStep = useSetAtom(transferStepAtom);
   const setTransferData = useSetAtom(transferDataAtom);
+  const accountData = useAtomValue(accountDataAtom);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const [recentAccountData, setRecentAccountData] = useState<
+    { accountNumber: string; userName: string | null }[]
+  >([]);
 
   // 계좌번호 입력 핸들러
   const handleAccountNumberChange = useCallback(
@@ -59,18 +68,60 @@ const AccountNumberForm = () => {
     []
   );
 
+  // 계좌번호로 예금주 조회
+  const handleFetchAccountHolder = useCallback(async () => {
+    if (!accountNumber) {
+      return;
+    }
+
+    try {
+      const user = await UserService.getUserByAccountNumber(accountNumber);
+      const accountHolder = user.steamName;
+      return accountHolder;
+    } catch {
+      throw new Error("해당 계좌를 사용하는 사용자를 찾을 수 없습니다.");
+    }
+  }, [accountNumber]);
+
   // 다음 단계로 이동 핸들러
-  const handleNext = useCallback(() => {
+  const handleNext = useCallback(async () => {
     // 계좌번호 유효성 검증
     if (!isAccountNumberValid(accountNumber)) {
       return;
     }
 
-    setTransferData((prev) => ({
-      ...prev,
-      toAccountNumber: accountNumber,
-    }));
-  }, [accountNumber, setTransferData]);
+    try {
+      // 예금주 조회
+      const accountHolder = await handleFetchAccountHolder();
+      if (!accountHolder) {
+        throw new Error("예금주 조회 실패");
+      }
+
+      // 계좌 정보 최신화
+      await AccountService.fetchAccounts();
+      if (accountNumber === accountData[0].accountNumber) {
+        throw new Error("본인 계좌로는 송금할 수 없습니다.");
+      }
+
+      // 송금 데이터에 계좌번호 저장
+      setTransferData({
+        receiverAccountNumber: accountNumber,
+        receiverAccountHolder: accountHolder,
+      });
+
+      // 다음 단계로 이동
+      setTransferStep(1);
+    } catch {
+      enqueueSnackbar("계좌를 찾지 못했어요.", { variant: "error" });
+      return;
+    }
+  }, [
+    accountData,
+    accountNumber,
+    handleFetchAccountHolder,
+    setTransferData,
+    setTransferStep,
+  ]);
 
   // Slide가 나타날 때 스크롤
   useEffect(() => {
@@ -83,6 +134,50 @@ const AccountNumberForm = () => {
       }, 0);
     }
   }, [accountNumber]);
+
+  // 최근 거래 계좌 조회
+  useEffect(() => {
+    const fetchRecentAccounts = async () => {
+      try {
+        const accountNumber = accountData[0]?.accountNumber;
+        if (!accountNumber) {
+          return;
+        }
+        const recentAccounts =
+          await AccountService.fetchRecentAccountNumbers(accountNumber);
+
+        setRecentAccountData(
+          recentAccounts.map((account) => ({
+            accountNumber: account.accountNumber,
+            userName: account.userName || null,
+          }))
+        );
+      } catch {
+        //
+      }
+    };
+
+    fetchRecentAccounts();
+  }, [accountData]);
+
+  // 최근 거래 계좌 클릭 핸들러
+  const handleRecentAccountClick = useCallback(
+    (recentAccount: { accountNumber: string; userName: string | null }) => {
+      if (!recentAccount.userName) {
+        return;
+      }
+
+      // 송금 데이터에 계좌번호 저장
+      setTransferData({
+        receiverAccountNumber: recentAccount.accountNumber,
+        receiverAccountHolder: recentAccount.userName,
+      });
+
+      // 다음 단계로 이동
+      setTransferStep(1);
+    },
+    [setTransferData, setTransferStep]
+  );
 
   return (
     <Stack gap={5} flex={1}>
@@ -154,7 +249,7 @@ const AccountNumberForm = () => {
             overflow="auto"
           >
             <Stack>
-              {Array.from({ length: 10 }).map((_, index) => (
+              {recentAccountData.map((recentAccount, index) => (
                 <ButtonBase
                   key={`recent-send-account-${index}`}
                   disabled={accountNumber.length > 0}
@@ -164,6 +259,7 @@ const AccountNumberForm = () => {
                     overflow: "hidden",
                     p: 1,
                   }}
+                  onClick={() => handleRecentAccountClick(recentAccount)}
                 >
                   <Stack
                     width="100%"
@@ -184,7 +280,7 @@ const AccountNumberForm = () => {
                     <Stack flex={1}>
                       {/* 계좌명 */}
                       <Typography variant="body1" fontWeight="bold">
-                        Jbank 계좌
+                        {recentAccount.userName || "알 수 없음"}
                       </Typography>
 
                       {/* 계좌번호 */}
@@ -193,7 +289,7 @@ const AccountNumberForm = () => {
                         fontWeight={500}
                         color="text.secondary"
                       >
-                        Jbank 1234-5678
+                        Jbank {recentAccount.accountNumber}
                       </Typography>
                     </Stack>
                   </Stack>

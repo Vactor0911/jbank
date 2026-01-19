@@ -13,6 +13,7 @@ export default defineConfig({
     }),
     svgr(),
   ],
+  base: "/jbank",
   server: {
     allowedHosts: ["0.tcp.jp.ngrok.io"],
   },

@@ -5,10 +5,12 @@ import DarkModeRoundedIcon from "@mui/icons-material/DarkModeRounded";
 import LanguageRoundedIcon from "@mui/icons-material/LanguageRounded";
 import { useAtomValue } from "jotai";
 import { isScrollOnTopAtom } from "../states";
+import useThemeMode from "../hooks/theme";
 
 const Header = () => {
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === "dark";
+  const { toggleThemeMode } = useThemeMode();
 
   // 스크롤이 최상단에 있는지 여부
   const isScrollOnTop = useAtomValue(isScrollOnTopAtom);
@@ -28,7 +30,6 @@ const Header = () => {
       position="fixed"
       top={0}
       right={0}
-      bgcolor="#F6F7F9"
       zIndex={1000}
       borderBottom={`1px solid ${theme.palette.divider}`}
       borderColor={isScrollOnTop ? "transparent" : theme.palette.divider}
@@ -46,7 +47,7 @@ const Header = () => {
       </IconButton>
 
       {/* 테마 변경 버튼 */}
-      <IconButton>
+      <IconButton onClick={() => toggleThemeMode()}>
         {isDarkMode ? (
           <DarkModeRoundedIcon
             sx={{

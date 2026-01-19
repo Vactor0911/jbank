@@ -7,9 +7,38 @@ import {
   useTheme,
 } from "@mui/material";
 import BuyMeACoffee from "../assets/buy-me-a-coffee.webp";
+import { useNavigate } from "react-router";
+import { useCallback } from "react";
+import AuthService from "../services/authService";
+import { useAtomValue } from "jotai";
+import { isAuthenticatedAtom } from "../states";
 
 const Footer = () => {
   const theme = useTheme();
+  const navigate = useNavigate();
+
+  const isAuthenticated = useAtomValue(isAuthenticatedAtom);
+
+  // 로그인 클릭 핸들러
+  const handleLoginClick = useCallback(() => {
+    navigate("/login");
+  }, [navigate]);
+
+  // 로그아웃 클릭 핸들러
+  const handleLogoutClick = useCallback(() => {
+    AuthService.logout();
+    navigate("/");
+  }, [navigate]);
+
+  // 개발자에게 커피 사주기 버튼 클릭 핸들러
+  const handleBuyMeACoffeeClick = useCallback(() => {
+    window.open("https://buymeacoffee.com/vactor0911", "_blank");
+  }, []);
+
+  // 의견 보내기 버튼 클릭 핸들러
+  const handleSendFeedbackClick = useCallback(() => {
+    window.open("https://forms.gle/pWhCPMB2QhpF3oAX8", "_blank");
+  }, []);
 
   return (
     <Stack gap={3} mt={3}>
@@ -19,6 +48,7 @@ const Footer = () => {
           borderRadius: 2,
           overflow: "hidden",
         }}
+        onClick={handleBuyMeACoffeeClick}
       >
         <Stack
           direction="row"
@@ -39,7 +69,13 @@ const Footer = () => {
           />
 
           {/* 텍스트 */}
-          <Typography variant="body1" fontWeight="bold">
+          <Typography
+            variant="body1"
+            fontWeight="bold"
+            sx={{
+              color: "#222222",
+            }}
+          >
             개발자에게 커피 사주기
           </Typography>
         </Stack>
@@ -58,22 +94,38 @@ const Footer = () => {
         p={1}
         borderRadius={2}
       >
-        <ButtonBase
-          sx={{
-            flex: 1,
-            borderRadius: 1.5,
-          }}
-        >
-          <Typography variant="body1" textAlign="center" color="text.primary">
-            로그아웃
-          </Typography>
-        </ButtonBase>
+        {isAuthenticated ? (
+          <ButtonBase
+            sx={{
+              flex: 1,
+              borderRadius: 1.5,
+            }}
+            onClick={handleLogoutClick}
+          >
+            <Typography variant="body1" textAlign="center" color="text.primary">
+              로그아웃
+            </Typography>
+          </ButtonBase>
+        ) : (
+          <ButtonBase
+            sx={{
+              flex: 1,
+              borderRadius: 1.5,
+            }}
+            onClick={handleLoginClick}
+          >
+            <Typography variant="body1" textAlign="center" color="text.primary">
+              로그인
+            </Typography>
+          </ButtonBase>
+        )}
 
         <ButtonBase
           sx={{
             flex: 1,
             borderRadius: 1.5,
           }}
+          onClick={handleSendFeedbackClick}
         >
           <Typography
             variant="body1"

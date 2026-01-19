@@ -1,9 +1,10 @@
 import { useSetAtom } from "jotai";
 import { useCallback } from "react";
 import {
-  isTransferLoadingAtom,
   isTransferSuccessAtom,
   transferDataAtom,
+  transferErrorMessageAtom,
+  transferStepAtom,
 } from "../states/transfer";
 
 /**
@@ -11,17 +12,24 @@ import {
  */
 export const useTransfer = () => {
   const setTransferData = useSetAtom(transferDataAtom);
-  const setIsTransferLoading = useSetAtom(isTransferLoadingAtom);
+  const setTransferStep = useSetAtom(transferStepAtom);
   const setIsTransferSuccess = useSetAtom(isTransferSuccessAtom);
+  const setTransferErrorMessage = useSetAtom(transferErrorMessageAtom);
 
   /**
    * 송금 상태 초기화
    */
   const resetTransferData = useCallback(() => {
-    setTransferData({ fromAccountNumber: "1234-5678" });
-    setIsTransferLoading(false);
+    setTransferData({});
+    setTransferStep(0);
     setIsTransferSuccess(null);
-  }, [setIsTransferLoading, setIsTransferSuccess, setTransferData]);
+    setTransferErrorMessage("");
+  }, [
+    setTransferData,
+    setTransferStep,
+    setIsTransferSuccess,
+    setTransferErrorMessage,
+  ]);
 
   return { resetTransferData };
 };

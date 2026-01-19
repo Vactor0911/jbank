@@ -1,11 +1,34 @@
-import { Pool, PoolConnection } from "mariadb/*";
+import { Pool, PoolConnection } from "mysql2/promise";
+import { UserData } from "../types";
 
-class UserModel {
+export class UserModel {
+  id: string;
+  uuid: string;
+  steamId: string;
+  steamName: string;
+  avatar: string;
+  status: "active" | "deleted" | "banned";
+  createdAt: Date;
+  lastLogin: Date;
+  lastProfileRefresh: Date;
+
+  constructor(data: any) {
+    this.id = data.id || "";
+    this.uuid = data.uuid;
+    this.steamId = data.steamId;
+    this.steamName = data.steamName;
+    this.avatar = data.avatar;
+    this.status = data.status;
+    this.createdAt = data.createdAt || new Date();
+    this.lastLogin = data.lastLogin || new Date();
+    this.lastProfileRefresh = data.lastProfileRefresh || new Date();
+  }
+
   /**
    * 사용자 id로 사용자 조회
    * @param userId 사용자 id
-   * @param connection 데이터베이스 연결 객체
-   * @returns 사용자 정보
+   * @param connection MariaDB 연결 객체
+   * @returns 사용자 객체 또는 null
    */
   static async findById(userId: string, connection: PoolConnection | Pool) {
     const [user] = await connection.execute(
@@ -17,14 +40,19 @@ class UserModel {
       [userId]
     );
 
-    return user;
+    if (!(user as any[])[0]) {
+      return null;
+    }
+
+    const formattedUser = this.formatUser((user as any[])[0]);
+    return formattedUser;
   }
 
   /**
    * 사용자 uuid로 사용자 조회
    * @param userUuid 사용자 uuid
-   * @param connection 데이터베이스 연결 객체
-   * @returns 사용자 정보
+   * @param connection MariaDB 연결 객체
+   * @returns 사용자 객체 또는 null
    */
   static async findByUuid(userUuid: string, connection: PoolConnection | Pool) {
     const [user] = await connection.execute(
@@ -36,19 +64,24 @@ class UserModel {
       [userUuid]
     );
 
-    return user;
+    if (!(user as any[])[0]) {
+      return null;
+    }
+
+    const formattedUser = this.formatUser((user as any[])[0]);
+    return formattedUser;
   }
 
   /**
-   * 스팀 고유번호로 사용자 조회
-   * @param steamId 스팀 고유번호 (SteamID64)
-   * @param connection 데이터베이스 연결 객체
-   * @returns 사용자 정보
+   * Steam ID로 사용자 조회
+   * @param steamId 사용자 Steam ID
+   * @param connection MariaDB 연결 객체
+   * @returns 사용자 객체 또는 null
    */
   static async findBySteamId(
     steamId: string,
     connection: PoolConnection | Pool
-  ) {
+  ): Promise<UserModel | null> {
     const [user] = await connection.execute(
       `
         SELECT *
@@ -58,100 +91,173 @@ class UserModel {
       [steamId]
     );
 
-    return user;
+    if (!(user as any[])[0]) {
+      return null;
+    }
+
+    const formattedUser = this.formatUser((user as any[])[0]);
+    return formattedUser;
   }
 
   /**
-   * 사용자명으로 사용자 조회
-   * @param name 사용자명
-   * @param connection 데이터베이스 연결 객체
-   * @returns 사용자 정보 목록
+   * 계좌번호로 사용자 조회
+   * @param accountNumber 계좌번호
+   * @param connection MariaDB 연결 객체
+   * @returns 사용자 객체 또는 null
    */
-  static async findByName(name: string, connection: PoolConnection | Pool) {
-    const users = await connection.execute(
+  static async findByAccountNumber(
+    accountNumber: string,
+    connection: PoolConnection | Pool
+  ): Promise<UserModel | null> {
+    const [user] = await connection.execute(
       `
-        SELECT *
-        FROM user
-        WHERE name = ?
+        SELECT u.*
+        FROM user u
+        JOIN account a ON u.user_id = a.user_id
+        WHERE a.account_number = ?
       `,
-      [name]
+      [accountNumber]
     );
 
-    return users;
+    if (!(user as any[])[0]) {
+      return null;
+    }
+
+    const formattedUser = this.formatUser((user as any[])[0]);
+    return formattedUser;
   }
 
   /**
    * 사용자 생성
-   * @param uuid 사용자 uuid
-   * @param steamId 스팀 고유번호 (SteamID64)
-   * @param name 사용자명
-   * @param connection 데이터베이스 연결 객체
-   * @returns 생성 결과
+   * @param userData 사용자 데이터
+   * @param connection MariaDB 연결 객체
+   * @returns 사용자 모델 객체
    */
   static async create(
-    uuid: string,
-    steamId: string,
-    name: string,
+    userData: UserData,
+    connection: PoolConnection | Pool
+  ): Promise<UserModel> {
+    await connection.execute(
+      `
+        INSERT INTO user (user_uuid, steam_id, steam_name, avatar) 
+        VALUES (?, ?, ?, ?)
+      `,
+      [userData.uuid, userData.steamId, userData.steamName, userData.avatar]
+    );
+
+    return new UserModel(userData);
+  }
+
+  /**
+   * 사용자 스팀 정보 업데이트
+   * @param userId 사용자 id
+   * @param steamName 스팀 이름
+   * @param avatar 아바타 URL
+   * @param connection MariaDB 연결 객체
+   * @returns
+   */
+  static async updateSteamInfo(
+    userId: string,
+    steamName: string,
+    avatar: string,
     connection: PoolConnection | Pool
   ) {
     const result = await connection.execute(
       `
-        INSERT INTO user (user_uuid, steam_id, name)
-        VALUES (?, ?, ?)
+        UPDATE user
+        SET steam_name = ?, avatar = ?, last_profile_refresh_at = NOW()
+        WHERE user_id = ?
       `,
-      [uuid, steamId, name]
+      [steamName, avatar, userId]
     );
 
     return result;
   }
 
   /**
-   * 사용자 상태 업데이트
+   * 사용자 삭제 (회원 탈퇴)
    * @param userId 사용자 id
-   * @param status 사용자 상태 ("active" | "disabled" | "banned")
-   * @param connection 데이터베이스 연결 객체
-   * @returns 업데이트 결과
+   * @param connection MariaDB 연결 객체
+   * @returns 삭제 결과
    */
-  static async updateStatus(
-    userId: string,
-    status: "active" | "disabled" | "banned",
-    connection: PoolConnection | Pool
-  ) {
+  static async deleteById(userId: string, connection: PoolConnection | Pool) {
     const result = await connection.execute(
       `
         UPDATE user
-        SET status = ?
+        SET status = 'deleted'
         WHERE user_id = ?
       `,
-      [status, userId]
+      [userId]
     );
 
     return result;
   }
 
   /**
-   * 사용자명 업데이트
+   * 마지막 로그인 시간 업데이트
    * @param userId 사용자 id
-   * @param name 새 사용자명
-   * @param connection 데이터베이스 연결 객체
-   * @returns 업데이트 결과
+   * @param connection MariaDB 연결 객체
+   * @return 업데이트 결과
    */
-  static async updateName(
+  static async stampLastLogin(
     userId: string,
-    name: string,
     connection: PoolConnection | Pool
   ) {
     const result = await connection.execute(
       `
         UPDATE user
-        SET name = ?
+        SET last_login_at = NOW()
         WHERE user_id = ?
       `,
-      [name, userId]
+      [userId]
     );
 
     return result;
+  }
+
+  /**
+   * 사용자 id로 사용자 상태 조회
+   * @param userId 사용자 id
+   * @param connection MariaDB 연결 객체
+   * @returns 사용자 상태
+   */
+  static async getStatusById(
+    userId: string,
+    connection: PoolConnection | Pool
+  ) {
+    const [result] = await connection.execute(
+      `
+        SELECT status
+        FROM user
+        WHERE user_id = ?
+      `,
+      [userId]
+    );
+
+    return (result as any).status;
+  }
+
+  /**
+   * 사용자 데이터 객체 포맷팅
+   * @param data DB 쿼리 결과
+   * @returns 사용자 객체
+   */
+  private static formatUser(data: any) {
+    if (!data) {
+      return null;
+    }
+
+    const user = new UserModel({
+      id: String(data.user_id),
+      uuid: data.user_uuid,
+      steamId: data.steam_id,
+      steamName: data.steam_name,
+      avatar: data.avatar,
+      status: data.status,
+      createdAt: data.created_at,
+      lastLogin: data.last_login_at,
+      lastProfileRefresh: data.last_profile_refresh_at,
+    });
+    return user;
   }
 }
-
-export default UserModel;

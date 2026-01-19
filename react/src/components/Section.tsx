@@ -1,7 +1,7 @@
 import { Paper, Stack, Typography, type PaperProps } from "@mui/material";
 import type { ReactNode } from "react";
 
-interface SectionProps extends PaperProps {
+export interface SectionProps extends PaperProps {
   label: ReactNode;
   dense?: boolean;
 }

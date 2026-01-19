@@ -2,23 +2,27 @@ import {
   Box,
   Button,
   IconButton,
+  Skeleton,
   Slide,
   Stack,
   Typography,
   useTheme,
 } from "@mui/material";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
-import { useAtom } from "jotai";
-import { transferDataAtom } from "../../../states/transfer";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { transferDataAtom, transferStepAtom } from "../../../states/transfer";
 import ResponsiveTextField from "../../../components/ResponsiveTextField";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { formatNumberKor } from "../../../utils";
+import { formatNumberKor, formatNumberString } from "../../../utils";
+import { accountDataAtom } from "../../../states/account";
 
 const AmountForm = () => {
   const theme = useTheme();
 
+  const setTransferStep = useSetAtom(transferStepAtom);
   const [transferData, setTransferData] = useAtom(transferDataAtom);
   const [amount, setAmount] = useState("");
+  const accountData = useAtomValue(accountDataAtom);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   // 송금액 추출
@@ -63,16 +67,27 @@ const AmountForm = () => {
 
       setAmount(rawValue + " 크레딧");
     },
-    [getRawAmount]
+    [getRawAmount],
   );
 
   // 다음 단계로 이동 핸들러
   const handleNext = useCallback(() => {
+    // 송금액 검증
+    const rawAmount = Number(getRawAmount(amount));
+    if (rawAmount <= 0 || rawAmount > 100000000) {
+      return;
+    }
+
+    // 상태 업데이트
     setTransferData((prev) => ({
       ...prev,
-      amount: Number(getRawAmount(amount)),
+      senderAccountNumber: accountData[0].accountNumber,
+      amount: rawAmount,
     }));
-  }, [setTransferData, getRawAmount, amount]);
+
+    // 다음 단계로 이동
+    setTransferStep(2);
+  }, [accountData, amount, getRawAmount, setTransferData, setTransferStep]);
 
   // Slide가 나타날 때 스크롤
   useEffect(() => {
@@ -93,11 +108,7 @@ const AmountForm = () => {
           alignSelf: "flex-start",
           transform: "translateX(-10px)",
         }}
-        onClick={() =>
-          setTransferData((prev) => ({
-            fromAccountNumber: prev.fromAccountNumber,
-          }))
-        }
+        onClick={() => setTransferStep(0)}
       >
         <ArrowBackRoundedIcon fontSize="large" />
       </IconButton>
@@ -126,7 +137,7 @@ const AmountForm = () => {
               fontWeight: "bold",
             }}
           >
-            123,456
+            {formatNumberString(accountData[0]?.credit ?? 0)}
           </span>{" "}
           크레딧
         </Typography>
@@ -135,8 +146,12 @@ const AmountForm = () => {
       {/* 받는 계좌 */}
       <Stack>
         {/* 입금주 */}
-        <Typography variant="h5">
-          홍길동
+        <Typography variant="h5" display="flex" gap={0.5}>
+          {transferData.receiverAccountHolder ? (
+            transferData.receiverAccountHolder
+          ) : (
+            <Skeleton variant="rounded" width="120px" />
+          )}
           <span
             css={{
               color: theme.palette.text.secondary,
@@ -149,7 +164,7 @@ const AmountForm = () => {
 
         {/* 계좌 번호 */}
         <Typography variant="body1">
-          Jbank {transferData.toAccountNumber}
+          Jbank {transferData.receiverAccountNumber}
         </Typography>
       </Stack>
 

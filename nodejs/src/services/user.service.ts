@@ -1,113 +1,38 @@
-import { v4 as uuidv4 } from "uuid";
-import TransactionHandler from "../utils/transactionHandler";
-import { dbPool } from "../config/db";
-import UserModel from "../models/user.model";
-import { ConflictError, NotFoundError } from "../errors/CustomErrors";
+import { mariaDB } from "../config/mariadb";
+import { NotFoundError } from "../errors/CustomErrors";
 import AccountModel from "../models/account.model";
-import { fetchSteamUserName, generateAccountNumber } from "../utils";
-import bcrypt from "bcrypt";
+import { UserModel } from "../models/user.model";
+import { fetchSteamProfile } from "../utils/steam";
+import TransactionHandler from "../utils/transactionHandler";
 
-class UserService {
+export class UserService {
   /**
-   * 사용자 생성
-   * @param steamId 스팀 고유번호 (SteamID64)
-   * @param password 4자리 숫자 비밀번호
-   * @returns 생성된 사용자 uuid
+   * 사용자 본인 정보 조회
+   * @param userId 사용자 id
+   * @returns 사용자 정보
    */
-  static async createUser(steamId: string, password: string) {
-    const userUuid = await TransactionHandler.executeInTransaction(
-      dbPool,
-      async (connection) => {
-        // 스팀 고유번호 중복 확인
-        const existingUser = await UserModel.findBySteamId(steamId, connection);
-        if (existingUser) {
-          throw new ConflictError("이미 존재하는 스팀 고유번호입니다.");
-        }
-
-        // 스팀 고유번호로 사용자명 조회
-        let steamUserName = await fetchSteamUserName(steamId);
-
-        // 사용자명 길이 제한 (최대 20자)
-        if (steamUserName.length > 20) {
-          steamUserName = steamUserName.slice(0, 20);
-        }
-
-        // 사용자 생성
-        const userUuid = uuidv4();
-        const result = await UserModel.create(
-          userUuid,
-          steamId,
-          steamUserName,
-          connection
-        );
-
-        // 계좌 개설
-        const accountUuid = uuidv4();
-        const userId = result.insertId;
-        const accountNumber = generateAccountNumber(userUuid);
-        const hashedPassword = await bcrypt.hash(password, 10);
-        await AccountModel.create(
-          accountUuid,
-          userId,
-          accountNumber,
-          hashedPassword,
-          connection
-        );
-
-        // 생성된 사용자 uuid 반환
-        return userUuid;
-      }
-    );
-
-    // 결과 반환
-    return userUuid;
-  }
-
-  /**
-   * 검색 키워드로 사용자 검색
-   * @param keyword 검색 키워드 (사용자명 또는 SteamID64)
-   * @returns 검색된 사용자 목록
-   */
-  static async searchUsers(keyword: string) {
-    // 사용자명으로 사용자 조회
-    const usersWithName = await UserModel.findByName(keyword, dbPool);
-
-    // SteamID64로 사용자 조회
-    const usersWithSteamId = await UserModel.findBySteamId(keyword, dbPool);
-
-    // 결과 병합
-    const normalizeToArray = (data: any) =>
-      Array.isArray(data) ? data : data ? [data] : [];
-
-    const searchResults = [
-      ...normalizeToArray(usersWithName),
-      ...normalizeToArray(usersWithSteamId),
-    ];
-
-    const userMap = new Map(
-      searchResults.map((user) => [user.user_id, this.formatUser(user)])
-    );
-
-    const users = Array.from(userMap.values());
-    if (users.length === 0) {
-      throw new NotFoundError("검색된 사용자가 없습니다.");
+  static async getMe(userId: string) {
+    // 사용자 조회
+    const user = await UserModel.findById(userId, mariaDB);
+    if (!user) {
+      throw new NotFoundError("사용자를 찾을 수 없습니다.");
     }
 
-    // 결과 반환
-    return users;
+    // id 필드 제거
+    delete (user as any).id;
+
+    // 사용자 정보 반환
+    return user;
   }
 
   /**
-   * 사용자 상태 업데이트
-   * @param userId 사용자 ID
-   * @param status 업데이트할 상태 (active, disabled, banned)
+   * 사용자 본인 정보 새로고침
+   * @param userId 사용자 id
+   * @returns 새로고침된 스팀 프로필
    */
-  static async updateUserStatus(
-    userId: string,
-    status: "active" | "disabled" | "banned"
-  ) {
-    const result = await TransactionHandler.executeInTransaction(
-      dbPool,
+  static async refreshMe(userId: string) {
+    const steamProfile = await TransactionHandler.executeInTransaction(
+      mariaDB,
       async (connection) => {
         // 사용자 조회
         const user = await UserModel.findById(userId, connection);
@@ -115,67 +40,120 @@ class UserService {
           throw new NotFoundError("사용자를 찾을 수 없습니다.");
         }
 
-        // 사용자 상태 업데이트
-        const result = await UserModel.updateStatus(userId, status, connection);
+        // 사용자 정보 새로고침
+        const steamProfile = await fetchSteamProfile(user.steamId);
+        if (!steamProfile) {
+          throw new NotFoundError("스팀 프로필을 찾을 수 없습니다.");
+        }
 
-        // 업데이트 결과 반환
-        return result;
+        // 사용자 정보 업데이트
+        await UserModel.updateSteamInfo(
+          userId,
+          steamProfile.steamID,
+          steamProfile.avatarFull,
+          connection
+        );
+
+        return steamProfile;
       }
     );
-
-    // 결과 반환
-    return result;
+    return steamProfile;
   }
 
   /**
-   * 사용자 사용자명 재설정
-   * @param steamId 스팀 고유번호 (SteamID64)
+   * 로그인 시 자동 프로필 새로고침 (마지막 새로고침이 1일 이상 경과한 경우)
+   * @param userId 사용자 id
+   * @returns 새로고침된 스팀 프로필 또는 null
    */
-  static async refreshUserName(steamId: string) {
-    const newUserName = await TransactionHandler.executeInTransaction(
-      dbPool,
+  static async autoRefreshProfile(userId: string) {
+    const steamProfile = await TransactionHandler.executeInTransaction(
+      mariaDB,
       async (connection) => {
         // 사용자 조회
-        const user = await UserModel.findBySteamId(steamId, connection);
+        const user = await UserModel.findById(userId, connection);
         if (!user) {
           throw new NotFoundError("사용자를 찾을 수 없습니다.");
         }
 
-        // 스팀 고유번호로 사용자명 조회
-        let newUserName = await fetchSteamUserName(steamId);
-
-        // 사용자명 길이 제한 (최대 20자)
-        if (newUserName.length > 20) {
-          newUserName = newUserName.slice(0, 20);
+        // 마지막 프로필 새로고침 일자 확인
+        const lastProfileRefresh = user.lastProfileRefresh;
+        const now = new Date();
+        const diffInHours =
+          (now.getTime() - lastProfileRefresh.getTime()) / (1000 * 60 * 60);
+        if (diffInHours < 24) {
+          // 1일 이내에 새로고침한 경우, 새로고침하지 않음
+          return null;
         }
 
-        // 사용자명 업데이트
-        await UserModel.updateName(user.user_id, newUserName, connection);
+        // 사용자 정보 새로고침
+        const steamProfile = await fetchSteamProfile(user.steamId);
+        if (!steamProfile) {
+          throw new NotFoundError("스팀 프로필을 찾을 수 없습니다.");
+        }
 
-        // 새 사용자 이름 반환
-        return newUserName;
+        // 사용자 정보 업데이트
+        await UserModel.updateSteamInfo(
+          userId,
+          steamProfile.steamID,
+          steamProfile.avatarFull,
+          connection
+        );
+
+        return steamProfile;
       }
     );
-
-    // 결과 반환
-    return newUserName;
+    return steamProfile;
   }
 
   /**
-   * 사용자 정보 포맷팅
-   * @param user 사용자 db 쿼리 결과
-   * @returns 포맷팅된 사용자 정보
+   * 사용자 id로 회원 탈퇴 처리
+   * @param userId 사용자 id
+   * @returns 탈퇴 처리 결과
    */
-  private static formatUser(user: any) {
-    return {
-      uuid: user.user_uuid,
-      name: user.name,
-      steamId: user.steam_id,
-      status: user.status,
-      createdAt: user.created_at,
-      updatedAt: user.updated_at,
-    };
+  static async deleteUserAccount(userId: string) {
+    const result = await TransactionHandler.executeInTransaction(
+      mariaDB,
+      async (connection) => {
+        // 사용자 조회
+        const user = await UserModel.findById(userId, connection);
+        if (!user) {
+          throw new NotFoundError("사용자를 찾을 수 없습니다.");
+        }
+
+        // 사용자 삭제
+        const result = await UserModel.deleteById(userId, connection);
+        return result;
+      }
+    );
+    return result;
+  }
+
+  /**
+   * 예금주 조회
+   * @param accountNumber 계좌번호
+   * @returns 예금주 정보
+   */
+  static async getAccountHolder(accountNumber: string) {
+    const account = await AccountModel.findByAccountNumber(
+      accountNumber,
+      mariaDB
+    );
+    if (!account) {
+      throw new NotFoundError("계좌를 찾을 수 없습니다.");
+    }
+
+    const accountHolder = await UserModel.findByAccountNumber(
+      accountNumber,
+      mariaDB
+    );
+    if (!accountHolder) {
+      throw new NotFoundError("해당 계좌번호의 예금주를 찾을 수 없습니다.");
+    }
+
+    // id 필드 제거
+    delete (accountHolder as any).id;
+
+    // 예금주 정보 반환
+    return accountHolder;
   }
 }
-
-export default UserService;

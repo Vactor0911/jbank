@@ -3,10 +3,14 @@ import PriorityHighRoundedIcon from "@mui/icons-material/PriorityHighRounded";
 import { useTransfer } from "../../../hooks/transfer";
 import { useCallback } from "react";
 import Zoom from "../../../components/transitions/Zoom";
+import { useAtomValue } from "jotai";
+import { transferErrorMessageAtom } from "../../../states/transfer";
 
 const TransferFailed = () => {
   const theme = useTheme();
   const { resetTransferData } = useTransfer();
+
+  const transferErrorMessage = useAtomValue(transferErrorMessageAtom);
 
   // 확인 버튼 클릭
   const handleConfirmClick = useCallback(() => {
@@ -37,12 +41,11 @@ const TransferFailed = () => {
         </Zoom>
 
         {/* 송금 실패 문구 */}
-        {/* TODO: 서버측 오류 메시지 표시 */}
         <Stack gap={1} alignItems="center">
           <Typography variant="h5">송금 중에 문제가 발생했어요.</Typography>
 
           <Typography variant="body1" color="text.secondary">
-            나중에 다시 시도해주세요.
+            {transferErrorMessage || "나중에 다시 시도해주세요."}
           </Typography>
         </Stack>
       </Stack>

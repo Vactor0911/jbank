@@ -1,24 +1,38 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
-import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 import { errorHandler } from "./middlewares/errorHandler";
-import { accountRouter, userRouter } from "./routes";
 import bodyParser from "body-parser";
-import transactionRouter from "./routes/transaction.route";
-
-// 환경변수 설정
-dotenv.config();
+import {
+  accountRouter,
+  authRouter,
+  transactionRouter,
+  userRouter,
+} from "./routes";
+import passport from "./config/passport";
+import "dotenv/config";
+import { limiter } from "./middlewares/rateLimiter";
 
 const app = express();
+
 app.use(express.json());
 app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser(process.env.COOKIE_SECRET));
 
 // CORS 설정
 app.use(
   cors({
+    origin: process.env.FRONTEND_URL,
     credentials: true,
-  })
+  }),
 );
+
+// Passport 초기화
+app.use(passport.initialize());
+
+// 전역 Rate Limiter 적용
+app.use("/api", limiter);
 
 // 기본 라우트 설정
 app.get("/", (_req: Request, res: Response) => {
@@ -34,6 +48,7 @@ app.get("/api/health", (_req: Request, res: Response) => {
 });
 
 // 라우트 정의
+app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 app.use("/api/account", accountRouter);
 app.use("/api/transaction", transactionRouter);

@@ -1,37 +1,46 @@
 import { Router } from "express";
-import { validateApiKey } from "../middlewares/authenticate";
-import { validateParams } from "../middlewares/validation";
-import {
-  getAccountBalanceSchema,
-  getAccountTransactionsSchema,
-  searchAccountSchema,
-} from "../schema/account.schema";
+import { authenticateJWT } from "../middlewares/auth";
 import AccountController from "../controllers/account.controller";
+import { csrfProtection } from "../middlewares/csrf";
+import { validateBody, validateParams } from "../middlewares/validation";
+import {
+  createAccountSchema,
+  getAccountSchema,
+  getRecentAccountsSchema,
+} from "../schema/account.schema";
+import { limiter } from "../middlewares/rateLimiter";
 
 const accountRouter = Router();
 
-// 예금 조회
+// 최근 거래 계좌 조회
 accountRouter.get(
-  "/:accountNumber/balance",
-  validateApiKey,
-  validateParams(getAccountBalanceSchema),
-  AccountController.getAccountBalance
+  "/:accountNumber/recent",
+  authenticateJWT,
+  limiter,
+  validateParams(getRecentAccountsSchema),
+  AccountController.getRecentAccounts,
 );
 
-// 계좌 거래 내역 조회
+// 계좌 정보 조회
 accountRouter.get(
-  "/:accountNumber",
-  validateApiKey,
-  validateParams(getAccountTransactionsSchema),
-  AccountController.getAccountTransactions
+  "/:accountUuid",
+  authenticateJWT,
+  limiter,
+  validateParams(getAccountSchema),
+  AccountController.getAccount,
 );
 
-// 계좌 조회
-accountRouter.get(
-  "/:accountNumber",
-  validateApiKey,
-  validateParams(searchAccountSchema),
-  AccountController.searchAccount
+// 계좌 목록 조회
+accountRouter.get("/", authenticateJWT, limiter, AccountController.getAccounts);
+
+// 새 계좌 개설
+accountRouter.post(
+  "/",
+  authenticateJWT,
+  csrfProtection,
+  limiter,
+  validateBody(createAccountSchema),
+  AccountController.createAccount,
 );
 
 export default accountRouter;
