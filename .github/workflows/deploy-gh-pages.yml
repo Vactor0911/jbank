@@ -22,11 +22,11 @@ jobs:
           git config --global user.name "Vactor0911"
 
       - name: Install dependencies
-        working-directory: ./frontend
+        working-directory: ./react
         run: npm install
 
       - name: Build the app
-        working-directory: ./frontend
+        working-directory: ./react
         run: npm run build
 
       - name: Set up GitHub token for authentication
@@ -35,7 +35,7 @@ jobs:
 
       - name: Deploy to GitHub Pages
         run: npm run deploy -- --repo https://github.com/${{ github.repository }}.git
-        working-directory: ./frontend
+        working-directory: ./react
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           VITE_SERVER_HOST: ${{ secrets.VITE_SERVER_HOST }}
