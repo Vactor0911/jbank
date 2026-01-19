@@ -12,12 +12,12 @@ export class AuthModel {
   static async storeRefreshToken(
     userId: string,
     refreshToken: string,
-    connection: Redis
+    connection: Redis,
   ): Promise<string> {
     const result = await connection.setex(
       `refreshToken:${userId}`,
-      parseTimeToSeconds(process.env.JWT_REFRESH_EXPIRES_IN),
-      refreshToken
+      parseTimeToSeconds(process.env.JWT_REFRESH_EXPIRES_IN!),
+      refreshToken,
     );
     return result;
   }
@@ -30,7 +30,7 @@ export class AuthModel {
    */
   static async deleteRefreshToken(
     userId: string,
-    connection: Redis
+    connection: Redis,
   ): Promise<number> {
     const result = await connection.del(`refreshToken:${userId}`);
     return result;
