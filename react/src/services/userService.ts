@@ -1,6 +1,7 @@
 import { getDefaultStore } from "jotai";
 import { axiosInstance } from "./axios";
 import { userDataAtom } from "../states";
+import { enqueueSnackbar } from "notistack";
 
 const store = getDefaultStore();
 
@@ -28,13 +29,26 @@ class UserService {
    * 현재 사용자 스팀 프로필 정보 새로고침 및 저장
    */
   static async refreshMe() {
-    const response = await axiosInstance.patch("/api/user/me/refresh");
-    const { steamName, avatar } = response.data.data.user;
-    const currentUserData = store.get(userDataAtom);
-    if (currentUserData) {
-      store.set(userDataAtom, { ...currentUserData, steamName, avatar });
+    try {
+      const response = await axiosInstance.patch("/api/user/me/refresh");
+      const { steamName, avatar } = response.data.data.user;
+      const currentUserData = store.get(userDataAtom);
+      if (currentUserData) {
+        store.set(userDataAtom, { ...currentUserData, steamName, avatar });
+      }
+
+      if (!response.data.success) {
+        throw new Error("사용자 정보 새로고침에 실패했습니다.");
+      }
+
+      enqueueSnackbar("사용자 정보가 새로고침되었어요.", {
+        variant: "success",
+      });
+      return response.data;
+    } catch (error) {
+      enqueueSnackbar("정보를 불러오지 못했어요.", { variant: "error" });
+      throw error;
     }
-    return response.data;
   }
 
   /**

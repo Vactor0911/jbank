@@ -16,7 +16,7 @@ class TransactionController {
         limit?: number;
       };
 
-      // 계좌 거내 내역 조회
+      // 계좌 거래 내역 조회
       const transactions = await TransactionService.getAccountTransactions(
         userId,
         accountUuid,

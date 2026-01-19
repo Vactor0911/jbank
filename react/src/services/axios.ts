@@ -47,14 +47,9 @@ class ApiClient {
       await this.refreshAccessToken();
       this.isInitialized = true;
 
-      // TODO: console log 제거 필요
-      console.log("토큰 초기화 완료!");
-
       return true;
     } catch {
       // Refresh Token이 없거나 만료된 경우
-      // TODO: console log 제거 필요
-      console.log("유효한 리프레시 토큰 없음!");
       this.isInitialized = true;
       return false;
     }
@@ -82,9 +77,6 @@ class ApiClient {
           config.headers["X-CSRF-Token"] = this.csrfToken;
         }
 
-        // TODO: console log 제거 필요
-        console.log(`${config.method?.toUpperCase()} ${config.url}`);
-
         return config;
       },
       (error) => Promise.reject(error)
@@ -93,20 +85,9 @@ class ApiClient {
     // 응답 인터셉터
     this.axiosInstance.interceptors.response.use(
       (response) => {
-        // TODO: console log 제거 필요
-        console.log(
-          `${response.config.method?.toUpperCase()} ${response.config.url}`,
-          response.status
-        );
         return response;
       },
       async (error: AxiosError) => {
-        console.error(
-          // TODO: console log 제거 필요
-          `${error.config?.method?.toUpperCase()} ${error.config?.url}`,
-          error.response?.status
-        );
-
         const originalRequest = error.config as InternalAxiosRequestConfig & {
           _retry?: boolean;
         };
@@ -158,9 +139,6 @@ class ApiClient {
         // 403 에러 핸들링 (CSRF 토큰 또는 권한 오류)
         if (error.response?.status === 403 && !originalRequest._retry) {
           originalRequest._retry = true;
-
-          // TODO: console log 제거 필요
-          console.error("403 오류! 토큰 갱신 중...");
 
           if (this.isRefreshing) {
             return new Promise((resolve) => {
@@ -222,25 +200,18 @@ class ApiClient {
    * @returns 새로운 CSRF Token
    */
   private async refreshCsrfToken(): Promise<string> {
-    try {
-      const response = await axios.post(
-        `${SERVER_HOST}/api/auth/csrf`,
-        {},
-        {
-          withCredentials: true,
-          headers: this.csrfToken ? { "X-CSRF-Token": this.csrfToken } : {},
-        }
-      );
+    const response = await axios.post(
+      `${SERVER_HOST}/api/auth/csrf`,
+      {},
+      {
+        withCredentials: true,
+        headers: this.csrfToken ? { "X-CSRF-Token": this.csrfToken } : {},
+      }
+    );
 
-      const csrfToken = response.data.csrfToken;
-      this.setCsrfToken(csrfToken);
-      console.log("새로운 CSRF 토큰 발급됨", csrfToken);
-      return csrfToken;
-    } catch (error) {
-      // TODO: console log 제거 필요
-      console.error("토큰 갱신 실패:", error);
-      throw error;
-    }
+    const csrfToken = response.data.csrfToken;
+    this.setCsrfToken(csrfToken);
+    return csrfToken;
   }
 
   /**
@@ -248,39 +219,28 @@ class ApiClient {
    * @returns 새로운 Access Token
    */
   private async refreshAccessToken(): Promise<string> {
-    try {
-      const response = await axios.post(
-        `${SERVER_HOST}/api/auth/refresh`,
-        {},
-        {
-          withCredentials: true,
-          headers: this.csrfToken ? { "X-CSRF-Token": this.csrfToken } : {},
-        }
-      );
+    const response = await axios.post(
+      `${SERVER_HOST}/api/auth/refresh`,
+      {},
+      {
+        withCredentials: true,
+        headers: this.csrfToken ? { "X-CSRF-Token": this.csrfToken } : {},
+      }
+    );
 
-      const accessToken = response.data.accessToken;
-      this.setAccessToken(accessToken);
-      console.log("새로운 Access Token 발급됨", accessToken);
-      return accessToken;
-    } catch (error) {
-      // TODO: console log 제거 필요
-      console.error("토큰 갱신 실패:", error);
-      throw error;
-    }
+    const accessToken = response.data.accessToken;
+    this.setAccessToken(accessToken);
+    return accessToken;
   }
 
   // 메모리에 토큰 저장
   public setAccessToken(accessToken: string) {
     this.accessToken = accessToken;
-    // TODO: console log 제거 필요
-    console.log("Access Token 저장됨!");
     store.set(isAuthenticatedAtom, this.isAuthenticated());
   }
 
   public setCsrfToken(csrfToken: string) {
     this.csrfToken = csrfToken;
-    // TODO: console log 제거 필요
-    console.log("CSRF Token 저장됨!");
     store.set(isAuthenticatedAtom, this.isAuthenticated());
   }
 
@@ -288,9 +248,6 @@ class ApiClient {
   public clearTokens() {
     this.accessToken = null;
     this.csrfToken = null;
-
-    // TODO: console log 제거 필요
-    console.log("토큰 제거됨!");
     store.set(isAuthenticatedAtom, false);
   }
 

@@ -42,66 +42,78 @@ const checkAuth = async () => {
 };
 
 const checkAccounts = async () => {
-  await requireAuth();
+  const authRedirect = await requireAuth();
+  if (authRedirect) {
+    // 인증 실패 시 리다이렉트
+    return authRedirect;
+  }
+
   const response = await AccountService.fetchAccounts();
   if (!response.data.success) {
     return redirect("/account/new");
   }
+
+  return null;
 };
 
-export const router = createBrowserRouter([
+export const router = createBrowserRouter(
+  [
+    {
+      path: "/",
+      element: <RootLayout />,
+      children: [
+        {
+          index: true,
+          element: <Home />,
+        },
+        {
+          path: "account/new",
+          element: <AccountNew />,
+          loader: requireAuth,
+        },
+        {
+          path: "account/:accountUuid",
+          element: <AccountDetail />,
+          loader: requireAuth,
+        },
+        {
+          path: "transaction/:transactionUuid",
+          element: <TransactionDetail />,
+          loader: requireAuth,
+        },
+        {
+          path: "account",
+          element: <NotFoundError />,
+          // 인증 불필요 (에러 페이지)
+        },
+        {
+          path: "notice",
+          element: <Notice />,
+        },
+        {
+          path: "transfer",
+          element: <Transfer />,
+          loader: checkAccounts,
+        },
+        {
+          path: "login",
+          element: <Login />,
+          loader: checkAuth, // 이미 로그인된 경우 홈으로
+        },
+        {
+          path: "profile",
+          element: <Profile />,
+          loader: requireAuth,
+        },
+        {
+          path: "*",
+          element: <NotFoundError />,
+          // 인증 불필요 (에러 페이지)
+        },
+      ],
+    },
+  ],
   {
-    path: "/",
-    element: <RootLayout />,
-    children: [
-      {
-        index: true,
-        element: <Home />,
-      },
-      {
-        path: "account/new",
-        element: <AccountNew />,
-        loader: requireAuth,
-      },
-      {
-        path: "account/:accountUuid",
-        element: <AccountDetail />,
-        loader: requireAuth,
-      },
-      {
-        path: "transaction/:transactionUuid",
-        element: <TransactionDetail />,
-        loader: requireAuth,
-      },
-      {
-        path: "account",
-        element: <NotFoundError />,
-        // 인증 불필요 (에러 페이지)
-      },
-      {
-        path: "notice",
-        element: <Notice />,
-      },
-      {
-        path: "transfer",
-        element: <Transfer />,
-        loader: checkAccounts,
-      },
-      {
-        path: "login",
-        element: <Login />,
-        loader: checkAuth, // 이미 로그인된 경우 홈으로
-      },
-      {
-        path: "profile",
-        element: <Profile />,
-        loader: requireAuth,
-      },
-      {
-        path: "*",
-        element: <NotFoundError />,
-        // 인증 불필요 (에러 페이지)
-      },
-    ],
+    basename: "/jbank",
   },
-]);
+);

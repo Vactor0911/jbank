@@ -1,7 +1,7 @@
 import passport from "passport";
 import { Strategy as SteamStrategy } from "passport-steam";
 import { UserModel } from "../models/user.model";
-import { SteamProfile, UserData } from "../types";
+import { SteamProfile } from "../types";
 import { v4 as uuidv4 } from "uuid";
 import { mariaDB } from "./mariadb";
 import TransactionHandler from "../utils/transactionHandler";
@@ -44,14 +44,6 @@ passport.use(
         if (!steamId) {
           return done(new Error("Steam ID가 올바르지 않습니다."), undefined);
         }
-
-        // 기존 사용자 데이터 조회
-        const userData: UserData = {
-          uuid: "", // UUID는 나중에 DB에서 생성
-          steamId: steamId,
-          steamName: profile.displayName,
-          avatar: profile.photos[2]?.value || profile._json.avatarfull,
-        };
 
         const user = await TransactionHandler.executeInTransaction(
           mariaDB,

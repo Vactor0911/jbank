@@ -10,6 +10,7 @@ import CreateAccountSuccess from "./CreateAccountSuccess";
 import CreateAccountFailed from "./CreateAccountFailed";
 import AccountService from "../../services/accountService";
 import { AxiosError } from "axios";
+import { enqueueSnackbar } from "notistack";
 
 const AccountNew = () => {
   const navigate = useNavigate();
@@ -24,7 +25,7 @@ const AccountNew = () => {
   useEffect(() => {
     // 단계 초기화 함수
     const setError = (message: string) => {
-      console.error("계좌 개설 중 오류 발생:", message);
+      enqueueSnackbar(message, { variant: "error" });
       setPassword("");
       setPasswordConfirm("");
       setErrorMessage(message);
@@ -42,13 +43,12 @@ const AccountNew = () => {
           setIsSuccess(true);
           setStep(4);
         } else {
-          setError(response.data.error || "알 수 없는 오류가 발생했습니다.");
+          setError(response.data.error || "알 수 없는 오류가 발생했어요.");
         }
       } catch (error) {
         if (error instanceof AxiosError) {
-          console.error("Axios error:", error.response?.data.error);
           setError(
-            error.response?.data.error || "알 수 없는 오류가 발생했습니다."
+            error.response?.data.error || "알 수 없는 오류가 발생했어요."
           );
 
           // 기존 계좌가 있을 수 있으므로 계좌 목록 새로고침
@@ -64,13 +64,13 @@ const AccountNew = () => {
 
     // 필드가 비어있으면 실행 중단
     if (!password || !passwordConfirm) {
-      setError("비밀번호가 올바르지 않습니다.");
+      setError("비밀번호가 올바르지 않아요.");
       return;
     }
 
     // 비밀번호와 비밀번호 확인이 다르면 실행 중단
     if (password !== passwordConfirm) {
-      setError("비밀번호가 일치하지 않습니다.");
+      setError("비밀번호가 일치하지 않아요.");
       return;
     }
 

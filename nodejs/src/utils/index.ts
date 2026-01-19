@@ -35,13 +35,8 @@ export const parseTimeToSeconds = (time: string): number => {
  * @returns XXXX-XXXX 형식의 계좌번호 (예: "1234-5678")
  */
 export const generateAccountNumber = (): string => {
-  const part1 = Math.floor(Math.random() * 10000)
-    .toString()
-    .padStart(4, "0");
-
-  const part2 = Math.floor(Math.random() * 10000)
-    .toString()
-    .padStart(4, "0");
+  const part1 = crypto.randomInt(0, 10000).toString().padStart(4, "0");
+  const part2 = crypto.randomInt(0, 10000).toString().padStart(4, "0");
 
   return `${part1}-${part2}`;
 };

@@ -17,9 +17,6 @@ export const errorHandler = (
     message = err.message;
   }
 
-  // 오류 처리
-  console.error("Error :", err);
-
   const response = {
     success: false,
     error: message,

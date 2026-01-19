@@ -21,7 +21,7 @@ export class AuthController {
     // 요청 헤더에서 사용자 정보 추출
     const user = req.user as any;
     if (!user) {
-      return res.redirect(`${process.env.FRONTEND_URL}/login?error=no_user`);
+      return res.redirect(`${process.env.FRONTEND_URL}/jbank/login?error=no_user`);
     }
 
     // UserModel 인스턴스에서 steamId 추출
@@ -29,9 +29,8 @@ export class AuthController {
     const userId = user.id;
 
     if (!steamId) {
-      console.error("No steamId in user:", user);
       return res.redirect(
-        `${process.env.FRONTEND_URL}/login?error=no_steam_id`
+        `${process.env.FRONTEND_URL}/jbank/login?error=no_steam_id`
       );
     }
 
@@ -40,39 +39,37 @@ export class AuthController {
     try {
       tokens = await AuthService.login(steamId);
     } catch (error) {
-      console.error("Login error:", error);
-
       // 예상치 못한 오류는 그대로 반환
       if (!(error instanceof AppError)) {
         return res.redirect(
-          `${process.env.FRONTEND_URL}/login?error=internal_error`
+          `${process.env.FRONTEND_URL}/jbank/login?error=internal_error`
         );
       }
 
       // 오류에 따른 리다이렉트 처리
       if (error instanceof NotFoundError) {
         return res.redirect(
-          `${process.env.FRONTEND_URL}/login?error=user_not_found`
+          `${process.env.FRONTEND_URL}/jbank/login?error=user_not_found`
         );
       } else if (
         error instanceof ForbiddenError &&
         error.message === "삭제된 계정입니다."
       ) {
         return res.redirect(
-          `${process.env.FRONTEND_URL}/login?error=account_deleted`
+          `${process.env.FRONTEND_URL}/jbank/login?error=account_deleted`
         );
       } else if (
         error instanceof ForbiddenError &&
         error.message === "차단된 계정입니다."
       ) {
         return res.redirect(
-          `${process.env.FRONTEND_URL}/login?error=account_banned`
+          `${process.env.FRONTEND_URL}/jbank/login?error=account_banned`
         );
       }
 
       // 그 외의 에러
       return res.redirect(
-        `${process.env.FRONTEND_URL}/login?error=internal_error`
+        `${process.env.FRONTEND_URL}/jbank/login?error=internal_error`
       );
     }
 
@@ -103,7 +100,7 @@ export class AuthController {
     });
 
     // 프론트엔드로 리다이렉트
-    res.redirect(`${process.env.FRONTEND_URL}/login?code=${tempAuthCode}`);
+    res.redirect(`${process.env.FRONTEND_URL}/jbank/login?code=${tempAuthCode}`);
   });
 
   static exchangeTokens = asyncHandler(
@@ -200,35 +197,6 @@ export class AuthController {
       res.json({
         success: true,
         message: "로그아웃되었습니다.",
-      });
-    }
-  );
-
-  /**
-   * 내 정보 조회
-   */
-  static me = asyncHandler(
-    async (req: AuthRequest, res: Response<APIResponse>) => {
-      const { userUuid } = req.user as { userUuid: string };
-
-      // 사용자 정보 조회
-      const user = await UserModel.findBySteamId(userUuid, mariaDB);
-      if (!user) {
-        throw new NotFoundError("사용자를 찾을 수 없습니다.");
-      }
-
-      // 응답 전송
-      res.json({
-        success: true,
-        message: "사용자 정보 조회에 성공했습니다.",
-        data: {
-          user: {
-            uuid: user.uuid,
-            steamId: user.steamId,
-            steamName: user.steamName,
-            avatar: user.avatar,
-          },
-        },
       });
     }
   );

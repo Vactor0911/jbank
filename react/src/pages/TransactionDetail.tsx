@@ -7,6 +7,7 @@ import TransactionService, {
 } from "../services/transactionService";
 import { useAtomValue } from "jotai";
 import { userDataAtom } from "../states";
+import { enqueueSnackbar } from "notistack";
 
 const TransactionDetail = () => {
   const navigate = useNavigate();
@@ -29,8 +30,8 @@ const TransactionDetail = () => {
             response.data.data.transaction;
           setTransactionData(fetchedTransactionData);
         }
-      } catch (error) {
-        console.error("Failed to fetch transaction data:", error);
+      } catch {
+        enqueueSnackbar("거래내역을 불러오지 못했어요.", { variant: "error" });
       }
     };
 
