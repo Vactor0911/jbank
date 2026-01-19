@@ -14,7 +14,7 @@ authRouter.get(
   "/steam/callback",
   limiter,
   passport.authenticate("steam", {
-    failureRedirect: `${process.env.FRONTEND_URL}/login?error=auth_failed`,
+    failureRedirect: `${process.env.FRONTEND_URL}/jbank/login?error=auth_failed`,
     session: false,
   }),
   AuthController.login,
