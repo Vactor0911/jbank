@@ -12,6 +12,7 @@ const authRouter = Router();
 // Steam 로그인 콜백
 authRouter.get(
   "/steam/callback",
+  limiter,
   passport.authenticate("steam", {
     failureRedirect: `${process.env.FRONTEND_URL}/login?error=auth_failed`,
     session: false,
@@ -22,12 +23,13 @@ authRouter.get(
 // 인증 토큰 교환
 authRouter.get(
   "/steam/tokens/:code",
+  limiter,
   validateParams(steamTokensSchema),
   AuthController.exchangeTokens,
 );
 
 // Steam 로그인
-authRouter.get("/steam", passport.authenticate("steam"));
+authRouter.get("/steam", limiter, passport.authenticate("steam"));
 
 // Refresh Token으로 Access Token 재발급
 authRouter.post(

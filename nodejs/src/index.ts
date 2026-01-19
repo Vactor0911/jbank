@@ -11,6 +11,7 @@ import {
 } from "./routes";
 import passport from "./config/passport";
 import "dotenv/config";
+import { limiter } from "./middlewares/rateLimiter";
 
 const app = express();
 
@@ -24,11 +25,14 @@ app.use(
   cors({
     origin: process.env.FRONTEND_URL,
     credentials: true,
-  })
+  }),
 );
 
 // Passport 초기화
 app.use(passport.initialize());
+
+// 전역 Rate Limiter 적용
+app.use("/api", limiter);
 
 // 기본 라우트 설정
 app.get("/", (_req: Request, res: Response) => {
