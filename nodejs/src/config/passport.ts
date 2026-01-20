@@ -29,14 +29,14 @@ passport.deserializeUser(async (data: any, done) => {
 passport.use(
   new SteamStrategy(
     {
-      returnURL: process.env.STEAM_RETURN_URL,
-      realm: process.env.STEAM_REALM,
-      apiKey: process.env.STEAM_API_KEY,
+      returnURL: process.env.STEAM_RETURN_URL!,
+      realm: process.env.STEAM_REALM!,
+      apiKey: process.env.STEAM_API_KEY!,
     },
     async (
       identifier: string,
       profile: SteamProfile,
-      done: (error: any, user?: any) => void
+      done: (error: any, user?: any) => void,
     ) => {
       try {
         // Steam ID 추출
@@ -67,7 +67,7 @@ passport.use(
                 createdAt: new Date(),
                 lastLogin: new Date(),
               },
-              connection
+              connection,
             );
 
             // 생성 후 다시 조회하여 완전한 데이터 반환
@@ -77,15 +77,15 @@ passport.use(
             }
 
             return newUser;
-          }
+          },
         );
 
         return done(null, user);
       } catch (error) {
         return done(error, undefined);
       }
-    }
-  )
+    },
+  ),
 );
 
 export default passport;
