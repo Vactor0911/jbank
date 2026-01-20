@@ -49,7 +49,7 @@ const checkAccounts = async () => {
   }
 
   const response = await AccountService.fetchAccounts();
-  if (!response.data.success) {
+  if (!response.data.success || response.data.data.accounts.length <= 0) {
     return redirect("/account/new");
   }
 
