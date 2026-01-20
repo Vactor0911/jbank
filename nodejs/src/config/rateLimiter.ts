@@ -42,13 +42,6 @@ export const createRateLimiter = (options: RateLimiterOptions = {}) => {
     // 레거시 헤더 비활성화
     legacyHeaders: false,
 
-    // 키 생성 함수
-    keyGenerator:
-      options.keyGenerator ||
-      ((req: AuthRequest): string => {
-        return req.user?.id || req.ip || "unknown";
-      }),
-
     // 요청 스킵 조건
     skip: options.skip,
 

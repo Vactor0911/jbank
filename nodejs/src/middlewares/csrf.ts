@@ -15,8 +15,8 @@ export const generateCsrfToken = async (userId: string) => {
   // CSRF 토큰 저장
   await redis.setex(
     `csrfToken:${userId}`,
-    parseTimeToSeconds(process.env.CSRF_EXPIRES_IN),
-    token
+    parseTimeToSeconds(process.env.CSRF_EXPIRES_IN!),
+    token,
   );
 
   return token;
@@ -59,7 +59,7 @@ const extractUserIdFromToken = (req: Request): string | null => {
     try {
       const decoded = jwt.verify(
         refreshToken,
-        process.env.JWT_REFRESH_SECRET
+        process.env.JWT_REFRESH_SECRET!,
       ) as any;
 
       return decoded.userId;
@@ -77,7 +77,7 @@ const extractUserIdFromToken = (req: Request): string | null => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET) as any;
+    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET!) as any;
     return decoded.userId;
   } catch {}
 
@@ -87,7 +87,7 @@ const extractUserIdFromToken = (req: Request): string | null => {
 export const csrfProtection = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   // 상태를 변경하지 않는 요청은 검증 제외
   if (["GET", "HEAD", "OPTIONS"].includes(req.method)) {
