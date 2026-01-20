@@ -15,6 +15,8 @@ import { limiter } from "./middlewares/rateLimiter";
 
 const app = express();
 
+app.set("trust proxy", 2);
+
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
