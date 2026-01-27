@@ -1,27 +1,29 @@
 import { Request, Response } from "express";
-import { APIResponse, AuthRequest } from "../types";
-import { UserModel } from "../models/user.model";
-import { asyncHandler } from "../utils/asyncHandler";
-import { AuthService } from "../services/auth.service";
-import { verifyRefreshToken } from "../utils/jwt";
-import { mariaDB } from "../config/mariadb";
-import { ForbiddenError, NotFoundError } from "../errors/CustomErrors";
-import { AuthModel } from "../models/auth.model";
-import { redis } from "../config/redis";
-import { deleteCsrfToken, generateCsrfToken } from "../middlewares/csrf";
+import { APIResponse, JwtRequest } from "../../types";
+import { UserModel } from "../../models/user.model";
+import { asyncHandler } from "../../utils/asyncHandler";
+import { AuthService } from "../../services/auth.service";
+import { verifyRefreshToken } from "../../utils/jwt";
+import { mariaDB } from "../../config/mariadb";
+import { ForbiddenError, NotFoundError } from "../../errors/CustomErrors";
+import { AuthModel } from "../../models/auth.model";
+import { redis } from "../../config/redis";
+import { deleteCsrfToken, generateCsrfToken } from "../../middlewares/csrf";
 import crypto from "crypto";
-import { UserService } from "../services/user.service";
-import AppError from "../errors/AppError";
+import { UserService } from "../../services/user.service";
+import AppError from "../../errors/AppError";
 
 export class AuthController {
   /**
    * Steam 로그인
    */
-  static login = asyncHandler(async (req: AuthRequest, res: Response) => {
+  static login = asyncHandler(async (req: JwtRequest, res: Response) => {
     // 요청 헤더에서 사용자 정보 추출
     const user = req.user as any;
     if (!user) {
-      return res.redirect(`${process.env.FRONTEND_URL}/jbank/login?error=no_user`);
+      return res.redirect(
+        `${process.env.FRONTEND_URL}/jbank/login?error=no_user`,
+      );
     }
 
     // UserModel 인스턴스에서 steamId 추출
@@ -30,7 +32,7 @@ export class AuthController {
 
     if (!steamId) {
       return res.redirect(
-        `${process.env.FRONTEND_URL}/jbank/login?error=no_steam_id`
+        `${process.env.FRONTEND_URL}/jbank/login?error=no_steam_id`,
       );
     }
 
@@ -42,34 +44,34 @@ export class AuthController {
       // 예상치 못한 오류는 그대로 반환
       if (!(error instanceof AppError)) {
         return res.redirect(
-          `${process.env.FRONTEND_URL}/jbank/login?error=internal_error`
+          `${process.env.FRONTEND_URL}/jbank/login?error=internal_error`,
         );
       }
 
       // 오류에 따른 리다이렉트 처리
       if (error instanceof NotFoundError) {
         return res.redirect(
-          `${process.env.FRONTEND_URL}/jbank/login?error=user_not_found`
+          `${process.env.FRONTEND_URL}/jbank/login?error=user_not_found`,
         );
       } else if (
         error instanceof ForbiddenError &&
         error.message === "삭제된 계정입니다."
       ) {
         return res.redirect(
-          `${process.env.FRONTEND_URL}/jbank/login?error=account_deleted`
+          `${process.env.FRONTEND_URL}/jbank/login?error=account_deleted`,
         );
       } else if (
         error instanceof ForbiddenError &&
         error.message === "차단된 계정입니다."
       ) {
         return res.redirect(
-          `${process.env.FRONTEND_URL}/jbank/login?error=account_banned`
+          `${process.env.FRONTEND_URL}/jbank/login?error=account_banned`,
         );
       }
 
       // 그 외의 에러
       return res.redirect(
-        `${process.env.FRONTEND_URL}/jbank/login?error=internal_error`
+        `${process.env.FRONTEND_URL}/jbank/login?error=internal_error`,
       );
     }
 
@@ -88,19 +90,21 @@ export class AuthController {
       JSON.stringify({
         accessToken: tokens.accessToken,
         csrfToken: tokens.csrfToken,
-      })
+      }),
     );
 
     // Refresh Token을 HttpOnly 쿠키로 설정
     res.cookie("refreshToken", tokens.refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
     });
 
     // 프론트엔드로 리다이렉트
-    res.redirect(`${process.env.FRONTEND_URL}/jbank/login?code=${tempAuthCode}`);
+    res.redirect(
+      `${process.env.FRONTEND_URL}/jbank/login?code=${tempAuthCode}`,
+    );
   });
 
   static exchangeTokens = asyncHandler(
@@ -126,14 +130,14 @@ export class AuthController {
         accessToken,
         csrfToken,
       });
-    }
+    },
   );
 
   /**
    * Refresh Token으로 Access Token 재발급
    */
   static refreshJwtToken = asyncHandler(
-    async (req: AuthRequest, res: Response<APIResponse>) => {
+    async (req: JwtRequest, res: Response<APIResponse>) => {
       const { refreshToken } = req.cookies;
 
       // 새로운 토큰 발급
@@ -141,8 +145,8 @@ export class AuthController {
 
       res.cookie("refreshToken", tokens.refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
+        secure: true,
+        sameSite: "none",
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
       });
 
@@ -152,11 +156,11 @@ export class AuthController {
         message: "토큰이 재발급되었습니다.",
         accessToken: tokens.accessToken,
       });
-    }
+    },
   );
 
   static refreshCsrfToken = asyncHandler(
-    async (req: AuthRequest, res: Response<APIResponse>) => {
+    async (req: JwtRequest, res: Response<APIResponse>) => {
       const { userId } = req.user as { userId: string };
 
       // 새로운 CSRF 토큰 발급
@@ -168,14 +172,14 @@ export class AuthController {
         message: "CSRF 토큰이 재발급되었습니다.",
         csrfToken,
       });
-    }
+    },
   );
 
   /**
    * 로그아웃
    */
   static logout = asyncHandler(
-    async (req: AuthRequest, res: Response<APIResponse>) => {
+    async (req: JwtRequest, res: Response<APIResponse>) => {
       const { refreshToken } = req.cookies;
 
       // Refresh Token 삭제
@@ -198,6 +202,6 @@ export class AuthController {
         success: true,
         message: "로그아웃되었습니다.",
       });
-    }
+    },
   );
 }

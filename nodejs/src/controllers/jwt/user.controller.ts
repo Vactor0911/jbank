@@ -1,18 +1,18 @@
 import { Response } from "express";
-import { APIResponse, AuthRequest } from "../types";
-import { asyncHandler } from "../utils/asyncHandler";
-import { UserService } from "../services/user.service";
-import { verifyRefreshToken } from "../utils/jwt";
-import { AuthModel } from "../models/auth.model";
-import { deleteCsrfToken } from "../middlewares/csrf";
-import { redis } from "../config/redis";
+import { APIResponse, JwtRequest } from "../../types";
+import { asyncHandler } from "../../utils/asyncHandler";
+import { UserService } from "../../services/user.service";
+import { verifyRefreshToken } from "../../utils/jwt";
+import { AuthModel } from "../../models/auth.model";
+import { deleteCsrfToken } from "../../middlewares/csrf";
+import { redis } from "../../config/redis";
 
 export class UserController {
   /**
    * 사용자 본인 정보 조회
    */
   static me = asyncHandler(
-    async (req: AuthRequest, res: Response<APIResponse>) => {
+    async (req: JwtRequest, res: Response<APIResponse>) => {
       const { userId } = req.user as { userId: string };
 
       const user = await UserService.getMe(userId);
@@ -24,14 +24,14 @@ export class UserController {
           user,
         },
       });
-    }
+    },
   );
 
   /**
    * 사용자 본인 정보 새로고침
    */
   static refreshMe = asyncHandler(
-    async (req: AuthRequest, res: Response<APIResponse>) => {
+    async (req: JwtRequest, res: Response<APIResponse>) => {
       const { userId } = req.user as { userId: string };
 
       const steamProfile = await UserService.refreshMe(userId);
@@ -47,14 +47,14 @@ export class UserController {
           user: userData,
         },
       });
-    }
+    },
   );
 
   /**
    * 회원 탈퇴
    */
   static deleteAccount = asyncHandler(
-    async (req: AuthRequest, res: Response<APIResponse>) => {
+    async (req: JwtRequest, res: Response<APIResponse>) => {
       const { userId } = req.user as { userId: string };
       const { refreshToken } = req.cookies;
 
@@ -81,14 +81,14 @@ export class UserController {
         success: true,
         message: "회원 탈퇴되었습니다.",
       });
-    }
+    },
   );
 
   /**
    * 예금주 조회
    */
   static getAccountHolder = asyncHandler(
-    async (req: AuthRequest, res: Response<APIResponse>) => {
+    async (req: JwtRequest, res: Response<APIResponse>) => {
       const { accountNumber } = req.params;
 
       // 예금주 조회
@@ -102,6 +102,6 @@ export class UserController {
           user: accountHolder,
         },
       });
-    }
+    },
   );
 }

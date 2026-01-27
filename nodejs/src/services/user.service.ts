@@ -51,11 +51,11 @@ export class UserService {
           userId,
           steamProfile.steamID,
           steamProfile.avatarFull,
-          connection
+          connection,
         );
 
         return steamProfile;
-      }
+      },
     );
     return steamProfile;
   }
@@ -96,11 +96,11 @@ export class UserService {
           userId,
           steamProfile.steamID,
           steamProfile.avatarFull,
-          connection
+          connection,
         );
 
         return steamProfile;
-      }
+      },
     );
     return steamProfile;
   }
@@ -123,7 +123,7 @@ export class UserService {
         // 사용자 삭제
         const result = await UserModel.deleteById(userId, connection);
         return result;
-      }
+      },
     );
     return result;
   }
@@ -134,9 +134,14 @@ export class UserService {
    * @returns 예금주 정보
    */
   static async getAccountHolder(accountNumber: string) {
+    // 중앙 은행 계좌는 조회 불가
+    if (accountNumber === "0000-0000") {
+      throw new NotFoundError("해당 계좌번호의 예금주를 찾을 수 없습니다.");
+    }
+
     const account = await AccountModel.findByAccountNumber(
       accountNumber,
-      mariaDB
+      mariaDB,
     );
     if (!account) {
       throw new NotFoundError("계좌를 찾을 수 없습니다.");
@@ -144,7 +149,7 @@ export class UserService {
 
     const accountHolder = await UserModel.findByAccountNumber(
       accountNumber,
-      mariaDB
+      mariaDB,
     );
     if (!accountHolder) {
       throw new NotFoundError("해당 계좌번호의 예금주를 찾을 수 없습니다.");

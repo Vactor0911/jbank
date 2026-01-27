@@ -19,7 +19,7 @@ class UserService {
    * 현재 사용자 정보 조회 및 저장
    */
   static async fetchMe() {
-    const response = await axiosInstance.get("/api/user/me");
+    const response = await axiosInstance.get("/api/v1/user/me");
     const userData = response.data.data.user as UserData;
     store.set(userDataAtom, userData);
     return response.data;
@@ -30,7 +30,7 @@ class UserService {
    */
   static async refreshMe() {
     try {
-      const response = await axiosInstance.patch("/api/user/me/refresh");
+      const response = await axiosInstance.patch("/api/v1/user/me/refresh");
       const { steamName, avatar } = response.data.data.user;
       const currentUserData = store.get(userDataAtom);
       if (currentUserData) {
@@ -55,7 +55,7 @@ class UserService {
    * 회원탈퇴
    */
   static async deleteAccount() {
-    const response = await axiosInstance.delete("/api/user/me");
+    const response = await axiosInstance.delete("/api/v1/user/me");
     return response.data;
   }
 
@@ -66,7 +66,7 @@ class UserService {
    */
   static async getUserByAccountNumber(accountNumber: string) {
     const response = await axiosInstance.get(
-      `/api/user/account/${accountNumber}`
+      `/api/v1/user/account/${accountNumber}`
     );
     return response.data.data.user as UserData;
   }

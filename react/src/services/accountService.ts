@@ -18,7 +18,7 @@ class AccountService {
    * @returns 계좌 목록
    */
   static async fetchAccounts() {
-    const response = await axiosInstance.get("/api/account/");
+    const response = await axiosInstance.get("/api/v1/account/");
     store.set(accountDataAtom, response.data.data.accounts as AccountData[]);
     return response;
   }
@@ -29,7 +29,7 @@ class AccountService {
    * @returns 계좌 정보
    */
   static async fetchAccount(accountUuid: string) {
-    const response = await axiosInstance.get(`/api/account/${accountUuid}`);
+    const response = await axiosInstance.get(`/api/v1/account/${accountUuid}`);
 
     // 계좌 정보 업데이트
     const accounts = store.get(accountDataAtom);
@@ -50,7 +50,7 @@ class AccountService {
    * @param password 계좌 비밀번호
    */
   static async createAccount(password: string) {
-    const response = await axiosInstance.post("/api/account/", {
+    const response = await axiosInstance.post("/api/v1/account/", {
       password: password,
     });
     return response;
@@ -63,7 +63,7 @@ class AccountService {
    */
   static async fetchRecentAccountNumbers(accountNumber: string) {
     const response = await axiosInstance.get(
-      `/api/account/${accountNumber}/recent`
+      `/api/v1/account/${accountNumber}/recent`
     );
 
     if (!response.data.success) {

@@ -22,7 +22,7 @@ const TransactionDetail = () => {
     const fetchTransactionData = async () => {
       try {
         const response = await TransactionService.fetchTransaction(
-          transactionUuid!
+          transactionUuid!,
         );
 
         if (response.data.success) {
@@ -120,7 +120,9 @@ const TransactionDetail = () => {
 
             {/* 계좌번호 */}
             <Typography variant="h6" color="text.secondary" fontWeight={500}>
-              Jbank {transactionData?.receiver.accountNumber}
+              {transactionData?.receiver.accountNumber === "0000-0000"
+                ? "Jellen 중앙 은행"
+                : `Jbank ${transactionData?.receiver.accountNumber}`}
             </Typography>
           </Stack>
 
@@ -138,7 +140,9 @@ const TransactionDetail = () => {
 
             {/* 계좌번호 */}
             <Typography variant="h6" color="text.secondary" fontWeight={500}>
-              Jbank {transactionData?.sender.accountNumber}
+              {transactionData?.sender.accountNumber === "0000-0000"
+                ? "Jellen 중앙 은행"
+                : `Jbank ${transactionData?.sender.accountNumber}`}
             </Typography>
           </Stack>
 

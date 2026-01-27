@@ -201,7 +201,7 @@ class ApiClient {
    */
   private async refreshCsrfToken(): Promise<string> {
     const response = await axios.post(
-      `${SERVER_HOST}/api/auth/csrf`,
+      `${SERVER_HOST}/api/v1/auth/csrf`,
       {},
       {
         withCredentials: true,
@@ -220,7 +220,7 @@ class ApiClient {
    */
   private async refreshAccessToken(): Promise<string> {
     const response = await axios.post(
-      `${SERVER_HOST}/api/auth/refresh`,
+      `${SERVER_HOST}/api/v1/auth/refresh`,
       {},
       {
         withCredentials: true,

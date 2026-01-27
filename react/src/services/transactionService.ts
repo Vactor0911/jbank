@@ -33,7 +33,7 @@ class TransactionService {
     limit: number = 10
   ) {
     const response = await axiosInstance.get(
-      `/api/transaction/account/${accountUuid}?page=${page}&limit=${limit}`
+      `/api/v1/transaction/account/${accountUuid}?page=${page}&limit=${limit}`
     );
     return response;
   }
@@ -45,7 +45,7 @@ class TransactionService {
    */
   static async fetchTransaction(transactionUuid: string) {
     const response = await axiosInstance.get(
-      `/api/transaction/${transactionUuid}`
+      `/api/v1/transaction/${transactionUuid}`
     );
     return response;
   }
