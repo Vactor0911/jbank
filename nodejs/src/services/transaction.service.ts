@@ -25,7 +25,7 @@ export class TransactionService {
     userId: string,
     accountUuid: string,
     page: number,
-    limit: number
+    limit: number,
   ) {
     // 사용자 조회
     const user = await UserModel.findById(userId, mariaDB);
@@ -42,7 +42,7 @@ export class TransactionService {
     // 계좌 소유자 확인
     if (account.userId !== user.id) {
       throw new ForbiddenError(
-        "해당 계좌의 거래 내역을 조회할 권한이 없습니다."
+        "해당 계좌의 거래 내역을 조회할 권한이 없습니다.",
       );
     }
 
@@ -51,7 +51,7 @@ export class TransactionService {
       account.id,
       page,
       limit,
-      mariaDB
+      mariaDB,
     );
 
     const formattedTransactions = [];
@@ -91,7 +91,7 @@ export class TransactionService {
     // 거래 내역 조회
     const transaction = await TransactionModel.findByUuid(
       transactionUuid,
-      mariaDB
+      mariaDB,
     );
     if (!transaction) {
       throw new NotFoundError("거래 내역을 찾을 수 없습니다.");
@@ -134,7 +134,7 @@ export class TransactionService {
     senderAccountNumber: string,
     receiverAccountNumber: string,
     amount: number,
-    password: string
+    password: string,
   ) {
     const transaction = await TransactionHandler.executeInTransaction(
       mariaDB,
@@ -153,13 +153,13 @@ export class TransactionService {
         // 첫 번째 계좌 조회 (쓰기 잠금)
         const account1 = await AccountModel.findByAccountNumberForUpdate(
           accountNumbers[0],
-          connection
+          connection,
         );
 
         // 두 번째 계좌 조회 (쓰기 잠금)
         const account2 = await AccountModel.findByAccountNumberForUpdate(
           accountNumbers[1],
-          connection
+          connection,
         );
 
         // 송금자/수취자 계좌 구분
@@ -190,7 +190,7 @@ export class TransactionService {
         }
         const receiver = await UserModel.findById(
           receiverAccount.userId,
-          connection
+          connection,
         );
         if (!receiver) {
           throw new NotFoundError("수취 계좌의 사용자를 찾을 수 없습니다.");
@@ -198,11 +198,11 @@ export class TransactionService {
 
         // 송금 계좌 검증
         if (senderAccount.userId !== userId) {
-          throw new ForbiddenError("권한이 없습니다.");
+          throw new ForbiddenError("거래 권한이 없습니다.");
         }
         if (senderAccount.status !== "active") {
           throw new UnprocessableEntityError(
-            "계좌의 거래가 정지되어 송금할 수 없습니다."
+            "계좌의 거래가 정지되어 송금할 수 없습니다.",
           );
         }
         if (BigInt(senderAccount.credit) < BigInt(amount)) {
@@ -212,9 +212,14 @@ export class TransactionService {
         // 송금 계좌 비밀번호 검증
         const isPasswordMatch = await bcrypt.compare(
           password,
-          senderAccount.password
+          senderAccount.password,
         );
-        if (!isPasswordMatch) {
+        // 비밀번호 불일치 검증 (중앙 은행 계좌가 아닐 경우에만)
+        if (
+          senderAccount.id !== "0" &&
+          receiverAccount.id !== "0" &&
+          !isPasswordMatch
+        ) {
           throw new ForbiddenError("계좌의 비밀번호가 일치하지 않습니다.");
         }
 
@@ -230,7 +235,7 @@ export class TransactionService {
         // 거래 후 잔액 조회
         const updatedSenderAccount = await AccountModel.findById(
           senderAccount.id,
-          connection
+          connection,
         );
         if (!updatedSenderAccount) {
           throw new NotFoundError("송금 계좌를 찾을 수 없습니다.");
@@ -239,7 +244,7 @@ export class TransactionService {
 
         const updatedReceiverAccount = await AccountModel.findById(
           receiverAccount.id,
-          connection
+          connection,
         );
         if (!updatedReceiverAccount) {
           throw new NotFoundError("수취 계좌를 찾을 수 없습니다.");
@@ -255,7 +260,7 @@ export class TransactionService {
           amount,
           senderCurrentBalance,
           receiverCurrentBalance,
-          connection
+          connection,
         );
 
         // 거래 데이터 생성
@@ -278,7 +283,7 @@ export class TransactionService {
         };
 
         return transaction;
-      }
+      },
     );
     return transaction;
   }

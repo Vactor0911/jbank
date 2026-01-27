@@ -5,56 +5,110 @@ import { TransactionService } from "../../services/transaction.service";
 import AccountModel from "../../models/account.model";
 import { mariaDB } from "../../config/mariadb";
 import { NotFoundError } from "../../errors/CustomErrors";
+import { UserModel } from "../../models/user.model";
 
 class TransactionController {
   // TODO: 은행 간 거래 서비스 로직 구현 필요
 
   /**
-   * 송금 거래 생성
+   * 입금 거래 생성
    */
-  static createTransferTransaction = asyncHandler(
+  static createBankDepositTransaction = asyncHandler(
     async (req: ApiKeyRequest, res: Response<APIResponse>) => {
       const { apiKey } = req;
-      const { receiverSteamId, amount, password } = req.body;
+      const { userSteamId, amount } = req.body;
 
-      // 거래 데이터 추출
+      // 은행 계좌 정보 조회
       const userId = apiKey?.userId;
       if (!userId) {
         throw new NotFoundError("API 키와 연결된 사용자를 찾을 수 없습니다.");
       }
 
-      const senderAccount = await AccountModel.findByUserId(userId, mariaDB);
-      if (!senderAccount || senderAccount.length === 0 || !senderAccount[0]) {
+      const bankAccount = await AccountModel.findByUserId(userId, mariaDB);
+      if (!bankAccount || bankAccount.length === 0 || !bankAccount[0]) {
         throw new NotFoundError("송금자 계좌를 찾을 수 없습니다.");
       }
-      const senderAccountNumber = senderAccount[0].accountNumber;
+      const bankAccountNumber = bankAccount[0].accountNumber;
 
-      const receiverAccount = await AccountModel.findByUserSteamId(
-        receiverSteamId,
+      // 사용자 계좌 정보 조회
+      const userAccount = await AccountModel.findByUserSteamId(
+        userSteamId,
         mariaDB,
       );
-      if (
-        !receiverAccount ||
-        receiverAccount.length === 0 ||
-        !receiverAccount[0]
-      ) {
-        throw new NotFoundError("수신자 계좌를 찾을 수 없습니다.");
+      if (!userAccount || userAccount.length === 0 || !userAccount[0]) {
+        throw new NotFoundError("수취자 계좌를 찾을 수 없습니다.");
       }
-      const receiverAccountNumber = receiverAccount[0].accountNumber;
+      const userAccountNumber = userAccount[0].accountNumber;
 
-      // 송금 거래 생성
+      // 입금 거래 생성
       const transaction = await TransactionService.createTransferTransaction(
         userId,
-        senderAccountNumber,
-        receiverAccountNumber,
+        bankAccountNumber,
+        userAccountNumber,
         amount,
-        password,
+        "0000",
       );
 
       // 응답 전송
       res.json({
         success: true,
-        message: "성공적으로 송금되었습니다.",
+        message: "성공적으로 입금되었습니다.",
+        data: {
+          transaction,
+        },
+      });
+    },
+  );
+
+  /**
+   * 출금 거래 생성
+   */
+  static createBankWithdrawTransaction = asyncHandler(
+    async (req: ApiKeyRequest, res: Response<APIResponse>) => {
+      const { apiKey } = req;
+      const { userSteamId, amount } = req.body;
+
+      // 은행 계좌 정보 조회
+      const userId = apiKey?.userId;
+      if (!userId) {
+        throw new NotFoundError("API 키와 연결된 사용자를 찾을 수 없습니다.");
+      }
+
+      const bankAccount = await AccountModel.findByUserId(userId, mariaDB);
+      if (!bankAccount || bankAccount.length === 0 || !bankAccount[0]) {
+        throw new NotFoundError("송금자 계좌를 찾을 수 없습니다.");
+      }
+      const bankAccountNumber = bankAccount[0].accountNumber;
+
+      // 사용자 및 사용자 계좌 정보 조회
+      const user = await UserModel.findBySteamId(userSteamId, mariaDB);
+      if (!user) {
+        throw new NotFoundError("수취자를 찾을 수 없습니다.");
+      }
+
+      const userAccount = await AccountModel.findByUserSteamId(
+        userSteamId,
+        mariaDB,
+      );
+      if (!userAccount || userAccount.length === 0 || !userAccount[0]) {
+        throw new NotFoundError("수취자 계좌를 찾을 수 없습니다.");
+      }
+      const userAccountNumber = userAccount[0].accountNumber;
+      console.log(userAccount[0].password, "userAccount password");
+
+      // 출금 거래 생성
+      const transaction = await TransactionService.createTransferTransaction(
+        user.id,
+        userAccountNumber,
+        bankAccountNumber,
+        amount,
+        "0000",
+      );
+
+      // 응답 전송
+      res.json({
+        success: true,
+        message: "성공적으로 출금되었습니다.",
         data: {
           transaction,
         },
