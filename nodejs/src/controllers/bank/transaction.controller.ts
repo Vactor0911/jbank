@@ -17,12 +17,6 @@ class TransactionController {
       const { apiKey } = req;
       const { receiverSteamId, amount, password } = req.body;
 
-      console.log("Create Transfer Transaction Request:", {
-        apiKey,
-        receiverSteamId,
-        amount,
-      });
-
       // 거래 데이터 추출
       const userId = apiKey?.userId;
       if (!userId) {

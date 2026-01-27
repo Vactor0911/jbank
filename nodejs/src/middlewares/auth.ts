@@ -126,11 +126,6 @@ export const authenticateApiKey = async (
   try {
     // 헤더에서 API 키 추출
     const apiKey = req.headers["x-api-key"];
-    console.log(
-      "요청된 API 키:",
-      apiKey,
-      String(apiKey).startsWith("sk-bank-"),
-    );
     if (!apiKey) {
       res.status(401).json({
         success: false,
@@ -157,13 +152,11 @@ export const authenticateApiKey = async (
       });
       return;
     }
-    console.log("인증된 API 키:", apiKeyModel);
 
     // 요청에 API 키 정보 추가
     req.apiKey = apiKeyModel;
     next();
   } catch (error) {
-    console.log("API 키 인증 오류:", error);
     next(error);
   }
 };

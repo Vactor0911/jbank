@@ -28,10 +28,10 @@ export const getTransactionSchema = z.object({
 export const createTransferTransactionSchema = z.object({
   senderAccountNumber: z
     .string("계좌번호는 문자열이어야 합니다.")
-    .regex(/^\d{4}-\d{4}$/, "유효한 계좌번호 형식이 아닙니다."),
+    .regex(/^(?!0000-0000$)\d{4}-\d{4}$/, "유효한 계좌번호 형식이 아닙니다."),
   receiverAccountNumber: z
     .string("계좌번호는 문자열이어야 합니다.")
-    .regex(/^\d{4}-\d{4}$/, "유효한 계좌번호 형식이 아닙니다."),
+    .regex(/^(?!0000-0000$)\d{4}-\d{4}$/, "유효한 계좌번호 형식이 아닙니다."),
   amount: z
     .number("송금액은 숫자이어야 합니다.")
     .positive("송금액이 올바르지 않습니다.")
