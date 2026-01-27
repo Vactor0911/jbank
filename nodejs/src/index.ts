@@ -6,7 +6,6 @@ import bodyParser from "body-parser";
 import webRouter from "./routes/jwt";
 import passport from "./config/passport";
 import "dotenv/config";
-import { limiter } from "./middlewares/rateLimiter";
 
 const app = express();
 
@@ -27,9 +26,6 @@ app.use(
 
 // Passport 초기화
 app.use(passport.initialize());
-
-// 전역 Rate Limiter 적용
-app.use("/api", limiter);
 
 // 기본 라우트 설정
 app.get("/", (_req: Request, res: Response) => {

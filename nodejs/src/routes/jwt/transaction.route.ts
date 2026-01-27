@@ -13,7 +13,6 @@ import {
   getTransactionSchema,
 } from "../../schema/transaction.schema";
 import TransactionController from "../../controllers/transaction.controller";
-import { limiter } from "../../middlewares/rateLimiter";
 
 const transactionRouter = Router();
 
@@ -21,7 +20,6 @@ const transactionRouter = Router();
 transactionRouter.get(
   "/account/:accountUuid",
   authenticateJWT,
-  limiter,
   validateParams(getAccountTransactionsParamsSchema),
   validateQuery(getAccountTransactionsQuerySchema),
   TransactionController.getAccountTransactions,
@@ -31,7 +29,6 @@ transactionRouter.get(
 transactionRouter.get(
   "/:transactionUuid",
   authenticateJWT,
-  limiter,
   validateParams(getTransactionSchema),
   TransactionController.getTransaction,
 );
@@ -41,7 +38,6 @@ transactionRouter.post(
   "/transfer",
   authenticateJWT,
   csrfProtection,
-  limiter,
   validateBody(createTransferTransactionSchema),
   TransactionController.createTransferTransaction,
 );
