@@ -54,6 +54,7 @@ export class TransactionService {
       mariaDB,
     );
 
+    // 거래 내역 데이터 생성
     const formattedTransactions = [];
     for (const transaction of transactions) {
       if (!transaction) {
@@ -61,17 +62,10 @@ export class TransactionService {
       }
 
       const formattedTransaction = await this.formatTransaction(transaction);
-
-      // 타인의 거래 잔액 제거
-      if (transaction.senderAccountHolderUuid !== user.uuid) {
-        delete (formattedTransaction.sender as any).currentBalance;
-      }
-      if (transaction.receiverAccountHolderUuid !== user.uuid) {
-        delete (formattedTransaction.receiver as any).currentBalance;
-      }
-
       formattedTransactions.push(formattedTransaction);
     }
+
+    // 거래 내역 반환
     return formattedTransactions;
   }
 
@@ -107,14 +101,6 @@ export class TransactionService {
 
     // 거래 내역 데이터 생성
     const formattedTransaction = await this.formatTransaction(transaction);
-
-    // 타인의 거래 잔액 제거
-    if (transaction.senderAccountHolderUuid !== user.uuid) {
-      delete (formattedTransaction.sender as any).currentBalance;
-    }
-    if (transaction.receiverAccountHolderUuid !== user.uuid) {
-      delete (formattedTransaction.receiver as any).currentBalance;
-    }
 
     // 거래 내역 반환
     return formattedTransaction;
@@ -270,18 +256,17 @@ export class TransactionService {
             uuid: senderAccount.uuid,
             steamName: user.steamName,
             accountNumber: senderAccount.accountNumber,
-            currentBalance: senderCurrentBalance,
           },
           receiver: {
             uuid: receiverAccount.uuid,
             steamName: receiver.steamName,
             accountNumber: receiverAccount.accountNumber,
-            currentBalance: receiverCurrentBalance,
           },
           currencyCode: "CRD",
           amount: amount,
         };
 
+        // 거래 내역 반환
         return transaction;
       },
     );
@@ -296,18 +281,17 @@ export class TransactionService {
         uuid: transaction.senderAccountHolderUuid,
         steamName: transaction.senderAccountHolderName,
         accountNumber: transaction.senderAccountNumber,
-        currentBalance: transaction.senderCurrentBalance,
       },
       receiver: {
         uuid: transaction.receiverAccountHolderUuid,
         steamName: transaction.receiverAccountHolderName,
         accountNumber: transaction.receiverAccountNumber,
-        currentBalance: transaction.receiverCurrentBalance,
       },
       currencyCode: transaction.currencyCode || "CRD",
       amount: transaction.amount,
       createdAt: transaction.createdAt,
     };
+
     return transactionData;
   }
 }
