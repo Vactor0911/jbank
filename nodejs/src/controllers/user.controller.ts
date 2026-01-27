@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { APIResponse, AuthRequest } from "../types";
+import { APIResponse, JwtRequest } from "../types";
 import { asyncHandler } from "../utils/asyncHandler";
 import { UserService } from "../services/user.service";
 import { verifyRefreshToken } from "../utils/jwt";
@@ -12,7 +12,7 @@ export class UserController {
    * 사용자 본인 정보 조회
    */
   static me = asyncHandler(
-    async (req: AuthRequest, res: Response<APIResponse>) => {
+    async (req: JwtRequest, res: Response<APIResponse>) => {
       const { userId } = req.user as { userId: string };
 
       const user = await UserService.getMe(userId);
@@ -31,7 +31,7 @@ export class UserController {
    * 사용자 본인 정보 새로고침
    */
   static refreshMe = asyncHandler(
-    async (req: AuthRequest, res: Response<APIResponse>) => {
+    async (req: JwtRequest, res: Response<APIResponse>) => {
       const { userId } = req.user as { userId: string };
 
       const steamProfile = await UserService.refreshMe(userId);
@@ -54,7 +54,7 @@ export class UserController {
    * 회원 탈퇴
    */
   static deleteAccount = asyncHandler(
-    async (req: AuthRequest, res: Response<APIResponse>) => {
+    async (req: JwtRequest, res: Response<APIResponse>) => {
       const { userId } = req.user as { userId: string };
       const { refreshToken } = req.cookies;
 
@@ -88,7 +88,7 @@ export class UserController {
    * 예금주 조회
    */
   static getAccountHolder = asyncHandler(
-    async (req: AuthRequest, res: Response<APIResponse>) => {
+    async (req: JwtRequest, res: Response<APIResponse>) => {
       const { accountNumber } = req.params;
 
       // 예금주 조회

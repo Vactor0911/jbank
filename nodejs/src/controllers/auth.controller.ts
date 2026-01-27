@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { APIResponse, AuthRequest } from "../types";
+import { APIResponse, JwtRequest } from "../types";
 import { UserModel } from "../models/user.model";
 import { asyncHandler } from "../utils/asyncHandler";
 import { AuthService } from "../services/auth.service";
@@ -17,7 +17,7 @@ export class AuthController {
   /**
    * Steam 로그인
    */
-  static login = asyncHandler(async (req: AuthRequest, res: Response) => {
+  static login = asyncHandler(async (req: JwtRequest, res: Response) => {
     // 요청 헤더에서 사용자 정보 추출
     const user = req.user as any;
     if (!user) {
@@ -133,7 +133,7 @@ export class AuthController {
    * Refresh Token으로 Access Token 재발급
    */
   static refreshJwtToken = asyncHandler(
-    async (req: AuthRequest, res: Response<APIResponse>) => {
+    async (req: JwtRequest, res: Response<APIResponse>) => {
       const { refreshToken } = req.cookies;
 
       // 새로운 토큰 발급
@@ -156,7 +156,7 @@ export class AuthController {
   );
 
   static refreshCsrfToken = asyncHandler(
-    async (req: AuthRequest, res: Response<APIResponse>) => {
+    async (req: JwtRequest, res: Response<APIResponse>) => {
       const { userId } = req.user as { userId: string };
 
       // 새로운 CSRF 토큰 발급
@@ -175,7 +175,7 @@ export class AuthController {
    * 로그아웃
    */
   static logout = asyncHandler(
-    async (req: AuthRequest, res: Response<APIResponse>) => {
+    async (req: JwtRequest, res: Response<APIResponse>) => {
       const { refreshToken } = req.cookies;
 
       // Refresh Token 삭제

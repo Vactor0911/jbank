@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { APIResponse, AuthRequest } from "../types";
+import { APIResponse, JwtRequest } from "../types";
 import { asyncHandler } from "../utils/asyncHandler";
 import AccountService from "../services/account.service";
 
@@ -8,7 +8,7 @@ class AccountController {
    * 계좌 목록 조회
    */
   static getAccounts = asyncHandler(
-    async (req: AuthRequest, res: Response<APIResponse>) => {
+    async (req: JwtRequest, res: Response<APIResponse>) => {
       const { userId } = req.user as { userId: string };
 
       // 계좌 목록 조회
@@ -29,7 +29,7 @@ class AccountController {
    * 계좌 정보 조회
    */
   static getAccount = asyncHandler(
-    async (req: AuthRequest, res: Response<APIResponse>) => {
+    async (req: JwtRequest, res: Response<APIResponse>) => {
       const { userId } = req.user as { userId: string };
       const { accountUuid } = req.params;
 
@@ -51,7 +51,7 @@ class AccountController {
    * 새 계좌 개설
    */
   static createAccount = asyncHandler(
-    async (req: AuthRequest, res: Response<APIResponse>) => {
+    async (req: JwtRequest, res: Response<APIResponse>) => {
       const { userId } = req.user as { userId: string };
       const { password } = req.body;
 
@@ -73,7 +73,7 @@ class AccountController {
    * 최근 거래 계좌 조회
    */
   static getRecentAccounts = asyncHandler(
-    async (req: AuthRequest, res: Response<APIResponse>) => {
+    async (req: JwtRequest, res: Response<APIResponse>) => {
       const { userId } = req.user as { userId: string };
       const { accountNumber } = req.params;
 

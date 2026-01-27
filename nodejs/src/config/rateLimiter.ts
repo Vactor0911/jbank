@@ -4,7 +4,7 @@ import RedisStore from "rate-limit-redis";
 import { Request, Response } from "express";
 import { RateLimiterOptions, RateLimitError } from "../types/rateLimiter";
 import { redisLimiter } from "./redisLimiter";
-import { AuthRequest } from "../types";
+import { JwtRequest } from "../types";
 
 // 기본 에러 메시지
 const defaultMessage: RateLimitError = {
