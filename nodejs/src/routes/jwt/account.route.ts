@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { authenticateJWT } from "../../middlewares/auth";
-import AccountController from "../../controllers/account.controller";
+import AccountController from "../../controllers/jwt/account.controller";
 import { csrfProtection } from "../../middlewares/csrf";
 import { validateBody, validateParams } from "../../middlewares/validation";
 import {

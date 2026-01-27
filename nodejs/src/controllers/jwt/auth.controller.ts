@@ -1,17 +1,17 @@
 import { Request, Response } from "express";
-import { APIResponse, JwtRequest } from "../types";
-import { UserModel } from "../models/user.model";
-import { asyncHandler } from "../utils/asyncHandler";
-import { AuthService } from "../services/auth.service";
-import { verifyRefreshToken } from "../utils/jwt";
-import { mariaDB } from "../config/mariadb";
-import { ForbiddenError, NotFoundError } from "../errors/CustomErrors";
-import { AuthModel } from "../models/auth.model";
-import { redis } from "../config/redis";
-import { deleteCsrfToken, generateCsrfToken } from "../middlewares/csrf";
+import { APIResponse, JwtRequest } from "../../types";
+import { UserModel } from "../../models/user.model";
+import { asyncHandler } from "../../utils/asyncHandler";
+import { AuthService } from "../../services/auth.service";
+import { verifyRefreshToken } from "../../utils/jwt";
+import { mariaDB } from "../../config/mariadb";
+import { ForbiddenError, NotFoundError } from "../../errors/CustomErrors";
+import { AuthModel } from "../../models/auth.model";
+import { redis } from "../../config/redis";
+import { deleteCsrfToken, generateCsrfToken } from "../../middlewares/csrf";
 import crypto from "crypto";
-import { UserService } from "../services/user.service";
-import AppError from "../errors/AppError";
+import { UserService } from "../../services/user.service";
+import AppError from "../../errors/AppError";
 
 export class AuthController {
   /**

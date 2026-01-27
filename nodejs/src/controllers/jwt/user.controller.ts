@@ -1,11 +1,11 @@
 import { Response } from "express";
-import { APIResponse, JwtRequest } from "../types";
-import { asyncHandler } from "../utils/asyncHandler";
-import { UserService } from "../services/user.service";
-import { verifyRefreshToken } from "../utils/jwt";
-import { AuthModel } from "../models/auth.model";
-import { deleteCsrfToken } from "../middlewares/csrf";
-import { redis } from "../config/redis";
+import { APIResponse, JwtRequest } from "../../types";
+import { asyncHandler } from "../../utils/asyncHandler";
+import { UserService } from "../../services/user.service";
+import { verifyRefreshToken } from "../../utils/jwt";
+import { AuthModel } from "../../models/auth.model";
+import { deleteCsrfToken } from "../../middlewares/csrf";
+import { redis } from "../../config/redis";
 
 export class UserController {
   /**

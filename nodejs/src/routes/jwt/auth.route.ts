@@ -1,6 +1,6 @@
 import { Router } from "express";
 import passport from "passport";
-import { AuthController } from "../../controllers/auth.controller";
+import { AuthController } from "../../controllers/jwt/auth.controller";
 import {
   authenticateJWT,
   authenticateRefreshToken,

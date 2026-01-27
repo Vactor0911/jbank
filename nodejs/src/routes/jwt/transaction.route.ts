@@ -12,7 +12,7 @@ import {
   getAccountTransactionsQuerySchema,
   getTransactionSchema,
 } from "../../schema/transaction.schema";
-import TransactionController from "../../controllers/transaction.controller";
+import TransactionController from "../../controllers/jwt/transaction.controller";
 
 const transactionRouter = Router();
 

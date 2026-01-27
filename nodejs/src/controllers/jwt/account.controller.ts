@@ -1,7 +1,7 @@
 import { Response } from "express";
-import { APIResponse, JwtRequest } from "../types";
-import { asyncHandler } from "../utils/asyncHandler";
-import AccountService from "../services/account.service";
+import { APIResponse, JwtRequest } from "../../types";
+import { asyncHandler } from "../../utils/asyncHandler";
+import AccountService from "../../services/account.service";
 
 class AccountController {
   /**

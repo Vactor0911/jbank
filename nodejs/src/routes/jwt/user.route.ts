@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { authenticateJWT } from "../../middlewares/auth";
-import { UserController } from "../../controllers/user.controller";
+import { UserController } from "../../controllers/jwt/user.controller";
 import { csrfProtection } from "../../middlewares/csrf";
 import { validateParams } from "../../middlewares/validation";
 import { getAccountHolderSchema } from "../../schema/user.schema";

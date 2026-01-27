@@ -1,7 +1,7 @@
 import { Response } from "express";
-import { APIResponse, JwtRequest } from "../types";
-import { asyncHandler } from "../utils/asyncHandler";
-import { TransactionService } from "../services/transaction.service";
+import { APIResponse, JwtRequest } from "../../types";
+import { asyncHandler } from "../../utils/asyncHandler";
+import { TransactionService } from "../../services/transaction.service";
 
 class TransactionController {
   /**
