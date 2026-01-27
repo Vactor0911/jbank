@@ -1,11 +1,11 @@
 import { Router } from "express";
 import passport from "passport";
-import { AuthController } from "../controllers/auth.controller";
-import { authenticateJWT, authenticateRefreshToken } from "../middlewares/auth";
-import { csrfProtection } from "../middlewares/csrf";
-import { validateParams } from "../middlewares/validation";
-import { steamTokensSchema } from "../schema/auth.schema";
-import { limiter } from "../middlewares/rateLimiter";
+import { AuthController } from "../../controllers/auth.controller";
+import { authenticateJWT, authenticateRefreshToken } from "../../middlewares/auth";
+import { csrfProtection } from "../../middlewares/csrf";
+import { validateParams } from "../../middlewares/validation";
+import { steamTokensSchema } from "../../schema/auth.schema";
+import { limiter } from "../../middlewares/rateLimiter";
 
 const authRouter = Router();
 

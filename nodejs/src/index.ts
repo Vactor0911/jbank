@@ -3,12 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { errorHandler } from "./middlewares/errorHandler";
 import bodyParser from "body-parser";
-import {
-  accountRouter,
-  authRouter,
-  transactionRouter,
-  userRouter,
-} from "./routes";
+import webRouter from "./routes/jwt";
 import passport from "./config/passport";
 import "dotenv/config";
 import { limiter } from "./middlewares/rateLimiter";
@@ -50,10 +45,7 @@ app.get("/api/health", (_req: Request, res: Response) => {
 });
 
 // 라우트 정의
-app.use("/api/auth", authRouter);
-app.use("/api/user", userRouter);
-app.use("/api/account", accountRouter);
-app.use("/api/transaction", transactionRouter);
+app.use("/api/v1", webRouter);
 
 // 전역 오류 처리 미들웨어 등록
 app.use(errorHandler);

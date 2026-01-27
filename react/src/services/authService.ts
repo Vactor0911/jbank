@@ -26,7 +26,7 @@ class AuthService {
    * Steam 로그인 페이지 리다이렉트
    */
   static loginWithSteam() {
-    window.location.href = `${SERVER_HOST}/api/auth/steam`;
+    window.location.href = `${SERVER_HOST}/api/v1/auth/steam`;
   }
 
   /**
@@ -36,7 +36,7 @@ class AuthService {
   static async handleLoginSuccess(code: string) {
     // 서버에서 토큰 교환
     const response = await axiosInstance.get<LoginResponse>(
-      `/api/auth/steam/tokens/${code}`
+      `/api/v1/auth/steam/tokens/${code}`
     );
 
     const accessToken = response.data.accessToken;
@@ -56,7 +56,7 @@ class AuthService {
    * @returns 사용자 정보
    */
   static async getCurrentUser(): Promise<User> {
-    const response = await axiosInstance.get("/api/auth/me");
+    const response = await axiosInstance.get("/api/v1/auth/me");
     return response.data.user as User;
   }
 
@@ -65,7 +65,7 @@ class AuthService {
    */
   static async logout() {
     try {
-      await axiosInstance.post("/api/auth/logout");
+      await axiosInstance.post("/api/v1/auth/logout");
       store.set(userDataAtom, null);
       store.set(accountDataAtom, []);
       enqueueSnackbar("성공적으로 로그아웃되었어요.", { variant: "success" });

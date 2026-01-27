@@ -1,19 +1,19 @@
 import { Router } from "express";
-import { authenticateJWT } from "../middlewares/auth";
-import { csrfProtection } from "../middlewares/csrf";
+import { authenticateJWT } from "../../middlewares/auth";
+import { csrfProtection } from "../../middlewares/csrf";
 import {
   validateBody,
   validateParams,
   validateQuery,
-} from "../middlewares/validation";
+} from "../../middlewares/validation";
 import {
   createTransferTransactionSchema,
   getAccountTransactionsParamsSchema,
   getAccountTransactionsQuerySchema,
   getTransactionSchema,
-} from "../schema/transaction.schema";
-import TransactionController from "../controllers/transaction.controller";
-import { limiter } from "../middlewares/rateLimiter";
+} from "../../schema/transaction.schema";
+import TransactionController from "../../controllers/transaction.controller";
+import { limiter } from "../../middlewares/rateLimiter";
 
 const transactionRouter = Router();
 

@@ -1,14 +1,14 @@
 import { Router } from "express";
-import { authenticateJWT } from "../middlewares/auth";
-import AccountController from "../controllers/account.controller";
-import { csrfProtection } from "../middlewares/csrf";
-import { validateBody, validateParams } from "../middlewares/validation";
+import { authenticateJWT } from "../../middlewares/auth";
+import AccountController from "../../controllers/account.controller";
+import { csrfProtection } from "../../middlewares/csrf";
+import { validateBody, validateParams } from "../../middlewares/validation";
 import {
   createAccountSchema,
   getAccountSchema,
   getRecentAccountsSchema,
-} from "../schema/account.schema";
-import { limiter } from "../middlewares/rateLimiter";
+} from "../../schema/account.schema";
+import { limiter } from "../../middlewares/rateLimiter";
 
 const accountRouter = Router();
 
