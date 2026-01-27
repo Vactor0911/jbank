@@ -22,6 +22,7 @@ const getPalette = (mode: PaletteMode) => {
     },
     background: {
       default: mode === "light" ? "#F6F7F9" : "#18181A",
+      paper: mode === "light" ? "#FFFFFF" : "#242629",
     },
   };
 };
@@ -133,7 +134,7 @@ export const createLightTheme = () =>
       typography,
       shape,
       components: getComponents("light"),
-    })
+    }),
   );
 
 // 다크 테마 생성 (VS Code Dark Modern 기반)
@@ -147,7 +148,7 @@ export const createDarkTheme = () =>
       typography,
       shape,
       components: getComponents("dark"),
-    })
+    }),
   );
 
 // 기본 내보내기 (라이트 테마) - 기존 코드 호환성 유지
