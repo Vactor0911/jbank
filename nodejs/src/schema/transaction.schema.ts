@@ -40,3 +40,15 @@ export const createTransferTransactionSchema = z.object({
     .string("비밀번호는 문자열이어야 합니다.")
     .regex(/^\d{4}$/, "비밀번호는 숫자 4자리이어야 합니다."),
 });
+
+export const createBankTransferTransactionSchema = z.object({
+  receiverSteamId: z
+    .string("수취자 Steam 고유번호는 문자열이어야 합니다.")
+    .min(1, "수취자 Steam 고유번호는 비어 있을 수 없습니다."),
+  amount: z
+    .number("송금액은 숫자이어야 합니다.")
+    .positive("송금액이 올바르지 않습니다."),
+  password: z
+    .string("비밀번호는 문자열이어야 합니다.")
+    .regex(/^\d{4}$/, "비밀번호는 숫자 4자리이어야 합니다."),
+});

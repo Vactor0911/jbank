@@ -21,7 +21,7 @@ class TransactionController {
         userId,
         accountUuid,
         page,
-        limit
+        limit,
       );
 
       // 응답 전송
@@ -32,7 +32,7 @@ class TransactionController {
           transactions,
         },
       });
-    }
+    },
   );
 
   /**
@@ -46,7 +46,7 @@ class TransactionController {
       // 거래 조회
       const transaction = await TransactionService.getTransaction(
         userId,
-        transactionUuid
+        transactionUuid,
       );
 
       // 응답 전송
@@ -57,7 +57,7 @@ class TransactionController {
           transaction,
         },
       });
-    }
+    },
   );
 
   /**
@@ -75,7 +75,7 @@ class TransactionController {
         senderAccountNumber,
         receiverAccountNumber,
         amount,
-        password
+        password,
       );
 
       // 응답 전송
@@ -86,7 +86,7 @@ class TransactionController {
           transaction,
         },
       });
-    }
+    },
   );
 }
 

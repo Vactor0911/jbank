@@ -24,7 +24,7 @@ export class UserController {
           user,
         },
       });
-    }
+    },
   );
 
   /**
@@ -47,7 +47,7 @@ export class UserController {
           user: userData,
         },
       });
-    }
+    },
   );
 
   /**
@@ -81,7 +81,7 @@ export class UserController {
         success: true,
         message: "회원 탈퇴되었습니다.",
       });
-    }
+    },
   );
 
   /**
@@ -102,6 +102,6 @@ export class UserController {
           user: accountHolder,
         },
       });
-    }
+    },
   );
 }

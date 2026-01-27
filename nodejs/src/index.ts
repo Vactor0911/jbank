@@ -6,6 +6,7 @@ import bodyParser from "body-parser";
 import webRouter from "./routes/jwt";
 import passport from "./config/passport";
 import "dotenv/config";
+import bankRouter from "./routes/bank";
 
 const app = express();
 
@@ -42,6 +43,7 @@ app.get("/api/health", (_req: Request, res: Response) => {
 
 // 라우트 정의
 app.use("/api/v1", webRouter);
+app.use("/api/bank/v1", bankRouter);
 
 // 전역 오류 처리 미들웨어 등록
 app.use(errorHandler);

@@ -22,7 +22,7 @@ class AccountController {
           accounts,
         },
       });
-    }
+    },
   );
 
   /**
@@ -44,7 +44,7 @@ class AccountController {
           account,
         },
       });
-    }
+    },
   );
 
   /**
@@ -66,7 +66,7 @@ class AccountController {
           account: newAccount,
         },
       });
-    }
+    },
   );
 
   /**
@@ -80,7 +80,7 @@ class AccountController {
       // 최근 거래 계좌 조회
       const recentAccounts = await AccountService.getRecentAccounts(
         userId,
-        accountNumber
+        accountNumber,
       );
 
       // 응답 전송
@@ -91,7 +91,7 @@ class AccountController {
           recentAccounts,
         },
       });
-    }
+    },
   );
 }
 

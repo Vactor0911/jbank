@@ -26,7 +26,7 @@ class ApiKeyModel {
       `
         SELECT *
         FROM apikey
-        WHERE key = ?
+        WHERE apikey = ?
       `,
       [key],
     );
