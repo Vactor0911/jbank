@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Response } from "express";
 import { ApiKeyRequest, APIResponse, JwtRequest } from "../types";
 import { verifyAccessToken, verifyRefreshToken } from "../utils/jwt";
 import ApiKeyModel from "../models/apikey.model";
