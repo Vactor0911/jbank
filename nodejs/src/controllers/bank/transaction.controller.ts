@@ -94,7 +94,6 @@ class TransactionController {
         throw new NotFoundError("수취자 계좌를 찾을 수 없습니다.");
       }
       const userAccountNumber = userAccount[0].accountNumber;
-      console.log(userAccount[0].password, "userAccount password");
 
       // 출금 거래 생성
       const transaction = await TransactionService.createTransferTransaction(
