@@ -1,6 +1,8 @@
 import { NextFunction, Response } from "express";
-import { APIResponse, AuthRequest } from "../types";
+import { ApiKeyRequest, APIResponse, JwtRequest } from "../types";
 import { verifyAccessToken, verifyRefreshToken } from "../utils/jwt";
+import ApiKeyModel from "../models/apikey.model";
+import { mariaDB } from "../config/mariadb";
 
 /**
  * JWT 토큰 인증 미들웨어
@@ -9,9 +11,9 @@ import { verifyAccessToken, verifyRefreshToken } from "../utils/jwt";
  * @param next 다음 미들웨어 호출 함수
  */
 export const authenticateJWT = (
-  req: AuthRequest,
+  req: JwtRequest,
   res: Response<APIResponse>,
-  next: NextFunction
+  next: NextFunction,
 ): void => {
   // 헤더에서 토큰 추출
   const authHeader = req.headers["authorization"];
@@ -52,11 +54,7 @@ export const authenticateJWT = (
  * @param res API 응답 객체
  * @param next 다음 미들웨어 호출 함수
  */
-export const optionalAuth = (
-  req: AuthRequest,
-  res: Response,
-  next: NextFunction
-): void => {
+export const optionalAuth = (req: JwtRequest, next: NextFunction): void => {
   // 헤더에서 토큰 추출
   const authHeader = req.headers["authorization"];
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -78,10 +76,16 @@ export const optionalAuth = (
   next();
 };
 
+/**
+ * 리프레시 토큰 인증 미들웨어
+ * @param req API 요청 객체
+ * @param res API 응답 객체
+ * @param next 다음 미들웨어 호출 함수
+ */
 export const authenticateRefreshToken = (
-  req: AuthRequest,
+  req: JwtRequest,
   res: Response<APIResponse>,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   // 쿠키에서 Refresh Token 추출
   const refreshToken = req.cookies["refreshToken"];
@@ -106,4 +110,53 @@ export const authenticateRefreshToken = (
   // 요청에 사용자 정보 추가
   req.user = decoded;
   next();
+};
+
+/**
+ * API 키 인증 미들웨어
+ * @param req API 요청 객체
+ * @param res API 응답 객체
+ * @param next 다음 미들웨어 호출 함수
+ */
+export const authenticateApiKey = async (
+  req: ApiKeyRequest,
+  res: Response<APIResponse>,
+  next: NextFunction,
+) => {
+  try {
+    // 헤더에서 API 키 추출
+    const apiKey = req.headers["x-api-key"];
+    if (!apiKey) {
+      res.status(401).json({
+        success: false,
+        message: "API 키가 필요합니다.",
+      });
+      return;
+    } else if (!String(apiKey).startsWith("sk-bank-")) {
+      res.status(403).json({
+        success: false,
+        message: "유효하지 않은 API 키입니다.",
+      });
+      return;
+    }
+
+    // API 키 검증
+    const apiKeyModel = await ApiKeyModel.findByKey(
+      String(apiKey).slice(8),
+      mariaDB,
+    );
+    if (!apiKeyModel || apiKeyModel.status !== "active") {
+      res.status(403).json({
+        success: false,
+        message: "유효하지 않은 API 키입니다.",
+      });
+      return;
+    }
+
+    // 요청에 API 키 정보 추가
+    req.apiKey = apiKeyModel;
+    next();
+  } catch (error) {
+    next(error);
+  }
 };

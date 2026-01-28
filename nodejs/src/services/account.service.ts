@@ -163,6 +163,9 @@ class AccountService {
       if (recentAccount.accountNumber === accountNumber) {
         continue; // 자기 자신은 제외
       }
+      if (recentAccount.accountNumber === "0000-0000") {
+        continue; // 중앙 은행 계좌는 제외
+      }
 
       const formattedRecentAccount = {
         accountNumber: recentAccount.accountNumber,

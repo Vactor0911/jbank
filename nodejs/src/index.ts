@@ -3,15 +3,10 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { errorHandler } from "./middlewares/errorHandler";
 import bodyParser from "body-parser";
-import {
-  accountRouter,
-  authRouter,
-  transactionRouter,
-  userRouter,
-} from "./routes";
+import webRouter from "./routes/jwt";
 import passport from "./config/passport";
 import "dotenv/config";
-import { limiter } from "./middlewares/rateLimiter";
+import bankRouter from "./routes/bank";
 
 const app = express();
 
@@ -33,9 +28,6 @@ app.use(
 // Passport 초기화
 app.use(passport.initialize());
 
-// 전역 Rate Limiter 적용
-app.use("/api", limiter);
-
 // 기본 라우트 설정
 app.get("/", (_req: Request, res: Response) => {
   res.send("Jbank Express Server!");
@@ -50,10 +42,8 @@ app.get("/api/health", (_req: Request, res: Response) => {
 });
 
 // 라우트 정의
-app.use("/api/auth", authRouter);
-app.use("/api/user", userRouter);
-app.use("/api/account", accountRouter);
-app.use("/api/transaction", transactionRouter);
+app.use("/api/v1", webRouter);
+app.use("/api/bank/v1", bankRouter);
 
 // 전역 오류 처리 미들웨어 등록
 app.use(errorHandler);

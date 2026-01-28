@@ -36,7 +36,7 @@ class AccountModel {
         FROM account
         WHERE account_id = ?
       `,
-      [accountId]
+      [accountId],
     );
 
     if (!(account as any[])[0]) {
@@ -55,7 +55,7 @@ class AccountModel {
    */
   static async findByUuid(
     accountUuid: string,
-    connection: PoolConnection | Pool
+    connection: PoolConnection | Pool,
   ) {
     const [account] = await connection.execute(
       `
@@ -63,7 +63,7 @@ class AccountModel {
         FROM account
         WHERE account_uuid = ?
       `,
-      [accountUuid]
+      [accountUuid],
     );
 
     if (!(account as any[])[0]) {
@@ -87,7 +87,7 @@ class AccountModel {
         FROM account
         WHERE user_id = ?
       `,
-      [userId]
+      [userId],
     );
 
     if (!accounts) {
@@ -95,7 +95,36 @@ class AccountModel {
     }
 
     return (accounts as any[]).map((account: any) =>
-      this.formatAccount(account)
+      this.formatAccount(account),
+    );
+  }
+
+  /**
+   * 사용자 Steam 고유번호 로 계좌 조회
+   * @param steamId 사용자 Steam 고유번호
+   * @param connection MariaDB 연결 객체
+   * @returns 계좌 목록
+   */
+  static async findByUserSteamId(
+    steamId: string,
+    connection: PoolConnection | Pool,
+  ) {
+    const [accounts] = await connection.execute(
+      `
+        SELECT a.*
+        FROM account a
+        JOIN user u ON a.user_id = u.user_id
+        WHERE u.steam_id = ?
+      `,
+      [steamId],
+    );
+
+    if (!accounts) {
+      return [];
+    }
+
+    return (accounts as any[]).map((account: any) =>
+      this.formatAccount(account),
     );
   }
 
@@ -107,7 +136,7 @@ class AccountModel {
    */
   static async findByAccountNumber(
     accountNumber: string,
-    connection: PoolConnection | Pool
+    connection: PoolConnection | Pool,
   ) {
     const [account] = await connection.execute(
       `
@@ -115,7 +144,7 @@ class AccountModel {
         FROM account
         WHERE account_number = ?
       `,
-      [accountNumber]
+      [accountNumber],
     );
 
     if (!(account as any[])[0]) {
@@ -134,7 +163,7 @@ class AccountModel {
    */
   static async findByAccountNumberForUpdate(
     accountNumber: string,
-    connection: PoolConnection | Pool
+    connection: PoolConnection | Pool,
   ) {
     const [account] = await connection.execute(
       `
@@ -143,7 +172,7 @@ class AccountModel {
         WHERE account_number = ?
         FOR UPDATE
       `,
-      [accountNumber]
+      [accountNumber],
     );
 
     if (!(account as any[])[0]) {
@@ -168,14 +197,14 @@ class AccountModel {
     userId: string,
     accountNumber: string,
     password: string,
-    connection: PoolConnection | Pool
+    connection: PoolConnection | Pool,
   ) {
     const result = await connection.execute(
       `
         INSERT INTO account (account_uuid, user_id, account_number, password)
         VALUES (?, ?, ?, ?)
       `,
-      [accountUuid, userId, accountNumber, password]
+      [accountUuid, userId, accountNumber, password],
     );
 
     return result;
@@ -190,7 +219,7 @@ class AccountModel {
   static async withdraw(
     accountId: string,
     amount: number,
-    connection: PoolConnection | Pool
+    connection: PoolConnection | Pool,
   ) {
     await connection.execute(
       `
@@ -198,7 +227,7 @@ class AccountModel {
         SET credit = credit - ?
         WHERE account_id = ?;
       `,
-      [amount, accountId]
+      [amount, accountId],
     );
   }
 
@@ -211,7 +240,7 @@ class AccountModel {
   static async deposit(
     accountId: string,
     amount: number,
-    connection: PoolConnection | Pool
+    connection: PoolConnection | Pool,
   ) {
     await connection.execute(
       `
@@ -219,7 +248,7 @@ class AccountModel {
         SET credit = credit + ?
         WHERE account_id = ?;
       `,
-      [amount, accountId]
+      [amount, accountId],
     );
   }
 
@@ -231,7 +260,7 @@ class AccountModel {
    */
   static async findRecentAccountsByAccountId(
     accountId: string,
-    connection: PoolConnection | Pool
+    connection: PoolConnection | Pool,
   ) {
     const [accounts] = await connection.execute(
       `
@@ -245,7 +274,7 @@ class AccountModel {
         ORDER BY t.transaction_id DESC
         LIMIT 10;
       `,
-      [accountId, accountId, accountId]
+      [accountId, accountId, accountId],
     );
 
     if (!accounts) {
@@ -253,7 +282,7 @@ class AccountModel {
     }
 
     const formattedAccounts = (accounts as any[]).map((account: any) =>
-      this.formatAccount(account)
+      this.formatAccount(account),
     );
     return formattedAccounts;
   }

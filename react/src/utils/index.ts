@@ -35,7 +35,7 @@ export const formatNumberKor = (number: number): string => {
  * @returns 계좌번호 유효성 여부
  */
 export const isAccountNumberValid = (accountNumber: string): boolean => {
-  return /^\d{4}-\d{4}$/.test(accountNumber);
+  return /^(?!0000-0000$)\d{4}-\d{4}$/.test(accountNumber);
 };
 
 /**
