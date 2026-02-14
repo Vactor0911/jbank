@@ -16,7 +16,7 @@
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^7.3.6",
     "@mui/material": "^7.3.6",
-    "axios": "^1.13.2",
+    "axios": "^1.13.5",
     "gh-pages": "^6.3.0",
     "jotai": "^2.16.1",
     "notistack": "^3.0.2",
