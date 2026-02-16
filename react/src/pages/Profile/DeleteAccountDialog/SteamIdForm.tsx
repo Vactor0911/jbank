@@ -13,6 +13,7 @@ import {
   TextField,
   useTheme,
 } from "@mui/material";
+import { accountDataAtom } from "../../../states/account";
 
 const SteamIdForm = () => {
   const navigate = useNavigate();
@@ -35,6 +36,7 @@ const SteamIdForm = () => {
     await UserService.deleteAccount();
     apiClient.clearTokens();
     store.set(userDataAtom, null);
+    store.set(accountDataAtom, []);
     navigate("/");
   }, [navigate, store]);
 
