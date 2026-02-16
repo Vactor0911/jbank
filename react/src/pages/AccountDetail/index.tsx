@@ -25,6 +25,7 @@ import TransactionService, {
   type TransactionData,
 } from "../../services/transactionService";
 import TransactionButton from "./TransactionButton";
+import { enqueueSnackbar } from "notistack";
 
 const RefreshAnimation = keyframes`
   0% {
@@ -46,7 +47,7 @@ const AccountDetail = () => {
   const [isFetchSuccess, setIsFetchSuccess] = useState<boolean | null>(null);
   const [accountData, setAccountData] = useState<AccountData | null>(null);
   const [transactionsData, setTransactionsData] = useState<TransactionData[]>(
-    []
+    [],
   );
 
   // 계좌 정보 조회 핸들러
@@ -71,7 +72,7 @@ const AccountDetail = () => {
       if (accountResponse.data.success) {
         setAccountData(accountResponse.data.data.account as AccountData);
         setTransactionsData(
-          transactionsResponse.data.data.transactions as TransactionData[]
+          transactionsResponse.data.data.transactions as TransactionData[],
         );
       }
 
@@ -99,7 +100,7 @@ const AccountDetail = () => {
       const response = await TransactionService.fetchAccountTransactions(
         accountUuid,
         page,
-        10
+        10,
       );
       if (response.data.success) {
         setTransactionsData((prev) => [
@@ -160,6 +161,7 @@ const AccountDetail = () => {
   const handleAccountNumberCopy = useCallback(() => {
     if (accountData?.accountNumber) {
       navigator.clipboard.writeText(accountData.accountNumber);
+      enqueueSnackbar("계좌번호가 복사되었어요.", { variant: "success" });
     }
   }, [accountData]);
 
