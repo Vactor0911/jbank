@@ -55,7 +55,7 @@ export class AuthService {
         // 토큰 반환
         const tokens = { accessToken, refreshToken, csrfToken };
         return tokens;
-      }
+      },
     );
 
     return tokens;

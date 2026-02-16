@@ -13,6 +13,7 @@ import { useCallback, useEffect } from "react";
 import AuthService from "../services/authService";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import UserService from "../services/userService";
+import { enqueueSnackbar } from "notistack";
 
 const Login = () => {
   const isMobile = useIsMobile();
@@ -42,27 +43,60 @@ const Login = () => {
       navigate("/");
       return;
     } else {
-      alert("로그인에 실패했습니다. 다시 시도해주세요.");
+      enqueueSnackbar(
+        <>
+          로그인에 실패했어요.
+          <br />
+          다시 시도해주세요.
+        </>,
+        { variant: "error" },
+      );
       navigate("/login");
     }
   }, [code, navigate]);
-
-  // 로그인 실패 처리
-  const handleLoginError = useCallback(() => {
-    if (error) {
-      alert("로그인에 실패했습니다. 다시 시도해주세요.");
-      navigate("/login");
-    }
-  }, [error, navigate]);
 
   // 페이지 로드 시 로그인 성공 또는 실패 처리
   useEffect(() => {
     if (code) {
       handleLoginSuccess();
     } else if (error) {
-      handleLoginError();
+      switch (error) {
+        case "account_deleted":
+          enqueueSnackbar(
+            <>
+              삭제된 계정이에요.
+              <br />
+              관리자에게 문의해주세요.
+            </>,
+            { variant: "error" },
+          );
+          break;
+        case "account_banned":
+          enqueueSnackbar(
+            <>
+              차단된 계정이에요.
+              <br />
+              관리자에게 문의해주세요.
+            </>,
+            { variant: "error" },
+          );
+          break;
+        default:
+          enqueueSnackbar(
+            <>
+              로그인에 실패했어요.
+              <br />
+              다시 시도해주세요.
+            </>,
+            { variant: "error" },
+          );
+          break;
+      }
+
+      // 로그인 페이지로 리다이렉트
+      navigate("/login");
     }
-  }, [code, error, handleLoginError, handleLoginSuccess]);
+  }, [code, error, handleLoginSuccess, navigate]);
 
   return (
     <Paper
