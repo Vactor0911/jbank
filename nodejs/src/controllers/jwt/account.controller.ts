@@ -31,7 +31,7 @@ class AccountController {
   static getAccount = asyncHandler(
     async (req: JwtRequest, res: Response<APIResponse>) => {
       const { userId } = req.user as { userId: string };
-      const { accountUuid } = req.params;
+      const accountUuid = req.params.accountUuid as string;
 
       // 계좌 정보 조회
       const account = await AccountService.getAccount(userId, accountUuid);
@@ -75,7 +75,7 @@ class AccountController {
   static getRecentAccounts = asyncHandler(
     async (req: JwtRequest, res: Response<APIResponse>) => {
       const { userId } = req.user as { userId: string };
-      const { accountNumber } = req.params;
+      const accountNumber = req.params.accountNumber as string;
 
       // 최근 거래 계좌 조회
       const recentAccounts = await AccountService.getRecentAccounts(

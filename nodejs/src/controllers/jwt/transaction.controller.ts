@@ -10,7 +10,7 @@ class TransactionController {
   static getAccountTransactions = asyncHandler(
     async (req: JwtRequest, res: Response<APIResponse>) => {
       const { userId } = req.user as { userId: string };
-      const { accountUuid } = req.params;
+      const accountUuid = req.params.accountUuid as string;
       const { page = 1, limit = 10 } = req.query as {
         page?: number;
         limit?: number;
@@ -41,7 +41,7 @@ class TransactionController {
   static getTransaction = asyncHandler(
     async (req: JwtRequest, res: Response<APIResponse>) => {
       const { userId } = req.user as { userId: string };
-      const { transactionUuid } = req.params;
+      const transactionUuid = req.params.transactionUuid as string;
 
       // 거래 조회
       const transaction = await TransactionService.getTransaction(
