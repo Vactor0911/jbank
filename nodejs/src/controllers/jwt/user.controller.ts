@@ -89,7 +89,7 @@ export class UserController {
    */
   static getAccountHolder = asyncHandler(
     async (req: JwtRequest, res: Response<APIResponse>) => {
-      const { accountNumber } = req.params;
+      const accountNumber = req.params.accountNumber as string;
 
       // 예금주 조회
       const accountHolder = await UserService.getAccountHolder(accountNumber);

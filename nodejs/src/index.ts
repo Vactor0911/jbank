@@ -2,8 +2,7 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { errorHandler } from "./middlewares/errorHandler";
-import bodyParser from "body-parser";
-import webRouter from "./routes/jwt";
+import webRouter from "./routes/web";
 import passport from "./config/passport";
 import "dotenv/config";
 import bankRouter from "./routes/bank";
@@ -13,7 +12,6 @@ const app = express();
 app.set("trust proxy", 2);
 
 app.use(express.json());
-app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser(process.env.COOKIE_SECRET));
 
