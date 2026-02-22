@@ -46,8 +46,8 @@ jobs:
           git config --global url."https://${{ secrets.GH_TOKEN }}@github.com/".insteadOf "https://github.com/"
 
       - name: Deploy to GitHub Pages
-        run: pnpm run deploy -- --repo https://github.com/${{ github.repository }}.git
         working-directory: ./react
+        run: pnpm exec gh-pages -d dist --repo https://github.com/${{ github.repository }}.git
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           VITE_SERVER_HOST: ${{ secrets.VITE_SERVER_HOST }}
