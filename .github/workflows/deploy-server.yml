@@ -24,7 +24,6 @@ jobs:
             set -e
             cd ~/jbank/nodejs/
             git pull origin main
-            cd backend
             pnpm install
             pnpm run build
             pm2 restart "jbank"
