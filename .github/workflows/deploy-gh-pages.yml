@@ -23,18 +23,18 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./react
-        run: npm install
+        run: pnpm install
 
       - name: Build the app
         working-directory: ./react
-        run: npm run build
+        run: pnpm run build
 
       - name: Set up GitHub token for authentication
         run: |
           git config --global url."https://${{ secrets.GH_TOKEN }}@github.com/".insteadOf "https://github.com/"
 
       - name: Deploy to GitHub Pages
-        run: npm run deploy -- --repo https://github.com/${{ github.repository }}.git
+        run: pnpm run deploy -- --repo https://github.com/${{ github.repository }}.git
         working-directory: ./react
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
