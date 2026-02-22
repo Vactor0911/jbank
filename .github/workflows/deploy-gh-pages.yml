@@ -40,6 +40,8 @@ jobs:
       - name: Build the app
         working-directory: ./react
         run: pnpm run build
+        env:
+          VITE_SERVER_HOST: ${{ secrets.VITE_SERVER_HOST }}
 
       - name: Set up GitHub token for authentication
         run: |
@@ -50,4 +52,3 @@ jobs:
         run: pnpm exec gh-pages -d dist --repo https://github.com/${{ github.repository }}.git
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          VITE_SERVER_HOST: ${{ secrets.VITE_SERVER_HOST }}
