@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { errorHandler } from "./middlewares/errorHandler";
-import webRouter from "./routes/jwt";
+import webRouter from "./routes/web";
 import passport from "./config/passport";
 import "dotenv/config";
 import bankRouter from "./routes/bank";
